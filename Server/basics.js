@@ -58,4 +58,23 @@ console.log(firstName.toLowerCase());
 console.log(firstName.toUpperCase());
 console.log(firstName.length);
 
+let IsStudent = true;
+let IsinHall = false;
+console.log(IsStudent && IsinHall)
+console.log(IsStudent || IsinHall)
+
+//Arrays
+
+let fruits = ["mangoes", "oranges", "grapes"]
+console.log(fruits);
+
+//appending items 
+fruits.push("apples");
+fruits.push("pineapples");
+
+//removing values from the array
+fruits.pop()
+console.log(fruits)
+
+//Objects 
 
