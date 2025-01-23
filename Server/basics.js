@@ -77,4 +77,44 @@ fruits.pop()
 console.log(fruits)
 
 //Objects 
+let credentials = {
+    "email": "chmuganga@ucu.ac.ug",
+    "password": "123456"
+}
 
+let signUp = {
+    "name": "John Wick",
+    "age" : "35",
+    "country": "USA",
+    "city": "New York",
+    "email" : "johnwick@gmail.com",
+    "password" : 123456,
+    "contact" : "12345678"
+}
+
+console.log(signUp.email);
+console.log(signUp);
+signUp["username"] = "Boogieman"
+signUp["confirmPassword"] = "123456"
+console.log(signUp);
+console.log(signUp.name);
+
+//comparison operators
+console.log(signUp.password == signUp.confirmPassword)
+console.log(signUp.password === signUp.confirmPassword)
+
+// for in loop
+// for(initialization in storage){
+//     results
+// }
+for(n in fruits) {
+    console.log(fruits[n]);
+}
+
+// for of loop
+// for(initialization of storage){
+//     results
+// }
+for(n of fruits) {
+    console.log(n);
+}
