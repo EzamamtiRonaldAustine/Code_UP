@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Jon Charles",
+    "email": "jon@gmail.com",
+    "password": "$2b$10$B3YDP0MgEpa3Eygrj1XMRObO0/VV9Nq70W/yzMVx5KEnBUz0FX9Ty"
+  },
+  {
+    "name": "Sir Charles",
+    "email": "char@gmail.com",
+    "password": "$2b$10$tE0P25t7FH.UPsHdw9fd3O8gGJWl0WHXGxKrzUzZ/Ez0ePQ8EV0oq"
+  },
+  {
+    "name": "Elon Musk",
+    "email": "elon@gmail.com",
+    "password": "$2b$10$Q7xRU52KidDun4NiaTItOO/5emCffcwM/rUwjv4bf88InS/yYjnme"
+  },
+  {
+    "name": "Ronald A",
+    "email": "ron@gmail.com",
+    "password": "$2b$10$oyZ9XsJRJ/QHI4C4GWCNp.OFb1GijufpoMCQn9NZYBJiKz58AJHpC"
+  }
+]
