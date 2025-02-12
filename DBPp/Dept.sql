@@ -31,3 +31,18 @@ INSERT INTO employee VALUES
 -- DROP TABLE employee;
 
 SELECT * FROM employee
+
+START TRANSACTION;
+UPDATE Employee SET Salary = 80000, Job = 'Cleaner' WHERE EmpNo = 'E004';
+
+DELETE FROM Employee WHERE EmpNo = 'E002';
+
+DESC Employee;
+
+SELECT * FROM employee
+
+ROLLBACK;
+
+DESC Employee;
+
+SELECT * FROM employee
