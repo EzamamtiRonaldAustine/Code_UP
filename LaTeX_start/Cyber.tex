@@ -1,0 +1,123 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[a4paper,margin=1.8cm,top=1.5cm,bottom=1.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  filecolor=black,
+  urlcolor=black
+}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{graphicx}  % For including the logo
+\usepackage{titlesec}  % For title formatting
+\setstretch{1.5}
+\renewcommand{\contentsname}{Table of Contents}
+\usepackage{tocbibind}
+\setlength{\parindent}{0pt}
+\usepackage{longtable}
+
+
+\begin{document}
+% Cover Page
+\begin{titlepage}
+    \begin{center}
+    \vspace{2.5cm}  
+        % Logo Placeholder
+        \includegraphics[width=17cm]{img/UCU.png} \\[1.5cm] % Adjust width as needed
+        
+        {\LARGE \textbf{A Report on the Most Significant Cyber Attacks in the Last Five Years}} \\[1cm]
+
+        {  \Large \textbf{by}} \\[1cm]
+        
+        \Large \textbf{Ezamamti Ronald Austine}  \\[0.5cm]
+        
+        \textbf{BSCS 2:2} \\[0.5cm]
+        
+        \textbf{S23B23/018} \\[0.5cm]
+        
+        \textbf{B24252} \\[1cm]
+
+        \textbf{Date: February 15, 2025}
+    \end{center}
+\end{titlepage}
+
+
+\begin{center}
+\vspace{2.5cm}
+\begin{abstract}
+\noindent This report explores the most significant cybersecurity threats in the past five years, detailing their attack techniques, impact, and mitigation strategies. The study includes high-profile incidents such as the NVIDIA Cyberattack, Microsoft Exchange Server attack, Ukraine Cyber Warfare, Black Basta Ransomware, Pegasus Spyware, and the Red Cross Data Breach. The report highlights evolving cyber tactics from analyzing the threats using the MITRE ATT\&CK framework and proposing defensive measures.
+\end{abstract}
+\end{center}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+The evolution of cyber threats has accelerated over the past five years, affecting various industries, including technology, finance, healthcare, and humanitarian organizations. Advanced Persistent Threats (APTs), ransomware, and state-sponsored cyber warfare by Cybercriminals have become more sophisticated, necessitating robust security frameworks.
+
+\section{Most Significant Cybersecurity Threats (2019-2024)}
+
+\subsection{NVIDIA Cyberattack (2022)}
+\textbf{Industry Affected:} Technology \\
+\textbf{How It Worked:} Lapsus\$ hacking group infiltrated NVIDIA's systems, stealing 1TB of sensitive data, including employee credentials and proprietary chip designs. The attack involved credential stuffing and social engineering \cite{lap2022}.\\
+\textbf{Impact:} Leak of confidential data, potential supply chain vulnerabilities, and financial loss.\\
+\textbf{Mitigation Strategies:} Enforcing MFA (Multi-Factor Authentication), zero-trust security models, and employee cybersecurity awareness training.
+
+\subsection{Microsoft Exchange Server Attack (2021)}
+\textbf{Industry Affected:} Government, Corporations \\
+\textbf{How It Worked:} Hafnium, a Chinese APT group, exploited zero-day vulnerabilities (CVE-2021-26855) in Microsoft Exchange, enabling remote code execution and email exfiltration \cite{hafnium2021}.\\
+\textbf{Impact:} Unauthorized email access, data breaches affecting thousands of enterprises, and prolonged downtime.\\
+\textbf{Mitigation Strategies:} Prompt patching, network segmentation, and behavioral monitoring to detect unusual activities.
+
+\subsection{Ukraine Cyber Warfare (2022-2023)}
+\textbf{Industry Affected:} Government, Energy, Critical Infrastructure \\
+\textbf{How It Worked:} Russia-linked cyber groups deployed wiper malware (HermeticWiper, WhisperGate) and DDoS attacks to cripple Ukrainian government and financial institutions \cite{ukraine2023}.\\
+\textbf{Impact:} Disruptions to military operations, financial instability, and loss of public trust.\\
+\textbf{Mitigation Strategies:} Incident response teams, international cyber alliances, and enhanced cloud-based security infrastructures.
+
+
+
+
+
+\subsection{Black Basta Ransomware (2021)}
+\textbf{Industry Affected:} Healthcare, Manufacturing \\
+\textbf{How It Worked:} Black Basta uses double extortion tactics—encrypting files and threatening to release stolen data if ransom is not paid \cite{blackbasta2022}.\\
+\textbf{Impact:} Data breaches, financial loss, operational disruptions in hospitals and industries.\\
+\textbf{Mitigation Strategies:} Regular backups, air-gapped storage, and endpoint detection and response (EDR) solutions.
+
+\subsection{Pegasus Spyware (2021)}
+\textbf{Industry Affected:} Government, Journalism, Human Rights \\
+\textbf{How It Worked:} The NSO Group's Pegasus spyware exploited zero-click iOS and Android vulnerabilities, enabling attackers to remotely access calls, messages, and cameras \cite{pegasus2021}.\\
+\textbf{Impact:} Targeted surveillance of journalists, politicians and activists, leading to violations of privacy and diplomatic tensions.\\
+\textbf{Mitigation Strategies:} Regular OS updates, strict app permissions, and mobile threat intelligence solutions.
+
+\subsection{Red Cross Data Breach (2022)}
+\textbf{Industry Affected:} Humanitarian, Non-Profit \\
+\textbf{How It Worked:} Attackers gained unauthorized access to Red Cross servers, compromising personal data of over 515,000 individuals \cite{redcross2022}.\\
+\textbf{Impact:} Exposure of sensitive information of displaced persons, loss of trust in humanitarian organizations.\\
+\textbf{Mitigation Strategies:} Zero-trust security models, encrypted databases, and continuous network monitoring.
+
+\section{Conclusion}
+The past five years have demonstrated an alarming increase in cyber threats targeting various industries. Attackers have employed sophisticated techniques, ranging from state-sponsored malware to ransomware-as-a-service (RaaS). Strengthening cybersecurity through proactive defense mechanisms, international collaborations, and policy regulations remains crucial. Additionally, as quantum computing and AI-driven cyberattacks emerge, future security policies must evolve to counteract these ever-growing risks.
+
+% \section{References}
+\begin{thebibliography}{9}
+\bibitem{lap2022} S. Abrams, ``Lapsus\$ Hackers Leak 1TB of NVIDIA Data, Demand Open-Source Drivers,'' Cybersecurity News, 2022.
+
+\bibitem{hafnium2021} M. Kumar, ``Microsoft Exchange Server Hack: Everything You Need to Know,'' The Hacker News, 2021. 
+
+\bibitem{ukraine2023} S. Goodin, ``Ukraine Hit by New Wiper Malware Attacks as Russia Invades,'' Ars Technica, 2023.
+
+\bibitem{blackbasta2022} J. McCarthy, ``Black Basta Ransomware Gang Targets US Healthcare System,'' SecurityWeek, 2022.
+
+\bibitem{pegasus2021} C. Marczak, ``The Pegasus Project: Tracking NSO Group’s Spyware,'' Amnesty International Report, 2021. URL: \url{https://www.amnesty.org/en/latest/research/2021/07/the-pegasus-project/}.
+
+\bibitem{redcross2022} R. Labrecque and A. Mahmoud, ``Data Security Breaches and Their Impact on NGOs: The Case of the Red Cross Attack,'' Computers in Human Behavior, vol. 114, 2022.
+\end{thebibliography}
+
+\end{document}
