@@ -1,4 +1,5 @@
 -- Active: 1738051755016@@127.0.0.1@3306@bscs
+USE BSCS;;
 SHOW TABLES;
 
 SELECT * FROM employee;

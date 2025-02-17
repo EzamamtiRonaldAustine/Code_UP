@@ -1,3 +1,6 @@
+-- Active: 1738051755016@@127.0.0.1@3306@bscs2
+USE bscs2;
+
 CREATE TABLE programme(PID VARCHAR(20) PRIMARY KEY, PNAME VARCHAR(20));
 DESC programme;
 

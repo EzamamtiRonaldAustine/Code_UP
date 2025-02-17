@@ -1,4 +1,4 @@
--- Active: 1708672519100@@127.0.0.1@3306@bscs2
+-- Active: 1738051755016@@127.0.0.1@3306@bscs
 -- CREATE DATABASE bscs2;
 
 CREATE TABLE doctor(did VARCHAR(20) PRIMARY key, dname VARCHAR(20), speciality VARCHAR(20));
