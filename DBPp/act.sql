@@ -141,6 +141,18 @@ SELECT * FROM project;
 
 SELECT * FROM department;
 
+SELECT e.*, d.DName, d.Loc FROM employee e JOIN department d ON e.DeptNo = d.DeptNo;
+
+SELECT p.ProjID, p.ProjName, d.DName, d.Loc FROM project p JOIN department d ON p.DeptNo = d.DeptNo;
+
+SELECT e.EmpNo, e.Ename, e.Job, e.Salary, d.DName AS Department, p.ProjName AS Project
+FROM employee e JOIN department d ON e.DeptNo = d.DeptNo JOIN project p ON d.DeptNo = p.DeptNo ;
+
+SELECT p.ProjName AS Project, d.DName AS Department, e.Ename AS Employee, e.Job 
+FROM project p JOIN department d ON p.DeptNo = d.DeptNo JOIN employee e ON d.DeptNo = e.DeptNo 
+ORDER BY p.ProjName;
+
+
 
 
 
