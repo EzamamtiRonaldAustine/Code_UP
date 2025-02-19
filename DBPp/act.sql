@@ -120,7 +120,26 @@ SELECT salary, job FROM employee ORDER BY salary , job DESC;
 SELECT salary, job FROM employee ORDER BY salary , job;
 
 
+CREATE TABLE Project (
+    ProjID INT PRIMARY KEY AUTO_INCREMENT,
+    ProjName VARCHAR(100) NOT NULL,
+    DeptNo INT, 
+    FOREIGN KEY (DeptNo) REFERENCES department(DeptNo)
+);
 
+-- ALTER TABLE Project ADD COLUMN AssignedDate DATE, ADD COLUMN role ENUM
+
+ALTER TABLE project ADD COLUMN EmpNo VARCHAR(20), ADD FOREIGN KEY (EmpNo) REFERENCES employee(EmpNo);
+
+INSERT INTO project(ProjName, DeptNo, EmpNo) VALUES
+    ("Sales Boost", 10, "E003"),
+    ("Marketing Expansion", 40, "E005"),
+    ("Accounting Automation", 30, "E007"),
+    ("Sales Strategy", 10, "E006");
+
+SELECT * FROM project;
+
+SELECT * FROM department;
 
 
 
