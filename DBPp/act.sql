@@ -127,7 +127,7 @@ CREATE TABLE Project (
     FOREIGN KEY (DeptNo) REFERENCES department(DeptNo)
 );
 
--- ALTER TABLE Project ADD COLUMN AssignedDate DATE, ADD COLUMN role ENUM
+ALTER TABLE Project ADD COLUMN AssignedDate DATE, ADD COLUMN role VARCHAR(225);
 
 ALTER TABLE project ADD COLUMN EmpNo VARCHAR(20), ADD FOREIGN KEY (EmpNo) REFERENCES employee(EmpNo);
 
@@ -152,8 +152,22 @@ SELECT p.ProjName AS Project, d.DName AS Department, e.Ename AS Employee, e.Job
 FROM project p JOIN department d ON p.DeptNo = d.DeptNo JOIN employee e ON d.DeptNo = e.DeptNo 
 ORDER BY p.ProjName;
 
+SELECT e.EmpNo, e.Ename, e.Job, d.DName AS Department, p.ProjName AS Project
+FROM employee e JOIN department d ON e.DeptNo = d.DeptNo 
+JOIN project p ON d.DeptNo = p.DeptNo 
+WHERE e.Salary > 40000;
 
+SELECT d.DName AS Department, p.ProjName AS Project, COUNT(e.EmpNo) AS Num_Employees
+FROM employee e JOIN department d ON e.DeptNo = d.DeptNo 
+JOIN project p ON d.DeptNo = p.DeptNo 
+GROUP BY d.DName, p.ProjName;
 
+SELECT e.EmpNo, e.Ename, e.Job, d.DName AS Department, p.ProjName AS Project
+FROM employee e JOIN department d ON e.DeptNo = d.DeptNo 
+JOIN project p ON d.DeptNo = p.DeptNo 
+WHERE e.Job = "Manager";
+
+UPDATE employee SET Salary = 45000 WHERE EmpNo = "E003";
 
 
 
