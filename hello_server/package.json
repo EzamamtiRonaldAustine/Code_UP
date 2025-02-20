@@ -1,0 +1,23 @@
+{
+  "name": "hello",
+  "version": "1.0.0",
+  "description": "Coding and Practice",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EzamamtiRonaldAustine/Code_UP.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EzamamtiRonaldAustine/Code_UP/issues"
+  },
+  "homepage": "https://github.com/EzamamtiRonaldAustine/Code_UP#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
