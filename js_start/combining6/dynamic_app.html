@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic_app</title>
+    <!-- Link to CSS for styling the page -->
+    <link rel="stylesheet" href="./styles/general_styles.css">
+    
+    <!-- JavaScript file for dynamic actions -->
+    <script src="./actions/action_it.js"></script>   
+   
+</head>
+<body onload="greet()">
+
+    <button onclick ="alert('Hello Uso')">Click me</button> <!-- Alert on button click -->
+    <p id="text">This is the first HTML, CSS and Javascript</p> <!-- Initial text -->
+    <button onclick="Changetext()">Change Text</button> <!-- Button to change text -->
+    <br>
+    <br>
+    <button id="changeColorButton">Change Color</button> <!-- Button to change background color -->
+    <input type="text" id="colorInput" placeholder="Enter a color (e.g red, blue)"> <!-- Text input for color -->
+    <input type="color" id="colorPicker" value="#BA55D3"> <!-- Color picker input -->
+    <br>
+    <br>
+    <button id="click">Internal Javascript</button> <!-- Button for internal JS actions -->
+
+    
+    <script>
+        const buttonId = document.getElementById('click'); // Get button element
+
+        buttonId.onclick = function(){
+            alert('The button was clicked');
+        }
+        buttonId.onmouseover = function(){
+            document.getElementById('click').style.color = 'red';
+        }
+        buttonId.onmouseout = function(){
+            document.getElementById('click').style.color = 'blue';
+        }
+    </script>
+</body>
+</html>
