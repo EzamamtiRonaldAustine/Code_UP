@@ -1,6 +1,6 @@
 import './App.css';
 //component
-function Square(){
+function Square({value}) {
   return <button className="square">1</button>;
 }
 function App() {
