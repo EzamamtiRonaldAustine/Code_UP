@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry,times}
+\geometry{a4paper, margin=1in,top=2cm}
+\usepackage{titlesec}  % For title formatting
+\onehalfspacing
+\usepackage{setspace}
+
+\title{\LARGE\textbf{Cybersecurity Analysis On Email Headers}}
+\date{}
+
+\begin{document}
+\vspace{-5cm}
+\maketitle
+\vspace{-1.5cm}
+\begin{center}
+\large\textbf{By}\\
+\vspace{0.5cm}
+\large\textbf{Name:} Ezamamti Ronald Austine \\ 
+\vspace{0.5cm}
+\large\textbf{RegNo: S23B23/018}\\
+\vspace{0.5cm}
+\large\textbf{Access No:} B24252
+\end{center}
+
+\vspace{1cm}
+\section*{Steps to Retrieve Email Headers Using SysTools PST Viewer}
+To analyze the email headers, I used SysTools PST Viewer. The steps followed are:
+\begin{itemize}
+    \item Open SysTools PST Viewer and load the PST file containing the outlook email.
+    \item Navigate to the email in question and select it.
+    \item Click on the \textbf{Message Header} option to view the detailed email header information.
+    \item Copy the email header details for further analysis in a txt file.
+    \item Upload the txt file to the analysis tool like the phishing tool for verification of the header details.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{img/ks0.png}
+    \caption{Message Header}
+    \label{fig:email_header}
+\end{figure}
+
+\section*{Questions}
+
+\subsection*{What are the From and Return-Path email addresses? Do they match?}
+\textbf{From:} \texttt{"alison@m57.biz" <tuckgorge@gmail.com>}\\
+\textbf{Return-Path:} \texttt{simson@xy.dreamhostps.com}\\
+\textbf{Do they match?}No, they do not match. The sender's email address is disguised to appear as \texttt{"alison@m57.biz"}, but the actual sending email is \texttt{tuckgorge@gmail.com}, and the return path is different \\ (\texttt{simson@xy.dreamhostps.com}), indicating possible email spoofing.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/phh2.png}
+    \caption{Email Header Showing Mismatch in From and Return-Path Addresses on the phishtool}
+    \label{fig:email_header}
+\end{figure}
+
+\subsection*{What is the name of the sending computer or server?}
+The email was sent via \texttt{xy.dreamhostps.com} (\texttt{apache2-xy.xy.dreamhostps.com}).\\
+The originating IP address is \texttt{208.97.188.9}, which resolves to \texttt{ip-208-97-188-9.dreamhost.com}.
+
+\subsection*{What website is linked to "Grant funding request." in the message?}
+
+\subsection*{How likely is it that this message is spam?}
+Indicators of spam:
+\begin{itemize}
+    \item The DMARC verification was \textbf{FAIL}, which suggests potential spoofing.
+    \item The \textbf{From} address and \textbf{Return-Path} do not match.
+    \item The email lacks \textbf{DKIM signatures}, reducing authenticity.
+    \item The sender is pretending to be "Alison from m57.biz", but the real email is \texttt{tuckgorge@gmail.com}.
+    \item The \textbf{Return-Path} shows a different domain, possibly indicating a phishing attempt.
+\end{itemize}
+Thus the message is high regarded as a spam
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/phh4.png}
+    \caption{Security analysis on phishtool}
+    \label{fig:phishing_signs}
+\end{figure}
+
+\newpage
+\subsection*{What type of social engineering attack is presented, and what are the red flags?}
+\textbf{Type of Social Engineering Attack:} Email Spoofing and Impersonation
+
+\textbf{Red Flags in the Email:}
+\begin{itemize}
+    \item \textbf{Sender Mismatch:} The sender appears to be Alison (\texttt{alison@m57.biz}), but the actual sending email is \texttt{tuckgorge@gmail.com}.
+    \item \textbf{Return-Path Mismatch:} Instead of being linked to \texttt{m57.biz}, the email originated from \texttt{dreamhostps.com}.
+    \item \textbf{DMARC Failure:} Indicating the email is likely spoofed.
+    \item \textbf{Absence of DKIM Signature:} No cryptographic validation of the sender.
+    \item \textbf{No SPF Record:} Makes it easier for attackers to spoof emails.
+\end{itemize}
+
+\newpage
+\section*{Appendix}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/ks4.png}
+    \caption{Email analysis on SysTools PST}
+    \label{fig:phishing_signs}
+\end{figure}
+
+\vspace{1.5cm}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/PHH5.png}
+    \caption{Message Hops}
+    \label{fig:phishing_signs}
+\end{figure}
+
+\end{document}
