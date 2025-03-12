@@ -49,4 +49,16 @@ DROP PROCEDURE jobsum;
 
 CALL jobsum('manager')/
 
+CREATE PROCEDURE job_hr(in id3 VARCHAR(20), in id4 INT)
+BEGIN
+SELECT COUNT(*) FROM employee WHERE job = id3 AND DeptNo = id4;
+
+end/
+
+DESC employee;
+
+CALL job_hr('manager', 10)/
+
+
+
 
