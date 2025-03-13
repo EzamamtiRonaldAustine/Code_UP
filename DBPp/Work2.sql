@@ -1,0 +1,94 @@
+CREATE DATABASE WORK2;
+
+USE WORK2;
+
+CREATE TABLE Donation(
+    DonorID VARCHAR(20) PRIMARY KEY,
+    Department VARCHAR(20),
+    Amount INT);
+
+INSERT INTO Donation(DonorID, Department, Amount) VALUES
+    ('D/25','CT',25000),
+    ('D/67','SOT',12000),
+    ('D/45','CT', 15000),
+    ('D/46','SOB', NULL),
+    ('D/50','SDT',11000);
+
+
+
+DELIMITER /
+
+CREATE PROCEDURE Procedure1(in id1 VARCHAR(20))
+BEGIN
+    SELECT MIN(Amount) AS LeastAmount
+    FROM Donation
+    WHERE Department = id1 AND Amount IS NOT NULL;
+END/
+
+DROP PROCEDURE Procedure1;
+
+CALL PROCEDURE1('CT');
+
+CREATE PROCEDURE PROCEDURE2(in id2 VARCHAR(20))
+BEGIN
+SELECT SUM(amount) AS Total_amount FROM donation WHERE department = id2;
+end/
+
+DROP PROCEDURE PROCEDURE2;
+CALL PROCEDURE2('CT');
+
+CALL PROCEDURE2('SOT');
+
+CALL PROCEDURE2('SOB');
+
+
+
+
+CREATE PROCEDURE PROCEDURE3(in id3 VARCHAR(20))
+BEGIN 
+DELETE FROM donation WHERE department = id3 AND amount = NULL;
+END/
+
+
+DROP PROCEDURE PROCEDURE3;
+
+CALL PROCEDURE3('SOB');
+
+SELECT * FROM donation;
+
+
+
+CREATE PROCEDURE PROCEDURE4(in id4 VARCHAR(20), IN id5 VARCHAR(20))
+BEGIN 
+UPDATE donation SET department = id5 WHERE department = id4;
+END/
+
+DROP PROCEDURE PROCEDURE4;
+
+CALL PROCEDURE4('CT', 'CS');
+
+SELECT * FROM donation;
+
+ALTER TABLE donation
+ADD CONSTRAINT Check_Department CHECK (department IN ('CT', 'SOT', 'SOB'));
+
+
+ALTER TABLE donation
+ADD CONSTRAINT Check_Amount CHECK (amount BETWEEN 12000 AND 25000);
+
+
+ALTER TABLE donation
+ADD CONSTRAINT Check_DonorID CHECK (DonorID LIKE 'D___');
+
+-- ALTER TABLE donation ADD COLUMN SNO INT AUTO_INCREMENT;
+
+-- ALTER TABLE donation AUTO_INCREMENT = 4;
+
+SELECT * FROM donation;
+
+DESC donation;
+
+
+
+
+
