@@ -1,38 +1,46 @@
-.App {
-  text-align: center;
+body { 
+  font-family: Arial, 
+  sans-serif; 
+  margin: 20px; 
+  padding: 0; 
+  background-color: white; /* Default light mode background */
+  color: black; /* Default light mode text color */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.dark-mode {
+  background-color: black; /* Dark mode background */
+  color: white; /* Dark mode text color */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.dark-mode h2 {
+  color: lightblue; /* Example color for headings in dark mode */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.dark-mode th {
+  background-color: #333; /* Dark background for table headers */
+  color: white; /* Light text color for table headers */
 }
 
-.App-link {
-  color: #61dafb;
+hr { 
+  margin: 20px 0;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+h2 {
+  color: rgb(24, 118, 144);
+}
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+th, td { 
+  border: 1px solid black; 
+  padding: 8px; text-align: left; }
+th { 
+  background-color: #f2f2f2; 
+  color: chocolate; 
+}
+img { 
+  display: block; 
+  margin: 10px auto; 
+  border-radius: 10px; 
+  max-width: 300px; 
 }
