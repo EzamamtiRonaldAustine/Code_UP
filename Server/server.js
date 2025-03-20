@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 
-const port = 8080;
+const port = 8000;
 
 const sql = `CREATE TABLE IF NOT EXISTS users(
     id INT AUTO_INCREMENT PRIMARY KEY,
