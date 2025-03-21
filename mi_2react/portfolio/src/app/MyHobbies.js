@@ -20,7 +20,6 @@ function MyHobbies() {
           referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
         ></iframe>
-        <hr />
       </div>
     );
   }
