@@ -27,8 +27,8 @@ function Login({ setIsAuthenticated }) {
 
 
 
-            <h2>Login</h2>
-            <p className="welcome-message">Welcome to your portfolio! Please log in to continue.</p>
+            <h1>Login Page</h1>
+            <p className="welcome-message">Aloha welcome 👋! <br/>Please log in to continue.</p>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="email">Email:</label>
