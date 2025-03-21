@@ -1,55 +1,43 @@
-/* Global Styles */
 body { 
-  font-family: Arial, sans-serif; 
+  font-family: Arial, 
+  sans-serif; 
   margin: 20px; 
   padding: 0; 
-  background-color: white;  /* Default light mode background */
-  color: black;  /* Default light mode text color */
+  background-color: white; /* Default light mode background */
+  color: black; /* Default light mode text color */
 }
 
-/* Dark Mode Styling */
 .dark-mode {
-  background-color: rgb(31, 29, 29);  /* Dark mode background */
-  color: white;  /* Dark mode text color */
+  background-color: black; /* Dark mode background */
+  color: white; /* Dark mode text color */
 }
 
 .dark-mode h2 {
-  color: lightblue;  /* Headings in dark mode */
+  color: lightblue; /* Example color for headings in dark mode */
 }
 
 .dark-mode th {
-  background-color: #333;  /* Dark background for table headers */
-  color: white;  /* Light text color for table headers */
+  background-color: #333; /* Dark background for table headers */
+  color: white; /* Light text color for table headers */
 }
 
-/* Headings */
-h2 {
-  color: rgb(24, 118, 144);
-}
-
-/* Horizontal Rule */
 hr { 
   margin: 20px 0;
 }
-
-/* Table Styling */
+h2 {
+  color: rgb(24, 118, 144);
+}
 table { 
   width: 100%; 
   border-collapse: collapse; 
 }
-
 th, td { 
   border: 1px solid black; 
-  padding: 8px; 
-  text-align: left; 
-}
-
+  padding: 8px; text-align: left; }
 th { 
   background-color: #f2f2f2; 
   color: chocolate; 
 }
-
-/* Image Styling */
 img { 
   display: block; 
   margin: 10px auto; 
