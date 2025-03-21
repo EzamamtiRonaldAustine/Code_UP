@@ -1,11 +1,11 @@
-function  Profile_pic() {
-    return (
-      <div>
-        {/* Profile Picture */}
-        <h2>Profile Picture</h2>
-        <img src="profile_pic.jpg" alt="Ronald's Profile Picture" />
-      </div>
-    );
-  }
+function ProfilePic() {
+  return (
+    <div>
+      {/* Profile Picture */}
+      <h2>Profile Picture</h2>
+      <img src="/assets/profile_pic.jpg" alt="Ronald Ezamamti" />
+    </div>
+  );
+}
 
-  export default Profile_pic;
+  export default ProfilePic;

@@ -4,7 +4,7 @@ function MyHobbies() {
         {/* Hobby */}
         <h2>Hobby</h2>
         <video width="500" autoPlay loop controls>
-          <source src="anime.mp4" type="video/mp4" />
+          <source src="/assets/anime.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <hr />

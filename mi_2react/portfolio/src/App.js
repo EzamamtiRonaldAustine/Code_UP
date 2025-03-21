@@ -1,8 +1,9 @@
 // import { useState } from "react";
 import ResultsComponent from "./app/resultscomponent.js";
-import Profile_pic from "./app/Profile_pic.js";
+import ProfilePic from "./app/Profile_pic.js";
 import CareerGoals from "./app/Careergoals.js";
 import MyHobbies from "./app/MyHobbies.js";
+import Introduction from "./app/Introduction.js";
 import "./App.css"; // Import your CSS file
 // import "./style1.js"; // Import your JavaScript file if needed
 
@@ -15,11 +16,11 @@ function App() {
       <hr />
 
       {/* Personal Details */}
-      <Personal_details />
+      <PersonalDetails />
       <hr />
 
       {/* Profile Picture */}
-      <Profile_pic />
+      <ProfilePic />
       <hr />
 
       {/* Hobbies */}
@@ -47,37 +48,9 @@ function App() {
   );
 }
 
-function Introduction() {
-  return (
-    <div>
-      {/* Mode Toggle */}
-      <div
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          background: "white",
-          padding: "5px",
-          borderRadius: "5px",
-          boxShadow: "0 0 5px rgba(0,0,0,0.3)",
-          cursor: "pointer",
-        }}
-      >
-        <span id="mode-toggle" style={{ color: "rgb(93, 92, 91)" }}>🌙</span>
-      </div>
-      {/* Introduction */}
-      <h1 style={{ color: "rgb(93, 92, 91)" }}>Ezamamti Ronald Austine ✌️</h1>
-      <p>
-        Yo, welcome to my personal portfolio! <br /> I am a passionate student
-        currently doing the Web Programming Course. <br />
-        Here, you will learn more about me and my career goals.
-      </p>
-    </div>
-  );
-}
 
 
-function Personal_details() {
+function PersonalDetails() {
   return (
     <div>
       {/* Personal Details */}
