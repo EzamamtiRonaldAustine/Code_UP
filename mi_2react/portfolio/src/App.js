@@ -10,7 +10,7 @@ import PersonalDetails from './app/PersonalDetails.js'; // Separate file
 // import ContactInfo from './app/ContactInfo.js'; // Separate file
 // import Links from './app/Links.js'; // Separate file
 import './App.css';
-import './login.css';
+
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);

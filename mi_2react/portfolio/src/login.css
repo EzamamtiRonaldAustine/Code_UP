@@ -1,17 +1,12 @@
-/* General Body Styles */
-.login-container body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    color: #333;
-    margin: 0;
-    padding: 0;
+/* General Body Styles for Login */
+.login-page {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100vh; /* Full viewport height */
+    background-color: #f7f7f7; /* Background color for the login page */
 }
 
-  
 /* Container for the login form */
 .login-container {
     background-color: white;
@@ -36,28 +31,7 @@
     margin-bottom: 30px;
 }
 
-  
-  /* Title and Welcome Message */
-.login-container h2 {
-    color: #4CAF50;
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-.login-container .welcome-message {
-    font-size: 1.2rem;
-    color: #555;
-    margin-bottom: 30px;
-}
-
-  
-  .welcome-message {
-    font-size: 1.2rem;
-    color: #555;
-    margin-bottom: 30px;
-  }
-  
-  /* Form Input Fields */
+/* Form Input Fields */
 .login-container input {
     width: 100%;
     padding: 12px;
@@ -69,20 +43,7 @@
     color: #333;
 }
 
-  
-  input[type="email"],
-  input[type="password"] {
-    background-color: #fafafa;
-  }
-  
-  input[type="email"]:focus,
-  input[type="password"]:focus {
-    outline: none;
-    border-color: #4CAF50;
-    background-color: #fff;
-  }
-  
-  /* Submit Button */
+/* Submit Button */
 .login-container button {
     width: 100%;
     padding: 12px;
@@ -94,14 +55,13 @@
     cursor: pointer;
 }
 
-  
-  button:hover {
+button:hover {
     background-color: #45a049;
-  }
-  
-  /* Error Message */
-  .error {
+}
+
+/* Error Message */
+.error {
     color: red;
     font-size: 0.9rem;
     margin-top: 10px;
-  }
+}
