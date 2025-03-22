@@ -1,46 +1,89 @@
-body { 
-  font-family: Arial, 
-  sans-serif; 
-  margin: 20px; 
-  padding: 0; 
-  background-color: white; /* Default light mode background */
-  color: black; /* Default light mode text color */
+/* General Styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 40px auto;
+  padding: 20px;
+  max-width: 1300px;
+  background-color: white;
+  color: black;
+  transition: background 0.3s ease, color 0.3s ease;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Paper effect */
+.paper-container {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode */
 .dark-mode {
-  background-color: black; /* Dark mode background */
-  color: white; /* Dark mode text color */
+  background-color: black;
+  color: white;
 }
 
-.dark-mode h2 {
-  color: lightblue; /* Example color for headings in dark mode */
+.dark-mode .paper-container {
+  background: #1e1e1e;
+  color: white;
 }
 
-.dark-mode th {
-  background-color: #333; /* Dark background for table headers */
-  color: white; /* Light text color for table headers */
-}
-
-hr { 
-  margin: 20px 0;
-}
+/* Keep headings colored */
 h2 {
   color: rgb(24, 118, 144);
 }
-table { 
-  width: 100%; 
-  border-collapse: collapse; 
+
+.dark-mode h2 {
+  color: lightblue;
 }
-th, td { 
-  border: 1px solid black; 
-  padding: 8px; text-align: left; }
-th { 
-  background-color: #f2f2f2; 
-  color: chocolate; 
+
+/* Profile Picture Centering */
+img {
+  display: block;
+  margin: 20px auto;
+  border-radius: 10px;
+  max-width: 300px;
 }
-img { 
-  display: block; 
-  margin: 10px auto; 
-  border-radius: 10px; 
-  max-width: 300px; 
+
+/* Dark Mode Toggle Button */
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #333;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.dark-mode-toggle:hover {
+  background: #555;
+  transform: scale(1.05);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  color: chocolate;
+}
+
+.dark-mode th {
+  background-color: #333;
+  color: white;
 }
