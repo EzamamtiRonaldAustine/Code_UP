@@ -1,0 +1,148 @@
+\documentclass{beamer}
+
+% Theme choice
+\usetheme{Madrid}
+
+% Package for better formatting
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{Number Systems in Digital Electronics}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+
+% Title Slide
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Table of Contents
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+
+% Definition of Number Systems
+\section{Definition of Number Systems}
+\begin{frame}{Definition and Origin of Number Systems}
+    \begin{itemize}
+        \item Number systems are methods of representing numerical values.
+        \item They have evolved from ancient counting systems to modern digital representations.
+        \item Essential in computing and digital circuit design.
+    \end{itemize}
+\end{frame}
+
+% Types and Examples of Number Systems
+\section{Types and Examples of Number Systems}
+\begin{frame}{Types of Number Systems}
+    \begin{itemize}
+        \item Decimal (Base-10)
+        \item Binary (Base-2)
+        \item Octal (Base-8)
+        \item Hexadecimal (Base-16)
+        \item Binary Coded Decimal (BCD)
+    \end{itemize}
+\end{frame}
+
+% Discussion on Number Systems
+\section{Discussion on Number Systems}
+\begin{frame}{Different Number Systems}
+    \begin{itemize}
+        \item Decimal: Most commonly used in daily life.
+        \item Binary: Used in digital electronics and computing.
+        \item Octal: Sometimes used in digital systems for compact representation.
+        \item Hexadecimal: Used for memory addressing and color coding.
+        \item BCD: Represents decimal digits in binary format.
+    \end{itemize}
+\end{frame}
+
+% Tables of Number Systems
+\section{Tables of Number Systems}
+\begin{frame}{Number System Representations}
+    \begin{table}[]
+        \centering
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            Decimal & Binary & Octal & Hexadecimal & BCD \\
+            \hline
+            0 & 0000 & 0 & 0 & 0000 \\
+            1 & 0001 & 1 & 1 & 0001 \\
+            2 & 0010 & 2 & 2 & 0010 \\
+            3 & 0011 & 3 & 3 & 0011 \\
+            4 & 0100 & 4 & 4 & 0100 \\
+            5 & 0101 & 5 & 5 & 0101 \\
+            \hline
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+% Conversion of Number Systems
+\section{Conversion of Number Systems}
+\begin{frame}{Number System Conversions}
+    \begin{itemize}
+        \item \textbf{Binary to Decimal}: Sum the place values.
+        \item \textbf{Hexadecimal to Decimal}: Multiply each digit by powers of 16.
+        \item \textbf{Octal to Binary}: Convert each octal digit to a 3-bit binary.
+        \item \textbf{BCD to Decimal}: Convert each 4-bit group to its decimal equivalent.
+    \end{itemize}
+\end{frame}
+
+% Examples of Conversions with Floating Points
+\begin{frame}{Examples of Conversions with Floating Points}
+    \begin{itemize}
+        \item Binary to Decimal: $101.101_2 = (1 \times 2^2) + (0 \times 2^1) + (1 \times 2^0) + (1 \times 2^{-1}) + (0 \times 2^{-2}) + (1 \times 2^{-3}) = 5.625_{10}$
+        \item Decimal to Binary: $10.625_{10} = 1010.101_2$
+        \item Hexadecimal to Decimal: $A.3_{16} = (10 \times 16^0) + (3 \times 16^{-1}) = 10.1875_{10}$
+        \item Octal to Binary: $7.4_8 = 111.100_2$
+    \end{itemize}
+\end{frame}
+
+% Operations on Binary Number System
+\section{Operations on Binary Numbers}
+\begin{frame}{Binary Arithmetic Operations}
+    \begin{itemize}
+        \item \textbf{Addition}: Follows rules of carrying.
+        \item \textbf{Subtraction}: Uses borrowing like decimal subtraction.
+        \item \textbf{Multiplication}: Follows the same pattern as decimal multiplication.
+        \item \textbf{Division}: Similar to long division in decimal.
+    \end{itemize}
+\end{frame}
+
+% Examples of Binary Arithmetic Operations
+\begin{frame}{Examples of Binary Arithmetic Operations}
+    \begin{itemize}
+        \item \textbf{Addition:} $101_2 + 110_2 = 1011_2$
+        \item \textbf{Subtraction:} $1101_2 - 101_2 = 1000_2$
+        \item \textbf{Multiplication:} $101_2 \times 11_2 = 1111_2$
+        \item \textbf{Division:} $1010_2 \div 10_2 = 101_2$
+    \end{itemize}
+\end{frame}
+
+% Applications of Number Systems
+\section{Applications of Number Systems}
+\begin{frame}{Applications in Digital Electronics}
+    \begin{itemize}
+        \item Binary: Used in logic circuits and programming.
+        \item Hexadecimal: Used in memory addressing and debugging.
+        \item BCD: Used in digital clocks and calculators.
+        \item Octal: Used in microprocessor and system design.
+    \end{itemize}
+\end{frame}
+
+% Conclusion
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item Number systems are fundamental to digital electronics.
+        \item Understanding conversions and operations is crucial.
+        \item Applications span across computing, networking, and digital circuit design.
+    \end{itemize}
+\end{frame}
+
+% Q&A Slide
+\begin{frame}{Q&A}
+    \centering
+    Questions?
+\end{frame}
+
+\end{document}
