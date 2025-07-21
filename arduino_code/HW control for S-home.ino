@@ -27,7 +27,7 @@ byte authorized1[] = {0x93, 0x18, 0xE1, 0x0F};
 byte authorized2[] = {0x33, 0xBD, 0x19, 0x0E};
 bool doorUnlocked = false;
 unsigned long unlockTime = 0;
-const int unlockDuration = 9000;
+const int unlockDuration = 5000;
 
 // ---------- DHT Setup ----------
 #define DHTTYPE DHT11
@@ -44,9 +44,9 @@ const unsigned long sendInterval = 5000;
 bool whiteMode = false;
 
 // ---------- Frequencies ----------
-const int INTRUDER_FREQ = 1700;
+const int INTRUDER_FREQ = 2000;
 const int DOORBELL_FREQ = 1500;
-const int BUZZER_ON_FREQ = 1700;
+const int BUZZER_ON_FREQ = 2500;
 
 // ---------- Buzzer State ----------
 bool doorbellActive = false;
@@ -110,6 +110,12 @@ void handleSerialCommands() {
     } else if (cmd == "FAN_AUTO") {
       fanAuto = true;
       Serial.println("ACK:FAN_AUTO");
+    } else if (cmd.startsWith("FAN_SPEED_")) {
+      int value = cmd.substring(10).toInt();
+      fanSpeed = constrain(value, 0, 255);
+      if (!fanAuto) analogWrite(FAN_PIN, fanSpeed);
+      Serial.print("ACK:FAN_SPEED_");
+      Serial.println(fanSpeed);
     } else if (cmd == "BUZZER_ON") {
       toneAC(BUZZER_ON_FREQ);
       Serial.println("ACK:BUZZER_ON");
