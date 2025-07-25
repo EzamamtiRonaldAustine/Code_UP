@@ -346,3 +346,21 @@ void handleIRRemote() {
     IrReceiver.resume();
   }
 }
+void setColor(bool red, bool green, bool blue) {
+  digitalWrite(RED_PIN, red);
+  digitalWrite(GREEN_PIN, green);
+  digitalWrite(BLUE_PIN, blue);
+}
+// // Check button state for doorbell functionality
+// void checkButton() {
+//   if (digitalRead(BUTTON_PIN) == LOW) {
+//     if (!doorbellActive) {
+//       Serial.println("DOORBELL:PRESSED");
+//       toneAC(DOORBELL_FREQ);
+//       doorbellActive = true;
+//     }
+//   } else if (doorbellActive) {
+//     noToneAC();
+//     doorbellActive = false;
+//   }
+// }
