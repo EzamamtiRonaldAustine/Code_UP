@@ -351,14 +351,6 @@ void setColor(bool red, bool green, bool blue) {
   digitalWrite(GREEN_PIN, green);
   digitalWrite(BLUE_PIN, blue);
 }
-
-}
-// Handle doorbell timeout
-  if (doorbellActive && millis() > intruderToneEnd) {
-    noToneAC();
-    doorbellActive = false;
-  }
-}
 // Check button state for doorbell functionality
 void checkButton() {
   if (digitalRead(BUTTON_PIN) == LOW) {
