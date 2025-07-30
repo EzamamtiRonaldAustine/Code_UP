@@ -1,0 +1,497 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{chngcntr}
+\usepackage{float}
+\usepackage{grffile}
+
+% Page setup
+\doublespacing
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+% Remove chapter number from figure numbering and use whole numbers
+\counterwithout{figure}{chapter}
+\renewcommand{\thefigure}{\arabic{figure}}
+
+% Chapter and section formatting
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\centering}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries}{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\chapter{ACTIVITIES AND PROCEDURES}
+
+\section{Introduction}
+
+This chapter summarizes the key activities and procedures undertaken during the nine-week internship at Uganda Industrial Research Institute (UIRI) from May 22 to July 18, 2025. The internship was supervised by experienced UIRI personnel, each with specialized expertise: Mr. Atwine Philip (Digital Electronics), Mr. Adaon Michel (Analog Electronics), Mr. Ngobi Elijah and Mr. Mutesasira Bashir (Embedded Systems and IoT), Mr. Ainebyona Savior and Ms. Annah Faith (Industrial Automation and PLC Programming). They provided technical guidance and mentorship throughout the internship period. The following sections provide detailed descriptions of weekly activities, objectives, tools used, technical procedures, and key learning outcomes, verified under the appropriate supervisors as per the official log book.
+
+\section{Week 1: Digital Electronics Foundations}
+
+\textbf{Description:} The first week laid the groundwork for understanding digital electronics, focusing on combinational logic circuits and their practical applications. The intern engaged in both theoretical learning and hands-on experimentation to build a solid foundation in digital logic design. Activities included introduction to multiplexers, decoder circuits, diode biasing, and flip-flop design, culminating in a smart traffic light simulation.
+
+\textbf{Objectives:}
+\begin{itemize}
+    \item Master combinational logic circuit design including 2:1 and 4:1 multiplexers, BCD-to-seven-segment decoders, and SR flip-flops.
+    \item Achieve proficiency in Tinkercad simulation platform and UIRI digital experimental hardware.
+    \item Develop systematic debugging techniques for identifying logic gate malfunctions and timing issues.
+\end{itemize}
+
+\textbf{Tools and Materials Used:}
+\begin{multicols}{2}
+\begin{itemize}
+    \item Tinkercad simulation platform
+    \item UIRI digital experimental box
+    \item Logic gate ICs (7400 series)
+    \item Toggle switches
+    \item LEDs
+    \item Resistors
+    \item Breadboard
+    \item Wires
+\end{itemize}
+\end{multicols}
+
+\noindent\textbf{Technical Procedure:}
+\begin{itemize}
+    \item Constructed and verified truth tables for 2:1 multiplexers, decoder circuits, and flip-flops using Tinkercad simulation.
+    \item Assembled physical circuits on breadboards, validating logic operations through LED indicator patterns.
+    \item Programmed a traffic light state machine using flip-flop sequential logic.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Established foundational competency in digital logic design principles, gained fluency with simulation-to-hardware workflow, and acquired systematic approach to combinational circuit verification.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/4-input multiplexer simulation on Tinkercad.png}
+\caption{4-input multiplexer circuit simulation using Tinkercad platform}
+\label{fig:multiplexer-sim}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/7 segment Display using an IC.png}
+\caption{Seven-segment display implementation with decoder IC}
+\label{fig:7segment-display}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Experimenting with Digital Trainer box.png}
+\caption{Hands-on digital logic experiments using UIRI digital trainer box}
+\label{fig:digital-trainer}
+\end{figure}
+
+\section{Week 2: Analog Electronics and Measurement Techniques}
+
+\textbf{Description:} Week two introduced fundamental concepts of analog electronics, emphasizing component behavior and measurement techniques. The intern conducted practical experiments to understand electrical properties and signal analysis.
+
+\textbf{Objectives:}
+\begin{itemize}
+    \item Analyze voltage-current characteristics of PN junction diodes under forward and reverse bias conditions.
+    \item Characterize capacitor charging/discharging time constants and transistor switching thresholds.
+    \item Master oscilloscope operation for AC signal measurement and function generator frequency synthesis.
+\end{itemize}
+
+\textbf{Tools and Materials Used:}
+\begin{multicols}{2}
+\begin{itemize}
+    \item Function generator
+    \item Oscilloscope
+    \item Diodes
+    \item Capacitors
+    \item Transistors
+    \item Resistors
+    \item Analog experimental box
+    \item Breadboard
+    \item Wires
+    \item DC power supply
+\end{itemize}
+\end{multicols}
+
+\textbf{Technical Procedure:}
+\noindent
+\begin{itemize}
+    \item Measured diode I-V curves using variable voltage sources and plotted characteristic responses.
+    \item Investigated RC time constants through capacitor charge/discharge cycles with oscilloscope monitoring.
+    \item Calibrated light-dependent resistor sensitivity curves across varying illumination levels.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Developed precision in analog measurement techniques, gained understanding of semiconductor device physics, and established competency in laboratory instrumentation protocols.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Using the Analog trainer box.png}
+\caption{Analog circuit component testing and characterization}
+\label{fig:analog-components}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Experimenting with Analog components.png}
+\caption{Practical analog circuit implementation on trainer platform}
+\label{fig:analog-trainer}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Using the Oscilloscpe and functional generator.png}
+\caption{Signal analysis using oscilloscope and function generator setup}
+\label{fig:oscilloscope-setup}
+\end{figure}
+
+\section{Weeks 3--7: Embedded Systems and IoT Development}
+
+\subsubsection{Embedded Systems Development (Weeks 3--4)}
+
+\textbf{Description:} This period focused on Arduino-based microcontroller programming, sensor integration, and modular system design. The intern worked on an intruder detection system and initial smart home automation modules, gaining hands-on experience in hardware assembly and debugging.
+
+\textbf{Objectives:}
+\begin{itemize}
+    \item Implement ultrasonic sensor distance measurement algorithms with sub-centimeter accuracy.
+    \item Engineer modular code architecture for scalable home security system expansion.
+    \item Resolve LCD display voltage regulation and I2C communication protocol errors.
+\end{itemize}
+
+\textbf{Tools and Materials Used:}
+\begin{multicols}{2}
+\begin{itemize}
+    \item Arduino UNO
+    \item ESP8266 Wi-Fi module
+    \item HC-SR04 ultrasonic sensor
+    \item Buzzer
+    \item LCD display
+    \item Arduino IDE
+    \item Breadboards
+    \item Jumper wires
+\end{itemize}
+\end{multicols}
+
+\textbf{Technical Procedure:}
+\noindent
+\begin{itemize}
+    \item Calibrated HC-SR04 sensor timing parameters for precise distance calculations using pulse-width measurement.
+    \item Integrated multi-tone buzzer alarm sequences triggered by configurable proximity thresholds.
+    \item Diagnosed and corrected LCD backlight voltage issues through systematic power supply analysis.
+    \item Optimized sensor polling rates to balance responsiveness with power consumption.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Acquired expertise in sensor signal processing, developed systematic hardware debugging methodology, and established foundation for real-time embedded system design.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/RGB control with IR remote and Door bell module.jpg}
+\caption{Integrated RGB lighting control and doorbell notification system}
+\label{fig:rgb-doorbell}
+\end{figure}
+
+\subsubsection{Smart Home System Implementation (Weeks 5--6)}
+
+\textbf{Description:} Focused on integrating security features such as RFID access control, wireless module testing, and assembling the full smart home system. Cloud connectivity was established using Firebase, and a mobile application was developed for remote monitoring and control.
+
+\textbf{Objectives:}
+\begin{itemize}
+    \item Configure RC522 RFID authentication with encrypted card ID verification and access logging.
+    \item Establish bidirectional Firebase Realtime Database communication for IoT device coordination.
+    \item Deploy React Native mobile application with real-time system status monitoring and control interfaces.
+\end{itemize}
+
+\textbf{Tools and Materials Used:}
+\begin{multicols}{2}
+\begin{itemize}
+    \item Arduino UNO
+    \item RC522 RFID module
+    \item GSM module
+    \item ESP8266 NodeMCU
+    \item Firebase SDK
+    \item React Native
+    \item Expo CLI
+    \item Mobile devices
+\end{itemize}
+\end{multicols}
+
+\noindent\textbf{Technical Procedure:}
+\begin{itemize}
+    \item Programmed MIFARE card reading protocols with SPI communication interface configuration.
+    \item Implemented GSM AT command sequences for SMS notification backup systems.
+    \item Structured Firebase database schema with separate command and status node hierarchies.
+    \item Developed React Native components with Firebase authentication and real-time data binding.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Mastered RFID security protocol implementation, gained proficiency in cloud-based IoT architecture design, and acquired mobile application development skills for hardware control.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/RFID module with relay switch opened using CID.jpg}
+\caption{RFID-based access control system with relay activation}
+\label{fig:rfid-system}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/full home monitoring system on dual boards.jpg}
+\caption{Complete smart home monitoring system with Arduino and NodeMCU integration}
+\label{fig:full-system}
+\end{figure}
+
+\subsubsection{System Optimization and Real-Time Control (Week 7)}
+
+\textbf{Description:} This week addressed system troubleshooting, authentication implementation, and real-time control optimization. The intern resolved hardware-software integration challenges, mitigated timer conflicts, and refined communication protocols for stable operation.
+
+\textbf{Objectives:}
+\begin{itemize}
+    \item Implement Firebase user credential embedding for secure cloud authentication protocols.
+    \item Eliminate hardware timer conflicts between IRremote library and buzzer PWM generation.
+    \item Optimize Firebase database polling intervals for sub-second command response latency.
+\end{itemize}
+
+\textbf{Tools and Materials Used:}
+\begin{multicols}{2}
+\begin{itemize}
+    \item NodeMCU ESP8266
+    \item Arduino UNO
+    \item toneAC library
+    \item IRremote library
+    \item Firebase Realtime Database
+    \item React Native app
+\end{itemize}
+\end{multicols}
+
+\textbf{Technical Procedure:}
+\begin{itemize}
+    \item Hardcoded Firebase authentication tokens with encrypted credential storage for autonomous operation.
+    \item Reassigned hardware timer resources and adopted non-blocking toneAC library for conflict resolution.
+    \item Implemented Firebase database listeners with exponential backoff retry mechanisms.
+    \item Benchmarked system response times under varying network latency conditions.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Developed advanced system integration problem-solving skills, gained expertise in embedded authentication security, and mastered real-time IoT communication optimization techniques.
+
+\section{Weeks 8--9: Industrial Automation and PLC Programming}
+
+\textbf{Description:} The final weeks focused on industrial automation concepts and Programmable Logic Controller (PLC) programming using Siemens STEP 7 software. The intern engaged in ladder logic design, timer and counter functions, and complex automation scenarios including traffic light control and conveyor sorting systems. The internship culminated with project presentations and professional development sessions.
+
+\textbf{Objectives:}
+\begin{itemize}
+    \item Program Siemens S7-300 ladder logic for industrial conveyor sorting with multi-sensor decision trees.
+    \item Design timer-based traffic light control systems with pedestrian crossing integration and emergency override.
+    \item Execute comprehensive project presentations demonstrating technical competency and system integration mastery.
+\end{itemize}
+
+\textbf{Tools and Materials Used:}
+\begin{multicols}{2}
+\begin{itemize}
+    \item Siemens STEP 7 software
+    \item Codesys software
+    \item PLC training boards
+    \item Ladder logic programming tools
+    \item Industrial sensors and actuators
+    \item Presentation software
+\end{itemize}
+\end{multicols}
+
+\textbf{Technical Procedure:}
+\begin{itemize}
+    \item Analyzed PLC memory architecture including input/output modules, data blocks, and function block organization.
+    \item Developed ladder logic sequences for material handling automation with proximity sensor feedback.
+    \item Simulated industrial processes using STEP 7 hardware configuration and program debugging tools.
+    \item Compiled technical documentation including system specifications, wiring diagrams, and operational procedures.
+    \item Presented integrated smart home system to evaluation panel including technical demonstration and Q\&A session.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Achieved proficiency in industrial automation programming standards, mastered PLC system design methodology, and developed professional technical presentation and documentation skills.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Simulation of Box lifter program on Simens Step 7.jpg}
+\caption{Material handling automation sequence programmed in Siemens STEP 7 environment}
+\label{fig:step7-simulation}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Tour via the industry to see PLCs in action.jpg}
+\caption{Industrial PLC systems observation during facility tour}
+\label{fig:plc-tour}
+\end{figure}
+
+\section{Week 9: Project Presentation and Closing Remarks}
+
+\textbf{Objective:} Execute professional project presentations demonstrating comprehensive technical integration and system functionality.
+
+\textbf{Tools and Materials Used:}
+\begin{itemize}
+    \item Final project hardware setup
+    \item Presentation slides (PPT)
+\end{itemize}
+
+\textbf{Technical Procedure:}
+\noindent
+\begin{itemize}
+    \item Demonstrated complete smart home system functionality including RFID authentication, motion detection, automated fan control, and Firebase cloud synchronization.
+    \item Presented technical architecture, implementation challenges, and solution methodologies to UCU and UIRI leadership panel.
+    \item Engaged in technical discussion covering system scalability, security considerations, and potential commercial applications.
+\end{itemize}
+
+\noindent\textbf{Key Learning Outcomes:} Developed confidence in technical communication under professional evaluation, refined ability to articulate complex system integration concepts, and received recognition for collaborative teamwork and technical innovation.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Engineer David Ilukol giving closing remarks.png}
+\caption{Closing ceremony remarks by Engineer David Ilukol}
+\label{fig:closing-remarks}
+\end{figure}
+
+\chapter{LESSONS LEARNED AND LEARNING OUTCOMES}
+
+\section{Introduction}
+
+This chapter presents a comprehensive reflection on the technical competencies and professional skills acquired during the UIRI internship experience. The structured progression through multiple engineering disciplines provided both depth and breadth in practical technology application.
+
+\section{Technical Lessons Learned}
+
+\subsection*{1. Digital Logic Design and Circuit Implementation}
+Mastered systematic approach to combinational and sequential logic design, including multiplexer selection logic, decoder truth table verification, and flip-flop state machine programming. Gained proficiency in simulation-to-hardware validation workflows using Tinkercad and physical breadboard implementations.
+
+\subsection*{2. Embedded Microcontroller Programming and Sensor Integration}
+Developed expertise in Arduino IDE programming with focus on real-time sensor data processing, interrupt-driven event handling, and modular code architecture. Acquired specialized skills in ultrasonic sensor calibration, RFID authentication protocols, and multi-peripheral communication management.
+
+\subsection*{3. Cloud-Based IoT Architecture and Mobile Application Development}
+Established competency in Firebase Realtime Database configuration, bidirectional data synchronization, and authentication security implementation. Gained proficiency in React Native mobile development with emphasis on hardware control interfaces and real-time status monitoring.
+
+\subsection*{4. Industrial Automation and PLC System Programming}
+Achieved fluency in Siemens STEP 7 ladder logic programming, including timer functions, counter operations, and sensor-based decision logic. Developed understanding of industrial automation standards, safety protocols, and system scalability considerations.
+
+\section{Advanced Problem-Solving and Engineering Analysis}
+
+The internship emphasized systematic troubleshooting methodologies, requiring analysis of hardware-software integration challenges, timing conflicts, and communication protocol optimization. This experience developed critical thinking skills essential for complex system debugging and performance optimization.
+
+\section{Professional Development and Communication Skills}
+
+\subsection*{1. Technical Collaboration and Knowledge Transfer}
+Enhanced ability to work within multidisciplinary teams, contribute to peer code reviews, and communicate complex technical concepts to both technical and non-technical audiences. Developed skills in technical mentorship and knowledge sharing.
+
+\subsection*{2. Professional Documentation and Presentation}
+Improved technical writing capabilities through system documentation, code commenting, and report preparation. Strengthened presentation skills through formal project demonstrations and stakeholder communication.
+
+\subsection*{3. Project Management and Resource Optimization}
+Developed time management skills for concurrent project development, resource allocation for shared laboratory equipment, and adaptive planning for technical challenges and changing requirements.
+
+\section{Career Development and Industry Insights}
+
+The comprehensive exposure to embedded systems, IoT architecture, and industrial automation clarified career interests and provided practical understanding of current industry technologies and methodologies. The mentorship experience highlighted the importance of continuous learning and professional development in rapidly evolving technical fields.
+
+\chapter{CHALLENGES, RECOMMENDATIONS AND CONCLUSION}
+
+\section{Introduction}
+
+This chapter analyzes the primary challenges encountered during the UIRI internship and provides evidence-based recommendations for program enhancement. The assessment is based on direct experience with training resources, technical tools, and learning methodologies.
+
+\section{Challenges Faced}
+
+\subsection*{1. Laboratory Equipment Access Limitations}
+Periodic constraints on specialized hardware including GSM communication modules, RFID development kits, and PLC programming stations limited hands-on experimentation time during peak training periods.
+
+\subsection*{2. Compressed Development Timeline for Complex Integration}
+The intensive nine-week schedule, while comprehensive, provided limited time for iterative optimization of embedded systems projects, particularly during the IoT integration and mobile application development phases.
+
+\subsection*{3. Software-Hardware Configuration Dependencies}
+Embedded module initialization, particularly GSM AT command configuration and Firebase SDK integration, required extensive setup procedures that occasionally disrupted development momentum.
+
+\subsection*{4. Infrastructure Reliability for Cloud-Based Development}
+Internet connectivity stability and electrical power continuity challenges occasionally impacted Firebase database synchronization and cloud-based development activities.
+
+\subsection*{5. Advanced Tool Learning Curve}
+Siemens STEP 7 programming environment and React Native development framework presented significant learning curves for participants without prior exposure to industrial automation or mobile development platforms.
+
+\section{Recommendations}
+
+\subsection*{1. Expanded Hardware Resource Allocation}
+Increase availability of critical development modules including GSM units, RFID systems, and PLC training stations to ensure adequate hands-on experience for all participants.
+
+\subsection*{2. Extended Project Development Phases}
+Allocate additional time for embedded systems and IoT development phases to allow for comprehensive system optimization and documentation.
+
+\subsection*{3. Pre-Configured Development Environments}
+Establish standardized, pre-configured development setups including driver installations, library dependencies, and Firebase project templates to minimize setup overhead.
+
+\subsection*{4. Infrastructure Reliability Enhancement}
+Implement robust backup power systems and redundant internet connectivity to ensure consistent cloud-based development capabilities.
+
+\subsection*{5. Progressive Tool Introduction}
+Introduce advanced development environments through preliminary orientation sessions, providing foundational knowledge before intensive application phases.
+
+\section{Overall Conclusion}
+
+The nine-week UIRI internship successfully bridged academic theory with practical industry application through structured progression from foundational electronics to advanced embedded systems and industrial automation.
+
+The program delivered comprehensive technical competencies across digital circuit design, analog measurement, embedded programming, IoT integration, and PLC automation. Expert mentorship from UIRI technical staff ensured deep understanding of complex technologies through hands-on methodology.
+
+Challenging project phases developed critical engineering judgment and systematic troubleshooting capabilities. Resolving hardware timer conflicts and optimizing cloud communication protocols provided authentic professional experience beyond traditional academic settings.
+
+Professional development was equally significant, with substantial improvement in technical communication, collaborative problem-solving, and project management. Presenting to professional evaluation panels and maintaining comprehensive documentation provided essential career preparation.
+
+The internship clarified professional interests while providing realistic perspectives on engineering practice. Exposure to current industry technologies and experienced practitioner mentorship offered valuable career development insights.
+
+Operational challenges, including equipment limitations and infrastructure constraints, provided additional learning opportunities in resource management and adaptive problem-solving that contribute to professional growth.
+
+The internship achieved its primary objectives of developing practical engineering competencies and providing career guidance. The technical skills and professional insights gained provide a solid foundation for advanced academic pursuits and successful career development in embedded systems, IoT, and industrial automation.
+
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+
+\begin{itemize}
+    \item Uganda Industrial Research Institute. (2020). \textit{Corporate Profile}. Retrieved from \url{https://www.uiri.go.ug}
+    \item Arduino Project Hub. (2024). \textit{Arduino Tutorials}. Retrieved from \url{https://create.arduino.cc/projecthub}
+    \item Firebase. (2024). \textit{Firebase Realtime Database Documentation}. Retrieved from \url{https://firebase.google.com/docs/database}
+    \item Siemens. (2024). \textit{STEP 7 Basic and Professional Documentation}. Retrieved from \url{https://support.industry.siemens.com}
+    \item Expo DevTools. (2024). \textit{React Native + Expo Documentation}. Retrieved from \url{https://docs.expo.dev}
+\end{itemize}
+
+\appendix
+
+\chapter*{Appendix}
+\addcontentsline{toc}{chapter}{Appendix}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/The Executive Director and the HR team.png}
+\caption{UIRI Executive Director and Human Resources team during internship program}
+\label{fig:uiri-leadership}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Powering the components using an Analog box.png}
+\caption{Component power supply configuration using analog trainer box}
+\label{fig:analog-power}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{img/Using a multimeter to mearsure voltage.png}
+\caption{Voltage measurement techniques using digital multimeter}
+\label{fig:multimeter-usage}
+\end{figure}
+\end{document}
