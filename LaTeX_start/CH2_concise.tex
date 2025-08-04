@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[margin=1in]{geometry}
 \usepackage{setspace}
+\usepackage{etoolbox}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
@@ -24,49 +25,303 @@
 \usepackage{chngcntr}
 \usepackage{float}
 \usepackage{grffile}
+\usepackage{cite}
+\usepackage{tocloft}
+\usepackage{ragged2e}
+
+% Set Times New Roman as the main font using more robust method
+\usepackage{newtxtext,newtxmath} % Better Times New Roman with proper bold
+\usepackage[T1]{fontenc} % Better font encoding for proper bold rendering
 
 % Page setup
-\doublespacing
+\setstretch{1.5}
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[C]{\thepage}
 
+\geometry{margin=1in}
+\justifying
+
 % Remove chapter number from figure numbering and use whole numbers
 \counterwithout{figure}{chapter}
 \renewcommand{\thefigure}{\arabic{figure}}
 
-% Chapter and section formatting
+% Chapter title formatting - 16pt bold for numbered chapters
 \titleformat{\chapter}[display]
-{\normalfont\huge\bfseries\centering}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-\titlespacing*{\chapter}{0pt}{50pt}{40pt}
+  {\normalfont\fontsize{16}{19.2}\bfseries\centering}{}{0pt}{\centering}
+\titlespacing{\chapter}{0pt}{-40pt}{20pt}
 
+% Custom command for preliminary pages with 14pt font
+\newcommand{\prelimchapter}[1]{%
+  \chapter*{#1}%
+  \addcontentsline{toc}{chapter}{#1}%
+  \markboth{#1}{#1}%
+}
+
+% Section title formatting - 14pt bold
 \titleformat{\section}
-{\normalfont\Large\bfseries}{\thesection}{1em}{}
+  {\normalfont\fontsize{14}{16.8}\bfseries}{\thesection}{0.5em}{}
+\titlespacing{\section}{0pt}{15pt}{10pt}
 
+% Subsection title formatting - 12pt bold
 \titleformat{\subsection}
-{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+  {\normalfont\fontsize{12}{14.4}\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing{\subsection}{0pt}{10pt}{5pt}
+
+% Subsubsection title formatting - 12pt bold
+\titleformat{\subsubsection}
+  {\normalfont\fontsize{12}{14.4}\bfseries}{\thesubsubsection}{0.5em}{}
+\titlespacing{\subsubsection}{0pt}{8pt}{3pt}
+
+% Table of Contents formatting
+\renewcommand{\contentsname}{Table of Contents}
+\setlength{\cftbeforechapskip}{5pt}
+\setlength{\cftbeforesecskip}{2.5pt}
+\setlength{\cftbeforesubsecskip}{1.5pt}
+
+% Reduce spacing before and after TOC title
+\setlength{\cftbeforetoctitleskip}{-20pt}
+\setlength{\cftaftertoctitleskip}{10pt}
+
+% Add leader dots for all TOC entries
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{\cftdotsep}}
+
+% Ensure chapter entries have dots too
+\renewcommand{\cftchapaftersnum}{}
+
+% Format TOC title to 14pt
+\renewcommand{\cfttoctitlefont}{\normalfont\fontsize{14}{16.8}\bfseries\centering}
+
+% Indent sections and subsections in TOC
+\setlength{\cftsecindent}{1.5em}
+\setlength{\cftsubsecindent}{3.0em}
+\setlength{\cftsubsubsecindent}{4.5em}
+
+% List of Figures formatting
+\renewcommand{\listfigurename}{List of Figures}
+\setlength{\cftfigindent}{0pt}
+\setlength{\cftfignumwidth}{3em}
+
+% Reduce spacing before and after List of Figures title
+\setlength{\cftbeforeloftitleskip}{-20pt}
+\setlength{\cftafterloftitleskip}{10pt}
+
+% Format List of Figures title to 14pt
+\renewcommand{\cftloftitlefont}{\normalfont\fontsize{14}{16.8}\bfseries\centering}
+
+% Remove chapter numbering patches
+\makeatletter
+\patchcmd{\@makechapterhead}{\vspace*{50\p@}}{\vspace*{0pt}}{}{}
+\patchcmd{\@makeschapterhead}{\vspace*{50\p@}}{\vspace*{0pt}}{}{}
+\makeatother
 
 \begin{document}
 
+\pagenumbering{roman}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    {\large \textbf{UGANDA CHRISTIAN UNIVERSITY}}\\[1.5cm]
+    % \includegraphics[width=0.3\textwidth]{ucu_logo.png}\\[1cm] % Optional Logo
+    {\large \textbf{FACULTY OF ENGINEERING, DESIGN AND TECHNOLOGY}}\\[0.5cm]
+    {\large \textbf{DEPARTMENT OF COMPUTING AND TECHNOLOGY}}\\[2cm]
+    {\LARGE \textbf{INTERNSHIP REPORT}}\\[0.5cm]
+    \textbf{On} \\[0.3cm]
+    {\Large \textbf{HANDS-ON INTERNSHIP TRAINING AT}}\\[0.3cm]
+    {\Large \textbf{UGANDA INDUSTRIAL RESEARCH INSTITUTE (UIRI)}}\\[1.5cm]
+
+    \textbf{By:} \\[0.3cm]
+    {\Large \textbf{EZAMAMTI RONALD AUSTINE}}\\
+    {\large Reg. No: S23B23/018}\\[2cm]
+
+    \textbf{Period of Internship:} \\[0.2cm]
+    \textit{22\textsuperscript{nd} May 2025 – 18\textsuperscript{th} July 2025}\\[2cm]
+
+    \textbf{Submitted in Partial Fulfillment of the Requirements for the Degree of} \\
+    \textit{Bachelor of Science in Computer Science}\\[1.5cm]
+
+    \textbf{JULY 2025}
+\end{titlepage}
+
+% Declaration
+{\fontsize{14}{16.8}\selectfont\bfseries\centering DECLARATION\par}
+\vspace{10pt}
+\addcontentsline{toc}{chapter}{Declaration}
+\noindent I, \textbf{Ezamamti Ronald Austine}, hereby declare that this Internship Report is a result of my original work and effort carried out at \textbf{Uganda Industrial Research Institute (UIRI)} from 22\textsuperscript{nd} May to 18\textsuperscript{th} July 2025. I affirm that this report is free from plagiarism and all referenced materials have been duly acknowledged.
+
+\vspace{1cm}
+\noindent \textbf{Student's Signature:} \rule{6cm}{0.2pt} \hfill \textbf{Date:} \rule{3cm}{0.2pt}
+
+\newpage
+% Approval
+{\fontsize{14}{16.8}\selectfont\bfseries\centering APPROVAL\par}
+\vspace{10pt}
+\addcontentsline{toc}{chapter}{Approval}
+\noindent This Internship Report has been submitted for examination with the approval of the following supervisors.\\[1cm]
+
+\noindent \textbf{University Supervisor:} \\
+Mr. \\
+Department of Computing and Technology, Uganda Christian University\\[0.5cm]
+Signature: \rule{5cm}{0.2pt} \hfill Date: \rule{3cm}{0.2pt}\\[1cm]
+
+\noindent \textbf{Industrial Supervisor:} \\
+Mr. Musana Sabiiti John\\
+Uganda Industrial Research Institute (UIRI)\\[0.5cm]
+Signature: \rule{5cm}{0.2pt} \hfill Date: \rule{3cm}{0.2pt}
+
+\newpage
+% Acknowledgement
+{\fontsize{14}{16.8}\selectfont\bfseries\centering ACKNOWLEDGEMENT\par}
+\vspace{10pt}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+\noindent First and foremost, I thank the Almighty God for the wisdom, health, strength, and perseverance He granted me throughout this internship journey.
+
+\noindent I extend my sincere gratitude to the entire management and staff of \textbf{Uganda Industrial Research Institute (UIRI)} for offering me the opportunity to acquire valuable hands-on training. I am especially grateful to my industrial supervisor \textbf{Mr. Ngobi Elijah} for his unwavering guidance, mentorship, and commitment to ensuring that I gained meaningful insights during my internship.
+
+\noindent I also wish to express my appreciation to the following instructors whose expertise and dedication greatly enriched my technical growth:
+\begin{itemize}
+    \item \textbf{Mr. Atwine Philip }
+    \item \textbf{Mr. Adaon Michel}
+    \item \textbf{Mr. Mutesasira Bashir}
+    \item \textbf{Mr. Mr Ainebyona Savior}
+    \item \textbf{Ms. Annah Faith}
+\end{itemize}
+
+\noindent Their support in areas such as embedded systems, electronics, and professional conduct was instrumental to the success of this training.
+
+\noindent Special thanks to my university supervisor, \textbf{Mr. Christopher Ssemambo, Ms Diana N------}, and the Department of Computing and Technology at Uganda Christian University for ensuring that this internship was possible and for providing the necessary academic support and monitoring throughout the period.
+
+\noindent I am also thankful to my fellow interns for the team spirit, knowledge sharing, and friendship that made this internship both productive and enjoyable.
+
+\newpage
+% Abstract
+{\fontsize{14}{16.8}\selectfont\bfseries\centering ABSTRACT\par}
+\vspace{10pt}
+\addcontentsline{toc}{chapter}{Abstract}
+\noindent This report documents an eight-week internship conducted at Uganda Industrial Research Institute (UIRI), focused on hands-on skills development in electronics, digital systems, and embedded programming. The internship offered exposure to industrial processes, logic circuit design, analog electronics, and full project development of a Smart Home System using microcontrollers.
+
+\noindent Key deliverables included the design, integration, and testing of various sensor modules interfaced with Arduino and ESP8266, culminating in a mobile-controlled smart home prototype. In addition to technical learning, the internship emphasized teamwork, professional communication, and practical problem-solving within an engineering context.
+
+\noindent The report details the daily activities, challenges encountered, and lessons learned, and provides recommendations to future interns and stakeholders for optimizing similar training programs.
+
+\newpage
+% Table of Contents
+\tableofcontents
+\vspace{-10pt}
+\newpage
+
+% List of Figures
+\listoffigures
+\vspace{-10pt}
+\newpage
+
+\pagenumbering{arabic}
+
+\chapter{INTRODUCTION AND BACKGROUND TO UIRI}
+
+\section{Introduction}
+\noindent The internship program is a core requirement for undergraduate students in the Department of Computing and Technology at Uganda Christian University. It provides students with an opportunity to apply classroom theory in practical, real-world industrial settings. From 22\textsuperscript{nd} May to 18\textsuperscript{th} July 2025, I undertook an internship at the Uganda Industrial Research Institute (UIRI), a government parastatal dedicated to industrial and technological development in Uganda.
+
+\noindent This chapter provides an overview of the hosting organization — its background, mandate, activities, and the relevance of the internship. It also highlights the connection between academic training and industrial research and development at UIRI.
+
+\section{Organizational Profile and Background}
+\noindent The Uganda Industrial Research Institute (UIRI) traces its origins to the East African Research Services Organization (EARSO), which was established during the East African Federation of the 1970s to serve Uganda, Kenya, and Tanzania. After the federation dissolved in 1977, EARSO was succeeded by KIRDI (Kenya) and TIRDO (Tanzania), while Uganda lacked a national R\&D institute until 2002.
+
+\noindent In 2002, UIRI was formally established by the Government of Uganda under the leadership of President Yoweri Kaguta Museveni. The institute was supported by a grant from the Chinese government, which contributed equipment and funding. Under the stewardship of Professor Charles Kwesiga, an industrial engineer, UIRI quickly emerged as one of Africa's premier research and development institutions.
+
+\noindent UIRI operates from two main campuses — its headquarters in Nakawa and the Machining Manufacturing Industrial Skills Development Centre (MMISDC) in Namanve. The Namanve facility began construction in 2018 and was fully commissioned on 15\textsuperscript{th} January 2020 by President Museveni.
+
+\section{Nature and Role of UIRI}
+\noindent UIRI is a government agency that was initially under the Ministry of Trade, Industry, and Cooperatives (MTIC) and now falls under the Ministry of Science, Technology, and Innovation. The institute serves as a platform for value addition, technology incubation, applied research, and SME support.
+
+\noindent Key services include:
+\begin{itemize}
+    \item Product and process design
+    \item Fabrication of equipment and machinery
+    \item Analytical laboratory services (chemistry and microbiology)
+    \item Technical support to entrepreneurs and innovators
+    \item Business incubation and skills development
+\end{itemize}
+
+\noindent UIRI operates as a computerized and technology-intensive organization that bridges the gap between academic research, industrial application, and national development goals.
+
+\section{Vision, Mission, and Mandate}
+\noindent\textbf{Vision:} To be a model institution and center of excellence for the incubation of industry, and a pioneer of self-financing research and development that elevates the level of technology in Uganda and the region.
+
+\noindent\textbf{Mission:} To catalyze the socio-economic transformation of Uganda and the region through enhanced technology use.
+
+\noindent\textbf{Mandate:} To engage in applied research and activities such as value addition that will result in the rapid industrialization of Uganda.
+
+\section{Objectives of UIRI}
+\begin{itemize}
+    \item To carry out applied research for product development and innovation.
+    \item To develop or acquire appropriate technologies to support a competitive industrial sector.
+    \item To promote value addition that transforms raw materials into marketable products.
+    \item To bridge the gap between academia, government, and private sector through commercialization of research.
+\end{itemize}
+
+\section{Key Activities of UIRI}
+
+\subsection{Value Addition and Product Development}
+\noindent UIRI identifies new uses for raw materials and develops value-added products through prototyping and innovation.
+
+\subsection{Pilot Processing Plants}
+\noindent These serve as training and demonstration units for local entrepreneurs and facilitate small-scale product testing and development.
+
+\subsection{Business Incubation}
+\noindent The institute offers incubation services such as workspace, laboratory access, skills training, marketing, and business development support to startups and SMEs.
+
+\subsection{Technology Transfer}
+\noindent UIRI assists entrepreneurs in acquiring and adapting appropriate technologies from within or outside the country, helping to improve production and competitiveness.
+
+\subsection{Analytical Laboratory Services}
+\noindent The institute provides chemical and microbiological testing services that support product formulation, quality control, and market readiness.
+
+\section{Internship Scope and Relevance}
+\noindent As a Computer Science student with an interest in embedded systems and automation, I was attached to the Embedded Systems Unit within the Engineering Department. The internship exposed me to practical technologies including:
+\begin{itemize}
+    \item Microcontroller programming using Arduino and ESP8266
+    \item Circuit design and simulation using Proteus and Tinkercad
+    \item Logic control systems using Siemens Step 7 and PLCs
+    \item Interfacing sensors and actuators in home automation
+    \item Collaborative project planning and documentation
+\end{itemize}
+
+\noindent The training provided essential hands-on experience in hardware design, programming, troubleshooting, and teamwork, preparing me for real-world challenges in the fields of IoT and digital control systems.
+
+\section{Training Objectives}
+\noindent The objectives of the internship at UIRI were to:
+\begin{itemize}
+    \item Gain practical exposure to electronics and embedded systems.
+    \item Understand the industrial application of microcontrollers and control systems.
+    \item Develop a functional embedded project from planning to deployment.
+    \item Improve soft skills including teamwork, communication, and technical reporting.
+\end{itemize}
+
+\newpage
 \chapter{ACTIVITIES AND PROCEDURES}
 
 \section{Introduction}
 
-This chapter summarizes the key activities and procedures undertaken during the nine-week internship at Uganda Industrial Research Institute (UIRI) from May 22 to July 18, 2025. The internship was supervised by experienced UIRI personnel, each with specialized expertise: Mr. Atwine Philip (Digital Electronics), Mr. Adaon Michel (Analog Electronics), Mr. Ngobi Elijah and Mr. Mutesasira Bashir (Embedded Systems and IoT), Mr. Ainebyona Savior and Ms. Annah Faith (Industrial Automation and PLC Programming). They provided technical guidance and mentorship throughout the internship period. The following sections provide detailed descriptions of weekly activities, objectives, tools used, technical procedures, and key learning outcomes, verified under the appropriate supervisors as per the official log book.
+\noindent This chapter summarizes the key activities and procedures undertaken during the nine-week internship at Uganda Industrial Research Institute (UIRI) from May 22 to July 18, 2025. The internship was supervised by experienced UIRI personnel, each with specialized expertise: Mr. Atwine Philip (Digital Electronics), Mr. Adaon Michel (Analog Electronics), Mr. Ngobi Elijah and Mr. Mutesasira Bashir (Embedded Systems and IoT), Mr. Ainebyona Savior and Ms. Annah Faith (Industrial Automation and PLC Programming). They provided technical guidance and mentorship throughout the internship period. The following sections provide detailed descriptions of weekly activities, objectives, tools used, technical procedures, and key learning outcomes, verified under the appropriate supervisors as per the official log book.
 
 \section{Week 1: Digital Electronics Foundations}
 
-\textbf{Description:} The first week laid the groundwork for understanding digital electronics, focusing on combinational logic circuits and their practical applications. The intern engaged in both theoretical learning and hands-on experimentation to build a solid foundation in digital logic design. Activities included introduction to multiplexers, decoder circuits, diode biasing, and flip-flop design, culminating in a smart traffic light simulation.
+\noindent\textbf{Description:} The first week laid the groundwork for understanding digital electronics, focusing on combinational logic circuits and their practical applications. The intern engaged in both theoretical learning and hands-on experimentation to build a solid foundation in digital logic design. Activities included introduction to multiplexers, decoder circuits, diode biasing, and flip-flop design, culminating in a smart traffic light simulation.
 
-\textbf{Objectives:}
+\noindent\textbf{Objectives:}
 \begin{itemize}
     \item Master combinational logic circuit design including 2:1 and 4:1 multiplexers, BCD-to-seven-segment decoders, and SR flip-flops.
     \item Achieve proficiency in Tinkercad simulation platform and UIRI digital experimental hardware.
     \item Develop systematic debugging techniques for identifying logic gate malfunctions and timing issues.
 \end{itemize}
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{multicols}{2}
 \begin{itemize}
     \item Tinkercad simulation platform
@@ -112,16 +367,16 @@ This chapter summarizes the key activities and procedures undertaken during the 
 
 \section{Week 2: Analog Electronics and Measurement Techniques}
 
-\textbf{Description:} Week two introduced fundamental concepts of analog electronics, emphasizing component behavior and measurement techniques. The intern conducted practical experiments to understand electrical properties and signal analysis.
+\noindent\textbf{Description:} Week two introduced fundamental concepts of analog electronics, emphasizing component behavior and measurement techniques. The intern conducted practical experiments to understand electrical properties and signal analysis.
 
-\textbf{Objectives:}
+\noindent\textbf{Objectives:}
 \begin{itemize}
     \item Analyze voltage-current characteristics of PN junction diodes under forward and reverse bias conditions.
     \item Characterize capacitor charging/discharging time constants and transistor switching thresholds.
     \item Master oscilloscope operation for AC signal measurement and function generator frequency synthesis.
 \end{itemize}
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{multicols}{2}
 \begin{itemize}
     \item Function generator
@@ -137,8 +392,7 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \end{itemize}
 \end{multicols}
 
-\textbf{Technical Procedure:}
-\noindent
+\noindent\textbf{Technical Procedure:}
 \begin{itemize}
     \item Measured diode I-V curves using variable voltage sources and plotted characteristic responses.
     \item Investigated RC time constants through capacitor charge/discharge cycles with oscilloscope monitoring.
@@ -170,18 +424,18 @@ This chapter summarizes the key activities and procedures undertaken during the 
 
 \section{Weeks 3--7: Embedded Systems and IoT Development}
 
-\subsubsection{Embedded Systems Development (Weeks 3--4)}
+\subsection{Embedded Systems Development (Weeks 3--4)}
 
-\textbf{Description:} This period focused on Arduino-based microcontroller programming, sensor integration, and modular system design. The intern worked on an intruder detection system and initial smart home automation modules, gaining hands-on experience in hardware assembly and debugging.
+\noindent\textbf{Description:} This period focused on Arduino-based microcontroller programming, sensor integration, and modular system design. The intern worked on an intruder detection system and initial smart home automation modules, gaining hands-on experience in hardware assembly and debugging.
 
-\textbf{Objectives:}
+\noindent\textbf{Objectives:}
 \begin{itemize}
     \item Implement ultrasonic sensor distance measurement algorithms with sub-centimeter accuracy.
     \item Engineer modular code architecture for scalable home security system expansion.
     \item Resolve LCD display voltage regulation and I2C communication protocol errors.
 \end{itemize}
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{multicols}{2}
 \begin{itemize}
     \item Arduino UNO
@@ -195,8 +449,7 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \end{itemize}
 \end{multicols}
 
-\textbf{Technical Procedure:}
-\noindent
+\noindent\textbf{Technical Procedure:}
 \begin{itemize}
     \item Calibrated HC-SR04 sensor timing parameters for precise distance calculations using pulse-width measurement.
     \item Integrated multi-tone buzzer alarm sequences triggered by configurable proximity thresholds.
@@ -213,18 +466,18 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \label{fig:rgb-doorbell}
 \end{figure}
 
-\subsubsection{Smart Home System Implementation (Weeks 5--6)}
+\subsection{Smart Home System Implementation (Weeks 5--6)}
 
-\textbf{Description:} Focused on integrating security features such as RFID access control, wireless module testing, and assembling the full smart home system. Cloud connectivity was established using Firebase, and a mobile application was developed for remote monitoring and control.
+\noindent\textbf{Description:} Focused on integrating security features such as RFID access control, wireless module testing, and assembling the full smart home system. Cloud connectivity was established using Firebase, and a mobile application was developed for remote monitoring and control.
 
-\textbf{Objectives:}
+\noindent\textbf{Objectives:}
 \begin{itemize}
     \item Configure RC522 RFID authentication with encrypted card ID verification and access logging.
     \item Establish bidirectional Firebase Realtime Database communication for IoT device coordination.
     \item Deploy React Native mobile application with real-time system status monitoring and control interfaces.
 \end{itemize}
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{multicols}{2}
 \begin{itemize}
     \item Arduino UNO
@@ -262,18 +515,18 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \label{fig:full-system}
 \end{figure}
 
-\subsubsection{System Optimization and Real-Time Control (Week 7)}
+\subsection{System Optimization and Real-Time Control (Week 7)}
 
-\textbf{Description:} This week addressed system troubleshooting, authentication implementation, and real-time control optimization. The intern resolved hardware-software integration challenges, mitigated timer conflicts, and refined communication protocols for stable operation.
+\noindent\textbf{Description:} This week addressed system troubleshooting, authentication implementation, and real-time control optimization. The intern resolved hardware-software integration challenges, mitigated timer conflicts, and refined communication protocols for stable operation.
 
-\textbf{Objectives:}
+\noindent\textbf{Objectives:}
 \begin{itemize}
     \item Implement Firebase user credential embedding for secure cloud authentication protocols.
     \item Eliminate hardware timer conflicts between IRremote library and buzzer PWM generation.
     \item Optimize Firebase database polling intervals for sub-second command response latency.
 \end{itemize}
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{multicols}{2}
 \begin{itemize}
     \item NodeMCU ESP8266
@@ -285,7 +538,7 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \end{itemize}
 \end{multicols}
 
-\textbf{Technical Procedure:}
+\noindent\textbf{Technical Procedure:}
 \begin{itemize}
     \item Hardcoded Firebase authentication tokens with encrypted credential storage for autonomous operation.
     \item Reassigned hardware timer resources and adopted non-blocking toneAC library for conflict resolution.
@@ -297,16 +550,16 @@ This chapter summarizes the key activities and procedures undertaken during the 
 
 \section{Weeks 8--9: Industrial Automation and PLC Programming}
 
-\textbf{Description:} The final weeks focused on industrial automation concepts and Programmable Logic Controller (PLC) programming using Siemens STEP 7 software. The intern engaged in ladder logic design, timer and counter functions, and complex automation scenarios including traffic light control and conveyor sorting systems. The internship culminated with project presentations and professional development sessions.
+\noindent\textbf{Description:} The final weeks focused on industrial automation concepts and Programmable Logic Controller (PLC) programming using Siemens STEP 7 software. The intern engaged in ladder logic design, timer and counter functions, and complex automation scenarios including traffic light control and conveyor sorting systems. The internship culminated with project presentations and professional development sessions.
 
-\textbf{Objectives:}
+\noindent\textbf{Objectives:}
 \begin{itemize}
     \item Program Siemens S7-300 ladder logic for industrial conveyor sorting with multi-sensor decision trees.
     \item Design timer-based traffic light control systems with pedestrian crossing integration and emergency override.
     \item Execute comprehensive project presentations demonstrating technical competency and system integration mastery.
 \end{itemize}
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{multicols}{2}
 \begin{itemize}
     \item Siemens STEP 7 software
@@ -318,7 +571,7 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \end{itemize}
 \end{multicols}
 
-\textbf{Technical Procedure:}
+\noindent\textbf{Technical Procedure:}
 \begin{itemize}
     \item Analyzed PLC memory architecture including input/output modules, data blocks, and function block organization.
     \item Developed ladder logic sequences for material handling automation with proximity sensor feedback.
@@ -345,16 +598,15 @@ This chapter summarizes the key activities and procedures undertaken during the 
 
 \section{Week 9: Project Presentation and Closing Remarks}
 
-\textbf{Objective:} Execute professional project presentations demonstrating comprehensive technical integration and system functionality.
+\noindent\textbf{Objective:} Execute professional project presentations demonstrating comprehensive technical integration and system functionality.
 
-\textbf{Tools and Materials Used:}
+\noindent\textbf{Tools and Materials Used:}
 \begin{itemize}
     \item Final project hardware setup
     \item Presentation slides (PPT)
 \end{itemize}
 
-\textbf{Technical Procedure:}
-\noindent
+\noindent\textbf{Technical Procedure:}
 \begin{itemize}
     \item Demonstrated complete smart home system functionality including RFID authentication, motion detection, automated fan control, and Firebase cloud synchronization.
     \item Presented technical architecture, implementation challenges, and solution methodologies to UCU and UIRI leadership panel.
@@ -370,115 +622,146 @@ This chapter summarizes the key activities and procedures undertaken during the 
 \label{fig:closing-remarks}
 \end{figure}
 
+\newpage
 \chapter{LESSONS LEARNED AND LEARNING OUTCOMES}
 
 \section{Introduction}
 
-This chapter presents a comprehensive reflection on the technical competencies and professional skills acquired during the UIRI internship experience. The structured progression through multiple engineering disciplines provided both depth and breadth in practical technology application.
+\noindent This chapter presents a comprehensive reflection on the technical competencies and professional skills acquired during the UIRI internship experience. The structured progression through multiple engineering disciplines provided both depth and breadth in practical technology application.
 
 \section{Technical Lessons Learned}
 
-\subsection*{1. Digital Logic Design and Circuit Implementation}
-Mastered systematic approach to combinational and sequential logic design, including multiplexer selection logic, decoder truth table verification, and flip-flop state machine programming. Gained proficiency in simulation-to-hardware validation workflows using Tinkercad and physical breadboard implementations.
+\subsection{Digital Logic Design and Circuit Implementation}
+\noindent Mastered systematic approach to combinational and sequential logic design, including multiplexer selection logic, decoder truth table verification, and flip-flop state machine programming. Gained proficiency in simulation-to-hardware validation workflows using Tinkercad and physical breadboard implementations.
 
-\subsection*{2. Embedded Microcontroller Programming and Sensor Integration}
-Developed expertise in Arduino IDE programming with focus on real-time sensor data processing, interrupt-driven event handling, and modular code architecture. Acquired specialized skills in ultrasonic sensor calibration, RFID authentication protocols, and multi-peripheral communication management.
+\subsection{Embedded Microcontroller Programming and Sensor Integration}
+\noindent Developed expertise in Arduino IDE programming with focus on real-time sensor data processing, interrupt-driven event handling, and modular code architecture. Acquired specialized skills in ultrasonic sensor calibration, RFID authentication protocols, and multi-peripheral communication management.
 
-\subsection*{3. Cloud-Based IoT Architecture and Mobile Application Development}
-Established competency in Firebase Realtime Database configuration, bidirectional data synchronization, and authentication security implementation. Gained proficiency in React Native mobile development with emphasis on hardware control interfaces and real-time status monitoring.
+\subsection{Cloud-Based IoT Architecture and Mobile Application Development}
+\noindent Established competency in Firebase Realtime Database configuration, bidirectional data synchronization, and authentication security implementation. Gained proficiency in React Native mobile development with emphasis on hardware control interfaces and real-time status monitoring.
 
-\subsection*{4. Industrial Automation and PLC System Programming}
-Achieved fluency in Siemens STEP 7 ladder logic programming, including timer functions, counter operations, and sensor-based decision logic. Developed understanding of industrial automation standards, safety protocols, and system scalability considerations.
+\subsection{Industrial Automation and PLC System Programming}
+\noindent Achieved fluency in Siemens STEP 7 ladder logic programming, including timer functions, counter operations, and sensor-based decision logic. Developed understanding of industrial automation standards, safety protocols, and system scalability considerations.
 
 \section{Advanced Problem-Solving and Engineering Analysis}
 
-The internship emphasized systematic troubleshooting methodologies, requiring analysis of hardware-software integration challenges, timing conflicts, and communication protocol optimization. This experience developed critical thinking skills essential for complex system debugging and performance optimization.
+\noindent The internship emphasized systematic troubleshooting methodologies, requiring analysis of hardware-software integration challenges, timing conflicts, and communication protocol optimization. This experience developed critical thinking skills essential for complex system debugging and performance optimization.
 
 \section{Professional Development and Communication Skills}
 
-\subsection*{1. Technical Collaboration and Knowledge Transfer}
-Enhanced ability to work within multidisciplinary teams, contribute to peer code reviews, and communicate complex technical concepts to both technical and non-technical audiences. Developed skills in technical mentorship and knowledge sharing.
+\subsection{Technical Collaboration and Knowledge Transfer}
+\noindent Enhanced ability to work within multidisciplinary teams, contribute to peer code reviews, and communicate complex technical concepts to both technical and non-technical audiences. Developed skills in technical mentorship and knowledge sharing.
 
-\subsection*{2. Professional Documentation and Presentation}
-Improved technical writing capabilities through system documentation, code commenting, and report preparation. Strengthened presentation skills through formal project demonstrations and stakeholder communication.
+\subsection{Professional Documentation and Presentation}
+\noindent Improved technical writing capabilities through system documentation, code commenting, and report preparation. Strengthened presentation skills through formal project demonstrations and stakeholder communication.
 
-\subsection*{3. Project Management and Resource Optimization}
-Developed time management skills for concurrent project development, resource allocation for shared laboratory equipment, and adaptive planning for technical challenges and changing requirements.
+\subsection{Project Management and Resource Optimization}
+\noindent Developed time management skills for concurrent project development, resource allocation for shared laboratory equipment, and adaptive planning for technical challenges and changing requirements.
 
 \section{Career Development and Industry Insights}
 
-The comprehensive exposure to embedded systems, IoT architecture, and industrial automation clarified career interests and provided practical understanding of current industry technologies and methodologies. The mentorship experience highlighted the importance of continuous learning and professional development in rapidly evolving technical fields.
+\noindent The comprehensive exposure to embedded systems, IoT architecture, and industrial automation clarified career interests and provided practical understanding of current industry technologies and methodologies. The mentorship experience highlighted the importance of continuous learning and professional development in rapidly evolving technical fields.
 
+\newpage
 \chapter{CHALLENGES, RECOMMENDATIONS AND CONCLUSION}
 
 \section{Introduction}
 
-This chapter analyzes the primary challenges encountered during the UIRI internship and provides evidence-based recommendations for program enhancement. The assessment is based on direct experience with training resources, technical tools, and learning methodologies.
+\noindent This chapter analyzes the primary challenges encountered during the UIRI internship and provides evidence-based recommendations for program enhancement. The assessment is based on direct experience with training resources, technical tools, and learning methodologies.
 
 \section{Challenges Faced}
 
-\subsection*{1. Laboratory Equipment Access Limitations}
-Periodic constraints on specialized hardware including GSM communication modules, RFID development kits, and PLC programming stations limited hands-on experimentation time during peak training periods.
+\subsection{Laboratory Equipment Access Limitations}
+\noindent Periodic constraints on specialized hardware including GSM communication modules, RFID development kits, and PLC programming stations limited hands-on experimentation time during peak training periods.
 
-\subsection*{2. Compressed Development Timeline for Complex Integration}
-The intensive nine-week schedule, while comprehensive, provided limited time for iterative optimization of embedded systems projects, particularly during the IoT integration and mobile application development phases.
+\subsection{Compressed Development Timeline for Complex Integration}
+\noindent The intensive nine-week schedule, while comprehensive, provided limited time for iterative optimization of embedded systems projects, particularly during the IoT integration and mobile application development phases.
 
-\subsection*{3. Software-Hardware Configuration Dependencies}
-Embedded module initialization, particularly GSM AT command configuration and Firebase SDK integration, required extensive setup procedures that occasionally disrupted development momentum.
+\subsection{Software-Hardware Configuration Dependencies}
+\noindent Embedded module initialization, particularly GSM AT command configuration and Firebase SDK integration, required extensive setup procedures that occasionally disrupted development momentum.
 
-\subsection*{4. Infrastructure Reliability for Cloud-Based Development}
-Internet connectivity stability and electrical power continuity challenges occasionally impacted Firebase database synchronization and cloud-based development activities.
+\subsection{Infrastructure Reliability for Cloud-Based Development}
+\noindent Internet connectivity stability and electrical power continuity challenges occasionally impacted Firebase database synchronization and cloud-based development activities.
 
-\subsection*{5. Advanced Tool Learning Curve}
-Siemens STEP 7 programming environment and React Native development framework presented significant learning curves for participants without prior exposure to industrial automation or mobile development platforms.
+\subsection{Advanced Tool Learning Curve}
+\noindent Siemens STEP 7 programming environment and React Native development framework presented significant learning curves for participants without prior exposure to industrial automation or mobile development platforms.
 
 \section{Recommendations}
 
-\subsection*{1. Expanded Hardware Resource Allocation}
-Increase availability of critical development modules including GSM units, RFID systems, and PLC training stations to ensure adequate hands-on experience for all participants.
+\subsection{Expanded Hardware Resource Allocation}
+\noindent Increase availability of critical development modules including GSM units, RFID systems, and PLC training stations to ensure adequate hands-on experience for all participants.
 
-\subsection*{2. Extended Project Development Phases}
-Allocate additional time for embedded systems and IoT development phases to allow for comprehensive system optimization and documentation.
+\subsection{Extended Project Development Phases}
+\noindent Allocate additional time for embedded systems and IoT development phases to allow for comprehensive system optimization and documentation.
 
-\subsection*{3. Pre-Configured Development Environments}
-Establish standardized, pre-configured development setups including driver installations, library dependencies, and Firebase project templates to minimize setup overhead.
+\subsection{Pre-Configured Development Environments}
+\noindent Establish standardized, pre-configured development setups including driver installations, library dependencies, and Firebase project templates to minimize setup overhead.
 
-\subsection*{4. Infrastructure Reliability Enhancement}
-Implement robust backup power systems and redundant internet connectivity to ensure consistent cloud-based development capabilities.
+\subsection{Infrastructure Reliability Enhancement}
+\noindent Implement robust backup power systems and redundant internet connectivity to ensure consistent cloud-based development capabilities.
 
-\subsection*{5. Progressive Tool Introduction}
-Introduce advanced development environments through preliminary orientation sessions, providing foundational knowledge before intensive application phases.
+\subsection{Progressive Tool Introduction}
+\noindent Introduce advanced development environments through preliminary orientation sessions, providing foundational knowledge before intensive application phases.
 
 \section{Overall Conclusion}
 
-The nine-week UIRI internship successfully bridged academic theory with practical industry application through structured progression from foundational electronics to advanced embedded systems and industrial automation.
+\noindent The nine-week UIRI internship successfully bridged academic theory with practical industry application through structured progression from foundational electronics to advanced embedded systems and industrial automation.
 
-The program delivered comprehensive technical competencies across digital circuit design, analog measurement, embedded programming, IoT integration, and PLC automation. Expert mentorship from UIRI technical staff ensured deep understanding of complex technologies through hands-on methodology.
+\noindent The program delivered comprehensive technical competencies across digital circuit design, analog measurement, embedded programming, IoT integration, and PLC automation. Expert mentorship from UIRI technical staff ensured deep understanding of complex technologies through hands-on methodology.
 
-Challenging project phases developed critical engineering judgment and systematic troubleshooting capabilities. Resolving hardware timer conflicts and optimizing cloud communication protocols provided authentic professional experience beyond traditional academic settings.
+\noindent Challenging project phases developed critical engineering judgment and systematic troubleshooting capabilities. Resolving hardware timer conflicts and optimizing cloud communication protocols provided authentic professional experience beyond traditional academic settings.
 
-Professional development was equally significant, with substantial improvement in technical communication, collaborative problem-solving, and project management. Presenting to professional evaluation panels and maintaining comprehensive documentation provided essential career preparation.
+\noindent Professional development was equally significant, with substantial improvement in technical communication, collaborative problem-solving, and project management. Presenting to professional evaluation panels and maintaining comprehensive documentation provided essential career preparation.
 
-The internship clarified professional interests while providing realistic perspectives on engineering practice. Exposure to current industry technologies and experienced practitioner mentorship offered valuable career development insights.
+\noindent The internship clarified professional interests while providing realistic perspectives on engineering practice. Exposure to current industry technologies and experienced practitioner mentorship offered valuable career development insights.
 
-Operational challenges, including equipment limitations and infrastructure constraints, provided additional learning opportunities in resource management and adaptive problem-solving that contribute to professional growth.
+\noindent Operational challenges, including equipment limitations and infrastructure constraints, provided additional learning opportunities in resource management and adaptive problem-solving that contribute to professional growth.
 
-The internship achieved its primary objectives of developing practical engineering competencies and providing career guidance. The technical skills and professional insights gained provide a solid foundation for advanced academic pursuits and successful career development in embedded systems, IoT, and industrial automation.
+\noindent The internship achieved its primary objectives of developing practical engineering competencies and providing career guidance. The technical skills and professional insights gained provide a solid foundation for advanced academic pursuits and successful career development in embedded systems, IoT, and industrial automation.
 
-\chapter*{References}
+\newpage
+% References
+{\fontsize{14}{16.8}\selectfont\bfseries\centering REFERENCES\par}
+\vspace{10pt}
 \addcontentsline{toc}{chapter}{References}
 
-\begin{itemize}
-    \item Uganda Industrial Research Institute. (2020). \textit{Corporate Profile}. Retrieved from \url{https://www.uiri.go.ug}
-    \item Arduino Project Hub. (2024). \textit{Arduino Tutorials}. Retrieved from \url{https://create.arduino.cc/projecthub}
-    \item Firebase. (2024). \textit{Firebase Realtime Database Documentation}. Retrieved from \url{https://firebase.google.com/docs/database}
-    \item Siemens. (2024). \textit{STEP 7 Basic and Professional Documentation}. Retrieved from \url{https://support.industry.siemens.com}
-    \item Expo DevTools. (2024). \textit{React Native + Expo Documentation}. Retrieved from \url{https://docs.expo.dev}
-\end{itemize}
+\begin{thebibliography}{9}
 
+\bibitem{uiri2020}
+Uganda Industrial Research Institute. (2020). \textit{Corporate Profile}. Retrieved from \url{https://www.uiri.go.ug}
+
+\bibitem{arduino2024}
+Arduino Project Hub. (2024). \textit{Arduino Tutorials}. Retrieved from \url{https://create.arduino.cc/projecthub}
+
+\bibitem{firebase2024}
+Firebase. (2024). \textit{Firebase Realtime Database Documentation}. Retrieved from \url{https://firebase.google.com/docs/database}
+
+\bibitem{siemens2024}
+Siemens. (2024). \textit{STEP 7 Basic and Professional Documentation}. Retrieved from \url{https://support.industry.siemens.com}
+
+\bibitem{expo2024}
+Expo DevTools. (2024). \textit{React Native + Expo Documentation}. Retrieved from \url{https://docs.expo.dev}
+
+\bibitem{ieee2024}
+IEEE. (2024). \textit{IEEE Standards for Embedded Systems}. IEEE Computer Society Press.
+
+\bibitem{arduino_uno}
+Atmel Corporation. (2023). \textit{ATmega328P Microcontroller Datasheet}. Atmel Corporation.
+
+\bibitem{esp8266}
+Espressif Systems. (2024). \textit{ESP8266 Wi-Fi Module Technical Reference}. Espressif Systems.
+
+\bibitem{react_native}
+Meta Platforms, Inc. (2024). \textit{React Native Documentation}. Retrieved from \url{https://reactnative.dev/docs/getting-started}
+
+\end{thebibliography}
+
+\newpage
 \appendix
 
-\chapter*{Appendix}
+% Appendix
+{\fontsize{14}{16.8}\selectfont\bfseries\centering APPENDIX\par}
+\vspace{10pt}
 \addcontentsline{toc}{chapter}{Appendix}
 
 \begin{figure}[H]
@@ -501,4 +784,5 @@ The internship achieved its primary objectives of developing practical engineeri
 \caption{Voltage measurement techniques using digital multimeter}
 \label{fig:multimeter-usage}
 \end{figure}
+
 \end{document}
