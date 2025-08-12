@@ -291,6 +291,15 @@ Tinkercad & Web-based circuit design and simulation platform \\
 \newpage
 
 \pagenumbering{arabic}
+\fancyhf{}  % Clear all header/footer settings
+\fancyfoot[R]{Page \thepage}  % Set right-aligned "Page X" for main content
+
+% Redefine plain page style for chapter pages
+  \fancypagestyle{plain}{%
+  \fancyhf{}  % Clear all header/footer settings for plain style
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyfoot[R]{Page \thepage}  % Set right-aligned "Page X" for chapter pages
+} 
 
 \chapter[CHAPTER ONE INTRODUCTION AND BACKGROUND TO UIRI]{CHAPTER ONE \\INTRODUCTION AND BACKGROUND TO UIRI}
 
@@ -865,11 +874,11 @@ Tinkercad & Web-based circuit design and simulation platform \\
 \label{fig:multimeter-usage}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.67\textwidth]{img/part of the current smart home app interface.png}
-\caption{Smart home mobile application interface showing real-time control and monitoring capabilities}
-\label{fig:mobile-app}
-\end{figure}
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.67\textwidth]{img/part of the current smart home app interface.png}
+% \caption{Smart home mobile application interface showing real-time control and monitoring capabilities}
+% \label{fig:mobile-app}
+% \end{figure}
 
 \end{document}
