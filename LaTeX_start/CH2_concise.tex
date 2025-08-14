@@ -123,36 +123,35 @@
 
 \pagenumbering{roman}
 
-% Title Page - UCU Version
+% Title Page - Updated UIRI Version
 \begin{titlepage}
     \centering
-    \vspace*{-1cm}
+    \vspace*{-0.5cm}
     
-    % UCU Logo
-    \includegraphics[width=0.9\textwidth]{img/UCU3.png}\\[1.5cm]
+    % UIRI Logo
+    \makebox[\textwidth]{\includegraphics[width=18cm]{img/UIRI4.png}}\par
+    \vspace{1.5cm}
     
     {\fontsize{18}{21.6}\selectfont\bfseries INTERNSHIP REPORT}\\[0.5cm]
     
-    {\fontsize{14}{16.8}\selectfont\bfseries On} \\[0.4cm]
+    {\fontsize{14}{16.8}\selectfont\bfseries On}\\[0.4cm]
     
-    {\fontsize{16}{19.2}\selectfont\bfseries ADVANCED TRAINING AT}\\[0.3cm]
-    {\fontsize{16}{19.2}\selectfont\bfseries UGANDA INDUSTRIAL RESEARCH INSTITUTE}\\[0.2cm]
-    {\fontsize{16}{19.2}\selectfont\bfseries (UIRI)}\\[1cm]
-
-    {\fontsize{14}{16.8}\selectfont\bfseries By:} \\[0.4cm]
+    {\fontsize{16}{19.2}\selectfont\bfseries ADVANCED HANDS-ON TRAINING IN EMBEDDED SYSTEMS AND INDUSTRIAL AUTOMATION}\\[1.2cm]
+    
+    {\fontsize{14}{16.8}\selectfont\bfseries By:}\\[0.4cm]
     {\fontsize{16}{19.2}\selectfont\bfseries EZAMAMTI RONALD AUSTINE}\\[0.3cm]
-    {\fontsize{14}{16.8}\selectfont Reg. No: S23B23/018}\\[0.2cm]
-    {\fontsize{14}{16.8}\selectfont Access No: B24252}\\[1.2cm]
+    {\fontsize{12}{16.8}\selectfont Reg. No: S23B23/018}\\[0.2cm]
+    {\fontsize{12}{16.8}\selectfont Email: austineblackezamati@gmail.com}\\[1.2cm]
+    
+    {\fontsize{14}{16.8}\selectfont\bfseries A Report Submitted to the Training and Development Centre (TDC)}\\[0.3cm]
+    {\fontsize{14}{16.8}\selectfont\bfseries Uganda Industrial Research Institute}\\[0.5cm]
+    
+    {\fontsize{12}{16.8}\selectfont\bfseries In Partial Fulfillment of the Requirements for the Award of the Degree of}\\[0.2cm]
+    {\fontsize{12}{16.8}\selectfont\bfseries Bachelor of Science in Computer Science}\\[1.5cm]
+    
+    {\fontsize{14}{16.8}\selectfont\bfseries Period of Internship:}\\[0.3cm]
+    {\fontsize{12}{16.8}\selectfont\textit{22\textsuperscript{nd} May 2025 - 18\textsuperscript{th} July 2025}}\\[1cm]
 
-    {\fontsize{14}{16.8}\selectfont\bfseries A Report Submitted to the} \\[0.3cm]
-    {\fontsize{14}{16.8}\selectfont\bfseries Faculty of Engineering, Design and Technology}\\[0.3cm]
-    {\fontsize{14}{16.8}\selectfont\bfseries Uganda Christian University}\\[0.8cm]
-
-    {\fontsize{12}{16.8}\selectfont\bfseries In Partial Fulfillment of the Requirements for the Award of the Degree of} \\[0.3cm]
-    {\fontsize{12}{16.8}\selectfont\bfseries Bachelor of Science in Computer Science}\\[0.7cm]
-
-    {\fontsize{14}{16.8}\selectfont\bfseries Period of Internship:} \\[0.3cm]
-    {\fontsize{12}{16.8}\selectfont 22\textsuperscript{nd} May 2025 - 18\textsuperscript{th} July 2025}
 \end{titlepage}
 
 % Declaration
@@ -168,21 +167,18 @@
 \noindent \textbf{Student's Signature:} \rule{6cm}{0.2pt} \hfill \textbf{Date:} \rule{3cm}{0.2pt}
 
 \newpage
-% Approval
+% Approval Page for UIRI
 {\fontsize{14}{16.8}\selectfont\bfseries\centering APPROVAL\par}
 \vspace{10pt}
 \addcontentsline{toc}{chapter}{Approval}
-\noindent This internship report has been submitted for review, and has received the approval of the \\supervisors listed below.\\[1cm]
 
-\noindent \textbf{University Supervisor:} \\
-Mr. Isaac Ndawula       \\
-Department of Computing and Technology, Uganda Christian University\\[0.5cm]
-Signature: \rule{5cm}{0.2pt} \hfill Date: \rule{3cm}{0.2pt}\\[1cm]
+\noindent This internship report has been reviewed and approved by the industrial supervisor named \\below.\\[1.2cm]
 
 \noindent \textbf{Industrial Supervisor:} \\
-Mr. Musana Sabiiti John\\
-Uganda Industrial Research Institute (UIRI)\\[0.5cm]
-Signature: \rule{5cm}{0.2pt} \hfill Date: \rule{3cm}{0.2pt}
+Engineer. Musana Sabiiti John \\
+Training and Development Centre (TDC) \\Uganda Industrial Research Institute (UIRI)\\[0.8cm]
+
+\noindent Signature: \rule{5cm}{0.2pt} \hfill Date: \rule{3cm}{0.2pt}
 
 \newpage
 % Acknowledgement
@@ -224,6 +220,7 @@ Signature: \rule{5cm}{0.2pt} \hfill Date: \rule{3cm}{0.2pt}
 \tableofcontents
 \vspace{40pt}
 
+\vspace{0.2cm}
 % List of Figures
 \addcontentsline{toc}{chapter}{List of Figures}
 \listoffigures
@@ -433,7 +430,7 @@ Tinkercad & Web-based circuit design and simulation platform \\
 \caption{4-input multiplexer circuit simulation using Tinkercad platform}
 \label{fig:multiplexer-sim}
 
-\vspace{1.5em}
+\vspace{3.5em}
 
 % Bottom row: two images side by side
 \begin{minipage}[t]{0.49\textwidth}
@@ -828,21 +825,27 @@ Tinkercad & Web-based circuit design and simulation platform \\
 \vspace{10pt}
 \addcontentsline{toc}{chapter}{References}
 
-\noindent \url{https://www.uiri.go.ug}
+\noindent\hangindent=1.4em [1] \url{https://www.uiri.go.ug}
 
-\noindent \url{https://www.uiri.go.ug/about}
+\noindent\hangindent=1.4em [2] \url{https://www.uiri.go.ug/about}
 
-\noindent Arduino component tutorials and projects: 
+\noindent\hangindent=1.4em [3] Arduino component tutorials and projects: 
 \url{https://projecthub.arduino.cc}
 
-\noindent Circuit design and simulation platform: 
+\noindent\hangindent=1.4em [4] Circuit design and simulation platform: 
 \url{https://www.tinkercad.com}
 
-\noindent More on the Home monitoring system: \\
+\noindent\hangindent=1.4em [5] More on the Home monitoring system: \\
 \url{https://drive.google.com/drive/folders/1kpCOZwo20NtfggT5KUVm3Gei5rfW0cfG?usp=drive_link}
 
-\noindent More images can be got from this link: \\
+\noindent\hangindent=1.4em [6] More images can be got from this link: \\
 \url{https://drive.google.com/drive/folders/13eKcRinhntNd0XVgoEnWzphzhrrDpTjw?usp=sharing}
+
+\noindent\hangindent=1.4em [7] Al Tareq, Abdulla, Md Riad Mostofa, Md Juel Rana, and Md Sadiqur Rahman. (2024). "A comprehensive review of intelligent home automation systems using embedded devices and IoT." \textit{Control Systems and Optimization Letters} 2, no. 2: 198-203.
+\vspace{0.2cm}
+
+\noindent\hangindent=1.4em [8] Kimutai, Metto S., Omieno K. Kelvin, and Ondulo M. Jasper. (2022). "Challenges and Opportunities for Smart Homes Deployment in Developing Countries: A Case Study of the User Perspective in Kenya." \textit{Open Access Library Journal} 9, no. 7: 1-8.
+\vspace{0.2cm}
 
 
 \newpage
