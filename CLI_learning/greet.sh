@@ -8,3 +8,6 @@ read name
 
 # Print a greeting 
 echo "Hello, $name! Welcome to Linux scripting lol"
+
+
+echo "Sap $name, today is $(date)"
