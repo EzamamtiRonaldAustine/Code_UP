@@ -14,9 +14,9 @@ if ( digitalRead ( 7 ) == HIGH) // If switch is On
   digitalWrite ( 6, LOW);
   } 
 
-  // digitalWrite(3, HIGH); // turn LED on
-  // delay(1000);           // wait for 1 second
-  // digitalWrite(3, LOW);  // turn LED off
-  // delay(1000);           // wait for 1 second
+  digitalWrite(3, HIGH); // turn LED on
+  delay(1000);           // wait for 1 second
+  digitalWrite(3, LOW);  // turn LED off
+  delay(1000);           // wait for 1 second
 } 
 
