@@ -1,0 +1,82 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{booktabs}
+\geometry{margin=0.2in}
+
+\begin{document}
+
+\section*{Smart Fish Pond Management System: Component Table with Estimated Costs}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{3.2cm}|
+                    >{\raggedright\arraybackslash}p{5.0cm}|
+                    >{\raggedright\arraybackslash}p{5.5cm}|
+                    >{\centering\arraybackslash}p{1.2cm}|
+                    >{\centering\arraybackslash}p{2.5cm}|}
+\hline
+\textbf{Component} & \textbf{Purpose} & \textbf{Recommended spec / interface} & \textbf{Qty} & \textbf{Estimated Cost (UGX)} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Component} & \textbf{Purpose} & \textbf{Recommended spec / interface} & \textbf{Qty} & \textbf{Estimated Cost (UGX)} \\
+\hline
+\endhead
+
+ESP32 (Dev board) & Main MCU + IoT communication & Dual-core, 240 MHz, Wi-Fi/BLE, 3.3V I/O, USB-serial & 1 & 60,000 \\
+\hline
+Dissolved Oxygen Sensor & Monitors oxygen levels & Galvanic/optical DO probe + amplifier & 1 & 150,000–250,000 \\
+\hline
+pH Sensor + Amplifier & Tracks acidity/alkalinity & pH electrode + amplifier module & 1 & 142,000 \\
+\hline
+Turbidity Sensor & Detects water cloudiness & Optical sensor, analog output & 1 & 50,000–100,000 \\
+\hline
+Temperature Sensor & Monitors pond temperature & DS18B20 waterproof, OneWire & 1–2 & 10,000–25,000 each \\
+\hline
+Ammonia/Nitrate Sensor & Detects waste buildup & Ion-selective, analog or RS-485 & 1 & 200,000–400,000 \\
+\hline
+Water Level Sensor & Monitors pond level & Ultrasonic or float switch & 1 & 30,000–60,000 \\
+\hline
+Relay / MOSFET Driver & Controls aerator/pump safely & 5V relay or N-MOSFET with flyback diode & 1–2 & 40,000–80,000 \\
+\hline
+Water Pump & Circulates pond water & Submersible DC/AC, 12–24V, 10–50W & 1 & 150,000–300,000 \\
+\hline
+Aerator & Maintains dissolved oxygen & DC/AC aerator, 5–20W & 1 & 100,000–200,000 \\
+\hline
+GSM Module & Sends alerts & SIM800L/SIM7600, 3.7–4.2V supply & 1 & 80,000–150,000 \\
+\hline
+ADS1115 ADC & High-resolution analog conversion & 16-bit, 4-channel, I\textsuperscript{2}C & 1 & 30,000–60,000 \\
+\hline
+RS-485 Transceiver & Connects industrial sensors & MAX485 module & 1 & 20,000–50,000 \\
+\hline
+Power Supply (Solar + Battery) & Off-grid power & 12V solar, 12V battery, MPPT/PWM controller & 1 set & 400,000–800,000 \\
+\hline
+DC-DC Converters & Regulated 5V/3.3V & Buck converters & 2 & 20,000–40,000 each \\
+\hline
+Enclosure & Protect electronics & IP65/IP67 box & 1 & 60,000–120,000 \\
+\hline
+Sensor Mounting Fixtures & Hold sensors in place & Clips/floats for tank & Set & 20,000–40,000 \\
+\hline
+Water Container (demo tank) & Portable pond simulation & Plastic tank 20–50 L & 1 & 50,000–120,000 \\
+\hline
+Tubing + Fittings & Connect pump/aerator & PVC/silicone tubes, connectors & Set & 20,000–50,000 \\
+\hline
+Air Stone / Diffuser & Disperse aerator air & Fine-bubble diffuser & 1–2 & 10,000–20,000 each \\
+\hline
+Decoupling / LC Capacitors & Stabilize analog signals & 0.1–100 μF, small LC filter & Set & 5,000–15,000 \\
+\hline
+Sensor Amplifier Boards & Improve signal & DO/pH amplifier modules & Set & 50,000–100,000 \\
+\hline
+Opto-Isolation (for relays) & Protect MCU from spikes & Opto-coupler module & Optional & 10,000–30,000 \\
+\hline
+LCD / OLED Display & Shows real-time sensor data & I²C or SPI interface, 16x2 or 0.96″ OLED & 1 & 50,000–100,000 \\
+\hline
+Buzzer & Audio alerts for threshold breach & Piezo or small speaker & 1 & 5,000–15,000 \\
+\hline
+LED Indicators & Visual alerts / status signals & Red/Green/Yellow LEDs, 5mm & 3–5 & 2,000–5,000 each \\
+\hline
+
+\end{longtable}
+
+\end{document}
