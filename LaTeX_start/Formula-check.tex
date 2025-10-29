@@ -1,0 +1,50 @@
+% Preamble suggestion: You'll need the amsmath package
+% \usepackage{amsmath}
+
+\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+
+\section*{Analysis of Threshold Voltage ($V_T$) Formulas}
+
+\subsection*{The Standard, Physically Correct Formula}
+The threshold voltage is defined as the sum of three distinct voltage components required to achieve strong inversion in the nMOS on a p-substrate.
+$$
+V_T = \underbrace{\left(\phi_{GC} - \frac{Q_{OX}}{C_{OX}}\right)}_{V_{FB} \text{ (Flat-Band Voltage)}} \mathbf{+} \underbrace{2\phi_F}_{\text{Inversion Voltage}} \mathbf{+} \underbrace{\frac{|Q_B|}{C_{OX}}}_{\text{Depletion Voltage}}
+$$
+
+\hrule
+
+\subsection*{Supervisor's Formula (Formula 2 from the image)}
+$$
+V_T = \phi_{GC} - 2\phi_F - \frac{Q_B}{C_{OX}} - \frac{Q_{OX}}{C_{OX}}
+$$
+
+\hrule
+
+\subsection*{Evidence and Discrepancy}
+
+\subsubsection*{Discrepancy: The $2\phi_F$ Term}
+The term $2\phi_F$ represents the \textbf{positive surface potential} required to bend the silicon energy bands to achieve strong inversion. Since $V_T$ is the total positive gate voltage needed, this component must be \textbf{added} to the Flat-Band Voltage.
+
+\begin{equation}
+\label{eq:discrepancy}
+    \text{Standard Form} \implies \mathbf{+2\phi_F} \qquad | \qquad \text{Formula (2) } \implies \mathbf{-2\phi_F}
+\end{equation}
+
+\subsubsection*{Physical Requirement (nMOS on p-Substrate)}
+For the nMOS on a p-type substrate, the inversion requirement $2\phi_F$ is always a positive value:
+$$
+2\phi_F = 2 \frac{kT}{q} \ln\left(\frac{N_A}{n_i}\right) > 0
+$$
+Therefore, the subtraction in Formula (2) ($\mathbf{-2\phi_F}$) incorrectly reduces the required threshold voltage by $0.612\text{ V}$, which contradicts the fundamental physics of MOSFET turn-on.
+
+\subsubsection*{Final Calculation using the Standard Formula (Question Four)}
+Using the correct signs:
+\begin{align*}
+V_T &= \left(\phi_{GC} - \frac{Q_{OX}}{C_{OX}}\right) + 2\phi_F + \frac{|Q_B|}{C_{OX}} \\
+V_T &\approx (-1.032\text{ V}) + (+0.612\text{ V}) + (+0.115\text{ V}) \\
+\mathbf{V_T} &\approx \mathbf{-0.305\text{ V}}
+\end{align*}
+
+\end{document}
