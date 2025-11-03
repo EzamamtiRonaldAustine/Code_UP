@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultrasonic Distance Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .distance-display {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .distance-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .distance-label {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .safe {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-on {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-on:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-off {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-off:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .status-message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 Distance Monitor</h1>
+        
+        <div class="distance-display">
+            <div>Current Distance</div>
+            <div id="distance-value" class="distance-value">-- cm</div>
+            <span id="distance-label" class="distance-label safe">SAFE</span>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-on" onclick="controlBuzzer('on')">Buzzer ON</button>
+            <button class="btn-off" onclick="controlBuzzer('off')">Buzzer OFF</button>
+        </div>
+        
+        <div id="status-message" class="status-message" style="display: none;"></div>
+    </div>
+    
+    <script>
+        // Update distance every 500ms
+        function updateDistance() {
+            fetch('/distance')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('distance-value').textContent = data.distance + ' cm';
+                    
+                    const label = document.getElementById('distance-label');
+                    label.textContent = data.label;
+                    label.className = 'distance-label ' + data.status;
+                })
+                .catch(error => {
+                    console.error('Error fetching distance:', error);
+                    document.getElementById('distance-value').textContent = 'Error';
+                });
+        }
+
+        // Buzzer control
+        function controlBuzzer(state) {
+            const endpoint = state === 'on' ? '/buzzer/on' : '/buzzer/off';
+            
+            fetch(endpoint, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage(data.message, state === 'on' ? 'success' : 'info');
+            })
+            .catch(error => {
+                console.error('Error controlling buzzer:', error);
+                showMessage('Error controlling buzzer', 'error');
+            });
+        }
+
+        // Show status message
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 2000);
+        }
+
+        // Start updating distance when page loads
+        setInterval(updateDistance, 500);
+        updateDistance();
+    </script>
+</body>
+</html>
