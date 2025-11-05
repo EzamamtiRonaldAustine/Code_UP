@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultrasonic Distance Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .distance-display {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .distance-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .distance-label {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .safe {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .mode-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mode-label {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .mode-indicator {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .mode-manual {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .mode-auto {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-on {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-on:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-off {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-off:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-auto {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-auto:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn-stop {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #757575;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(158, 158, 158, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .status-message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 Distance Monitor</h1>
+        
+        <div class="distance-display">
+            <div>Current Distance</div>
+            <div id="distance-value" class="distance-value">-- cm</div>
+            <span id="distance-label" class="distance-label safe">SAFE</span>
+        </div>
+
+        <div class="mode-section">
+            <div class="mode-label">Current Mode:</div>
+            <span id="mode-indicator" class="mode-indicator mode-manual">Manual Control</span>
+        </div>
+        
+        <div class="controls">
+            <button class="btn-on" onclick="controlBuzzer('on')">Buzzer ON</button>
+            <button class="btn-off" onclick="controlBuzzer('off')">Buzzer OFF</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn-auto" onclick="enableAutoMode()">Enable Auto Mode</button>
+            <button class="btn-stop" onclick="stopAutoMode()">Stop Auto Mode</button>
+        </div>
+
+        <div class="info-text">
+            Auto mode activates buzzer when distance &lt; 6cm
+        </div>
+        
+        <div id="status-message" class="status-message" style="display: none;"></div>
+    </div>
+    
+    <script>
+        let currentAutoMode = false;
+
+        // Update distance every 500ms
+        function updateDistance() {
+            fetch('/distance')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('distance-value').textContent = data.distance + ' cm';
+                    
+                    const label = document.getElementById('distance-label');
+                    label.textContent = data.label;
+                    label.className = 'distance-label ' + data.status;
+
+                    // Update mode indicator
+                    updateModeIndicator(data.auto_mode);
+                })
+                .catch(error => {
+                    console.error('Error fetching distance:', error);
+                    document.getElementById('distance-value').textContent = 'Error';
+                });
+        }
+
+        // Update mode indicator
+        function updateModeIndicator(isAuto) {
+            const indicator = document.getElementById('mode-indicator');
+            if (isAuto) {
+                indicator.textContent = 'Auto Mode Active';
+                indicator.className = 'mode-indicator mode-auto';
+            } else {
+                indicator.textContent = 'Manual Control';
+                indicator.className = 'mode-indicator mode-manual';
+            }
+            currentAutoMode = isAuto;
+        }
+
+        // Buzzer manual control
+        function controlBuzzer(state) {
+            const endpoint = state === 'on' ? '/buzzer/on' : '/buzzer/off';
+            
+            fetch(endpoint, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage(data.message, state === 'on' ? 'success' : 'info');
+                updateModeIndicator(false);
+            })
+            .catch(error => {
+                console.error('Error controlling buzzer:', error);
+                showMessage('Error controlling buzzer', 'error');
+            });
+        }
+
+        // Enable auto mode
+        function enableAutoMode() {
+            fetch('/buzzer/auto', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage(data.message, 'success');
+                updateModeIndicator(true);
+            })
+            .catch(error => {
+                console.error('Error enabling auto mode:', error);
+                showMessage('Error enabling auto mode', 'error');
+            });
+        }
+
+        // Stop auto mode
+        function stopAutoMode() {
+            fetch('/buzzer/stop', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage(data.message, 'info');
+                updateModeIndicator(false);
+            })
+            .catch(error => {
+                console.error('Error stopping auto mode:', error);
+                showMessage('Error stopping auto mode', 'error');
+            });
+        }
+
+        // Show status message
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            // Style based on type
+            if (type === 'success') {
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+            } else if (type === 'error') {
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+            } else {
+                statusDiv.style.background = '#d1ecf1';
+                statusDiv.style.color = '#0c5460';
+            }
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 2000);
+        }
+
+        // Start updating distance when page loads
+        setInterval(updateDistance, 500);
+        updateDistance();
+    </script>
+</body>
+</html>
