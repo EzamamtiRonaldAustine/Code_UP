@@ -10,6 +10,7 @@ import time
 import requests
 import csv
 import os
+from statistics import median
 
 # ---------------- ThingSpeak ----------------
 THINGSPEAK_URL = "https://api.thingspeak.com/update"
@@ -24,6 +25,7 @@ BUZZER = 18
 ALERT_DISTANCE_CM = 15      # buzzer threshold (cm) — adjust to your setup
 SLEEP_SECONDS = 15          # must be >= 15 for free ThingSpeak
 BACKUP_FILE = "/home/pi/thingspeak_backup.csv"
+NUM_SAMPLES = 3             # number of readings to average for stability
 
 # ---------------- Setup ----------------
 GPIO.setmode(GPIO.BCM)
@@ -46,27 +48,52 @@ def get_distance():
     time.sleep(0.00001)
     GPIO.output(TRIG, False)
 
+    # Wait for ECHO to go HIGH
     start_time = time.time()
     timeout = start_time + 0.02
-    while GPIO.input(ECHO) == 0 and time.time() < timeout:
+    while GPIO.input(ECHO) == 0:
+        if time.time() > timeout:
+            return None
         start_time = time.time()
 
+    # Wait for ECHO to go LOW
     end_time = time.time()
     timeout = end_time + 0.02
-    while GPIO.input(ECHO) == 1 and time.time() < timeout:
+    while GPIO.input(ECHO) == 1:
+        if time.time() > timeout:
+            return None
         end_time = time.time()
 
     duration = end_time - start_time
-    if duration <= 0:
-        return float('nan')
-
+    
+    # Calculate distance
     distance_cm = (duration * 34300) / 2
-    if distance_cm > 400 or distance_cm <= 0:
-        return float('nan')
+    
+    # Validate reading (HC-SR04 range: 2cm - 400cm)
+    if distance_cm > 400 or distance_cm < 2:
+        return None
+    
     return round(distance_cm, 2)
 
 
+def get_stable_distance():
+    """Take multiple readings and return the median for stability."""
+    readings = []
+    for _ in range(NUM_SAMPLES):
+        dist = get_distance()
+        if dist is not None:
+            readings.append(dist)
+        time.sleep(0.06)  # Small delay between readings (60ms)
+    
+    if not readings:
+        return None
+    
+    # Return median to filter out outliers
+    return round(median(readings), 2)
+
+
 def save_local(timestamp, distance):
+    """Save failed readings to local CSV backup."""
     header_needed = not os.path.exists(BACKUP_FILE)
     with open(BACKUP_FILE, "a", newline="") as f:
         writer = csv.writer(f)
@@ -76,25 +103,28 @@ def save_local(timestamp, distance):
 
 
 def send_to_thingspeak(distance):
+    """Send distance reading to ThingSpeak. Returns True on success."""
     payload = {"api_key": API_KEY, "field1": distance}
     try:
         r = requests.get(THINGSPEAK_URL, params=payload, timeout=10)
         return r.status_code == 200 and r.text.strip().isdigit()
-    except requests.RequestException:
+    except requests.RequestException as e:
+        print(f"  Error: {e}")
         return False
 
 
 def flush_backup():
+    """Attempt to resend backed-up readings to ThingSpeak."""
     if not os.path.exists(BACKUP_FILE):
         return
+    
     rows_to_keep = []
     with open(BACKUP_FILE, "r", newline="") as f:
         reader = csv.reader(f)
         header = next(reader, None)
         for row in reader:
-            if len(row) < 2:
-                continue
-            rows_to_keep.append(row)
+            if len(row) >= 2:
+                rows_to_keep.append(row)
 
     if not rows_to_keep:
         try:
@@ -110,8 +140,10 @@ def flush_backup():
         if not success:
             still_failed.append(row)
         else:
-            time.sleep(1)
+            print(f"  Flushed backup: {ts}, {dist} cm")
+            time.sleep(1)  # Respect ThingSpeak rate limits
 
+    # Write back only failed entries
     if still_failed:
         with open(BACKUP_FILE, "w", newline="") as f:
             writer = csv.writer(f)
@@ -120,46 +152,77 @@ def flush_backup():
     else:
         try:
             os.remove(BACKUP_FILE)
+            print("  All backup data sent successfully")
         except OSError:
             pass
 
 
+def control_buzzer(distance):
+    """Control buzzer based on distance. Returns current PWM state."""
+    global pwm_started
+    
+    if distance is None:
+        # Invalid reading - turn off buzzer
+        if pwm_started:
+            pwm.stop()
+            pwm_started = False
+        return pwm_started
+    
+    # Valid reading - check distance threshold
+    if distance < ALERT_DISTANCE_CM:
+        if not pwm_started:
+            pwm.start(60)  # 60% duty cycle for louder sound
+            pwm_started = True
+            print(f"  ⚠️  ALERT: Object detected at {distance} cm!")
+    else:
+        if pwm_started:
+            pwm.stop()
+            pwm_started = False
+    
+    return pwm_started
+
+
 try:
+    print("Starting ultrasonic monitor...")
+    print(f"Alert distance: {ALERT_DISTANCE_CM} cm")
+    print(f"Update interval: {SLEEP_SECONDS} seconds\n")
+    
     while True:
-        distance = get_distance()
+        # Get stable distance reading
+        distance = get_stable_distance()
         now = time.strftime("%Y-%m-%d %H:%M:%S")
-        print(f"{now} Distance: {distance} cm")
-
-        # --- Buzzer logic ---
-        if not (distance != distance):  # valid reading
-            if distance < ALERT_DISTANCE_CM:
-                if not pwm_started:
-                    pwm.start(60)  # 80% duty cycle for louder sound
-                    pwm_started = True
-            else:
-                if pwm_started:
-                    pwm.stop()
-                    pwm_started = False
+        
+        # Display reading
+        if distance is not None:
+            print(f"{now} | Distance: {distance:6.2f} cm", end="")
         else:
-            if pwm_started:
-                pwm.stop()
-                pwm_started = False
-
-        # --- ThingSpeak updates ---
+            print(f"{now} | Distance: INVALID", end="")
+        
+        # Control buzzer based on distance
+        control_buzzer(distance)
+        
+        # Attempt to flush any backed-up readings first
         flush_backup()
-        ok = send_to_thingspeak(distance if not (distance != distance) else "")
-        if ok:
-            print("Sent to ThingSpeak")
+        
+        # Send current reading to ThingSpeak
+        if distance is not None:
+            ok = send_to_thingspeak(distance)
+            if ok:
+                print(" | ✓ Sent to ThingSpeak")
+            else:
+                print(" | ✗ Failed - saved locally")
+                save_local(now, distance)
         else:
-            print("Failed to send — saving locally")
-            save_local(now, distance)
-
+            print(" | Skipped (invalid reading)")
+        
         time.sleep(SLEEP_SECONDS)
 
 except KeyboardInterrupt:
-    print("Stopping...")
+    print("\n\nStopping...")
 
 finally:
-    pwm.stop()
+    if pwm_started:
+        pwm.stop()
     GPIO.output(BUZZER, False)
     GPIO.cleanup()
+    print("Cleanup complete. Goodbye!")
