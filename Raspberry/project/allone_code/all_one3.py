@@ -47,7 +47,7 @@ DEFAULT_CONFIG = {
     "HISTORY_SIZE": 5,
     "THINGSPEAK": {
         "URL": "https://api.thingspeak.com/update",
-        "API_KEY": "YASGLGVVU1CVURY7",
+        "API_KEY": "",
         "SEND_INTERVAL": 60,
         "BACKUP_FILE": os.path.join(SCRIPT_DIR, 'pond_thingspeak_backup.csv'),
         "MAX_RETRIES": 3,
