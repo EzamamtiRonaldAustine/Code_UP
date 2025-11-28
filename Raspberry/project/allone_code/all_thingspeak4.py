@@ -1,33 +1,75 @@
+"""
+Smart Fish Pond Monitoring System
+
+A comprehensive IoT-based monitoring and control system for aquaculture fish ponds.
+This system continuously monitors water quality parameters including temperature, pH,
+electrical conductivity (EC), nitrogen, phosphorus, and turbidity.
+
+Key Features:
+    - Real-time sensor data collection from RS485 and DS18B20 sensors
+    - Multi-threaded architecture for concurrent monitoring, display, and control
+    - Automatic water quality assessment with configurable thresholds
+    - Visual and audio alerts via LEDs and buzzer
+    - Automatic pump control based on water quality status
+    - SMS notifications for critical conditions
+    - Cloud data logging to ThingSpeak platform
+    - Local backup system for offline data storage
+    - Network connectivity monitoring and auto-recovery
+
+Hardware Components:
+    - Raspberry Pi (main controller)
+    - RS485 multi-parameter water quality sensor
+    - DS18B20 temperature sensor
+    - 16x2 LCD display (I2C)
+    - GSM module for SMS alerts
+    - GPIO-controlled LEDs, buzzer, and water pump
+
+Author: Smart Fish Pond Development Team
+Version: 5.14
+"""
+
 import os
 import glob
 import time
 import serial
-import random  # CRITICAL FIX: Added for random.uniform()
+import random  # Used for exponential backoff in retry logic
 import RPi.GPIO as GPIO
 from datetime import datetime
-import minimalmodbus
-from RPLCD.i2c import CharLCD
-import threading
-from collections import deque
-import requests
+import minimalmodbus  # For RS485 Modbus communication
+from RPLCD.i2c import CharLCD  # For I2C LCD display control
+import threading  # For concurrent operations
+from collections import deque  # For efficient historical data storage
+import requests  # For HTTP requests to ThingSpeak API
 import csv
 import json
 import logging
 from pathlib import Path
 import sys
-import socket
-import subprocess
-import re
+import socket  # For network connectivity checks
+import subprocess  # For system-level network commands
+import re  # For text parsing in LCD display
 
-# Get directory where the script is located
+# ============================================================================
+# CONFIGURATION AND INITIALIZATION
+# ============================================================================
+
+# Get directory where the script is located (for relative file paths)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+
 # Configure logging with proper path handling
+# Logs are written to both file and console for debugging and monitoring
 LOG_FILE = os.path.join(SCRIPT_DIR, 'pond_monitor.log')
 
-# Ensure log directory exists
+# Ensure log directory exists before creating log file
 os.makedirs(os.path.dirname(LOG_FILE) if os.path.dirname(LOG_FILE) else '.', exist_ok=True)
 
+# Set up logging with timestamp, level, and message format
+# FileHandler: Persistent log storage for troubleshooting
+# StreamHandler: Real-time console output for monitoring
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -38,44 +80,85 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Load configuration from file
+# ============================================================================
+# CONFIGURATION CONSTANTS
+# ============================================================================
+
+# Configuration file path (JSON format for easy editing)
 CONFIG_FILE = os.path.join(SCRIPT_DIR, 'pond_config.json')
+
+# Mapping of water quality status text to numeric codes for ThingSpeak
+# ThingSpeak charts require numeric values, so we encode status as integers
+QUALITY_STATUS_CODES = {
+    "GOOD": 0,      # Normal operating conditions
+    "WARNING": 1,   # Parameters outside optimal range, monitoring required
+    "CRITICAL": 2   # Immediate action required to prevent fish mortality
+}
+
+# Default configuration values (can be overridden by pond_config.json)
 DEFAULT_CONFIG = {
-    "TEMP_READ_INTERVAL": 15,
-    "LCD_REFRESH_INTERVAL": 5,
-    "PUMP_RUN_DURATION": {"SHORT": 120, "NORMAL": 300, "LONG": 600},
-    "SMS_COOLDOWN": 300,
-    "CRITICAL_DURATION": 300,
-    "HISTORY_SIZE": 5,
+    # Sensor reading intervals (seconds)
+    "TEMP_READ_INTERVAL": 15,      # How often to read sensors
+    "LCD_REFRESH_INTERVAL": 5,     # How often to update LCD display
+    
+    # Pump control durations (seconds) - different modes for different severity levels
+    "PUMP_RUN_DURATION": {
+        "SHORT": 120,   # 2 minutes - for pH emergencies
+        "NORMAL": 180,  # 5 minutes - standard aeration/circulation
+        "LONG": 240     # 10 minutes - for temperature emergencies
+    },
+    
+    # Alert and notification settings
+    "SMS_COOLDOWN": 120,           # Minimum time between SMS alerts (5 minutes)
+    "CRITICAL_DURATION": 120,      # How long condition must persist before SMS (5 minutes)
+    "HISTORY_SIZE": 5,             # Number of readings to keep for averaging/trending
+    
+    # ThingSpeak cloud logging configuration
     "THINGSPEAK": {
         "URL": "https://api.thingspeak.com/update",
         "API_KEY": "",
-        "SEND_INTERVAL": 60,
+        "SEND_INTERVAL": 60,       # Minimum 15 seconds (ThingSpeak rate limit)
         "BACKUP_FILE": os.path.join(SCRIPT_DIR, 'pond_thingspeak_backup.csv'),
-        "MAX_RETRIES": 3,
-        "RETRY_DELAY": 5,
-        "MAX_RETRY_DELAY": 60
+        "MAX_RETRIES": 3,          # Retry attempts for failed uploads
+        "RETRY_DELAY": 5,          # Initial retry delay (seconds)
+        "MAX_RETRY_DELAY": 60      # Maximum retry delay (exponential backoff cap)
     },
+    
+    # GPIO pin assignments (BCM numbering)
     "GPIO": {
-        "TURBIDITY_PIN": 17,
-        "BUZZER_PIN": 18,
-        "BLUE_LED_PIN": 27,
-        "YELLOW_LED_PIN": 22,
-        "RED_LED_PIN": 5,
-        "PUMP_PIN": 16
+        "TURBIDITY_PIN": 17,       # Digital input for turbidity sensor
+        "BUZZER_PIN": 18,          # PWM output for buzzer
+        "BLUE_LED_PIN": 27,        # Output for GOOD status indicator
+        "YELLOW_LED_PIN": 22,      # Output for WARNING status indicator
+        "RED_LED_PIN": 5,          # Output for CRITICAL status indicator
+        "PUMP_PIN": 16             # Output for water pump relay control
     },
+    
+    # Sensor communication settings
     "SENSORS": {
-        "RS485_PORT": '/dev/ttyUSB0',
-        "RS485_SLAVE_ID": 1,
-        "GSM_PORT": "/dev/serial0",
-        "GSM_BAUDRATE": 9600
+        "RS485_PORT": '/dev/ttyUSB0',  # Serial port for RS485 sensor
+        "RS485_SLAVE_ID": 1,           # Modbus slave address
+        "GSM_PORT": "/dev/serial0",    # Serial port for GSM module
+        "GSM_BAUDRATE": 9600          # Communication speed
     },
+    
+    # Phone numbers for SMS alerts (international format with country code)
     "PHONE_NUMBERS": ["+256764152908", "+256770701680"]
 }
 
 def check_network_connectivity():
-    """Check if the device has internet connectivity by resolving Google's DNS."""
+    """
+    Check if the device has internet connectivity.
+    
+    Uses Google's public DNS (8.8.8.8) as a connectivity test endpoint.
+    This is a lightweight check that doesn't require actual HTTP requests.
+    
+    Returns:
+        bool: True if network is reachable, False otherwise
+    """
     try:
+        # Attempt to resolve Google's DNS IP address
+        # If this succeeds, basic network connectivity exists
         socket.gethostbyname('8.8.8.8')
         return True
     except socket.gaierror:
@@ -86,16 +169,35 @@ def check_network_connectivity():
         return False
 
 def restart_network_interface():
-    """Attempt to restart the network interface using systemd (common on RPi OS)."""
+    """
+    Attempt to restart the network interface to recover from connectivity issues.
+    
+    This function performs a soft reset of the wireless interface by:
+    1. Bringing the interface down
+    2. Bringing it back up
+    3. Restarting the network service (NetworkManager or networking)
+    
+    This is useful when the system detects persistent network failures and
+    attempts automatic recovery before falling back to backup storage.
+    
+    Returns:
+        bool: True if connectivity is restored, False otherwise
+    """
     try:
         logger.info("Attempting to restart network interface...")
+        
+        # Bring wireless interface down (disconnect)
         subprocess.run(["sudo", "ip", "link", "set", "wlan0", "down"], 
                       stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=10)
-        time.sleep(2)
+        time.sleep(2)  # Allow interface to fully disconnect
+        
+        # Bring wireless interface back up (reconnect)
         subprocess.run(["sudo", "ip", "link", "set", "wlan0", "up"], 
                       stderr=subprocess.PIPE, stdout=subprocess.PIPE, timeout=10)
-        time.sleep(5)
+        time.sleep(5)  # Allow interface to initialize
         
+        # Restart network management service
+        # Try NetworkManager first (common on modern RPi OS), fallback to networking
         try:
             subprocess.run(["sudo", "systemctl", "restart", "NetworkManager"], 
                           timeout=10, check=False)
@@ -104,8 +206,9 @@ def restart_network_interface():
                           timeout=10, check=False)
         
         logger.info("Network interface restart commands issued. Waiting 15 seconds...")
-        time.sleep(15)
+        time.sleep(15)  # Allow time for DHCP and connection establishment
         
+        # Verify connectivity was restored
         if check_network_connectivity():
             logger.info("✅ Network connectivity restored after restart.")
             return True
@@ -117,22 +220,36 @@ def restart_network_interface():
         return False
 
 def load_config():
-    """Load configuration from file or create default config."""
+    """
+    Load configuration from JSON file or create default configuration file.
+    
+    This function implements a merge strategy: user-defined values in the config
+    file override defaults, but nested dictionaries are merged rather than replaced.
+    This allows partial configuration updates without losing default values.
+    
+    Returns:
+        dict: Configuration dictionary with user overrides applied to defaults
+    """
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, 'r') as f:
                 user_config = json.load(f)
                 merged_config = DEFAULT_CONFIG.copy()
+                
+                # Merge user config with defaults
+                # Nested dicts are merged, top-level values are replaced
                 for key, value in user_config.items():
                     if key in merged_config and isinstance(merged_config[key], dict) and isinstance(value, dict):
-                        merged_config[key].update(value)
+                        merged_config[key].update(value)  # Merge nested dictionaries
                     else:
-                        merged_config[key] = value
+                        merged_config[key] = value  # Replace top-level values
+                        
                 logger.info(f"✅ Configuration loaded from {CONFIG_FILE}")
                 return merged_config
         except Exception as e:
             logger.error(f"Error loading config: {e}. Using defaults.")
     else:
+        # Config file doesn't exist - create it with default values
         try:
             with open(CONFIG_FILE, 'w') as f:
                 json.dump(DEFAULT_CONFIG, f, indent=2)
@@ -142,11 +259,27 @@ def load_config():
 
     return DEFAULT_CONFIG
 
-# Load configuration
+# Load configuration at module import time
 config = load_config()
 
+# ============================================================================
+# UTILITY FUNCTIONS
+# ============================================================================
+
 def ensure_directory_exists(file_path):
-    """Ensure the directory for the file path exists."""
+    """
+    Ensure the directory for the given file path exists.
+    
+    Creates parent directories if they don't exist. This is useful for
+    ensuring backup files and logs can be written even if directories
+    haven't been created yet.
+    
+    Args:
+        file_path (str): Full path to a file
+        
+    Returns:
+        bool: True if directory exists or was created, False on error
+    """
     directory = os.path.dirname(file_path)
     if directory and not os.path.exists(directory):
         try:
@@ -159,7 +292,16 @@ def ensure_directory_exists(file_path):
     return True
 
 def ensure_backup_file_exists():
-    """Create the ThingSpeak backup file if it doesn't exist."""
+    """
+    Create the ThingSpeak backup CSV file if it doesn't exist.
+    
+    The backup file stores sensor readings when network connectivity is lost.
+    This ensures no data is lost during outages. The file is created with
+    a proper CSV header for easy parsing when flushing data later.
+    
+    Returns:
+        bool: True if backup file exists or was created, False on error
+    """
     backup_file = config.get('THINGSPEAK', {}).get('BACKUP_FILE')
     if not backup_file:
         logger.error("BACKUP_FILE not found in configuration.")
@@ -171,6 +313,7 @@ def ensure_backup_file_exists():
             ensure_directory_exists(backup_file)
             with open(backup_file, 'w', newline='') as f:
                 writer = csv.writer(f)
+                # Write CSV header with all sensor parameters
                 writer.writerow(["timestamp", "temperature", "ph", "ec", "nitrogen",
                               "phosphorus", "turbidity", "quality_score", "quality_status"])
             logger.info(f"✅ Successfully created new backup file.")
@@ -180,9 +323,39 @@ def ensure_backup_file_exists():
             return False
     return True
 
+# ============================================================================
+# MAIN MONITORING CLASS
+# ============================================================================
+
 class SmartFishPondMonitor:
+    """
+    Main monitoring and control class for the Smart Fish Pond System.
+    
+    This class manages all aspects of the monitoring system including:
+    - Sensor data collection and processing
+    - Water quality assessment
+    - Visual/audio alerts
+    - Automatic pump control
+    - SMS notifications
+    - Cloud data logging
+    - Multi-threaded operation
+    
+    The system uses a multi-threaded architecture where different threads
+    handle monitoring, display updates, pump control, and cloud logging
+    concurrently for responsive operation.
+    """
+    
     def __init__(self):
-        # --- Initialize System State ---
+        """
+        Initialize the Smart Fish Pond Monitor system.
+        
+        Sets up all hardware interfaces, initializes data structures,
+        and starts background threads for continuous operation.
+        """
+        # ====================================================================
+        # SYSTEM STATE INITIALIZATION
+        # ====================================================================
+        # Centralized state dictionary for thread-safe access to system status
         self.state = {
             'running': True,
             'pump': {
@@ -219,19 +392,29 @@ class SmartFishPondMonitor:
             }
         }
 
-        # Thread safety locks - minimal locking strategy
-        self.state_lock = threading.Lock()
-        self.gsm_lock = threading.Lock()
+        # ====================================================================
+        # THREAD SAFETY AND MONITORING
+        # ====================================================================
+        # Thread locks for safe concurrent access to shared resources
+        # Minimal locking strategy: only lock when modifying shared state
+        self.state_lock = threading.Lock()  # Protects self.state dictionary
+        self.gsm_lock = threading.Lock()    # Protects GSM module access (serial port)
 
-        # Watchdog for thread monitoring
+        # Watchdog timestamps for monitoring thread health
+        # Each thread updates its timestamp periodically; watchdog checks for stuck threads
         self.thread_watchdog = {
-            'monitor': time.time(),
-            'display': time.time(),
-            'pump': time.time(),
-            'thingspeak': time.time()
+            'monitor': time.time(),      # Main sensor reading loop
+            'display': time.time(),      # LCD update loop
+            'pump': time.time(),         # Pump control loop
+            'thingspeak': time.time()   # Cloud logging loop
         }
 
-        # --- Initialize Historical Data ---
+        # ====================================================================
+        # HISTORICAL DATA STORAGE
+        # ====================================================================
+        # Use deque (double-ended queue) for efficient rolling window storage
+        # Automatically discards oldest values when maxlen is reached
+        # This provides moving averages and trend analysis without manual array management
         self.history = {
             'temp': deque(maxlen=config.get('HISTORY_SIZE', 5)),
             'ph': deque(maxlen=config.get('HISTORY_SIZE', 5)),
@@ -241,19 +424,31 @@ class SmartFishPondMonitor:
             'turbidity': deque(maxlen=config.get('HISTORY_SIZE', 5))
         }
 
-        # --- Initialize GPIO ---
+        # ====================================================================
+        # GPIO INITIALIZATION
+        # ====================================================================
         try:
+            # Use BCM pin numbering (Broadcom chip pin numbers)
             GPIO.setmode(GPIO.BCM)
+            
+            # Configure input pin for turbidity sensor (pull-up resistor enabled)
             GPIO.setup(config.get('GPIO', {}).get('TURBIDITY_PIN', 17), GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.setup(config.get('GPIO', {}).get('BLUE_LED_PIN', 27), GPIO.OUT)
-            GPIO.setup(config.get('GPIO', {}).get('YELLOW_LED_PIN', 22), GPIO.OUT)
-            GPIO.setup(config.get('GPIO', {}).get('RED_LED_PIN', 5), GPIO.OUT)
+            
+            # Configure output pins for status LEDs
+            GPIO.setup(config.get('GPIO', {}).get('BLUE_LED_PIN', 27), GPIO.OUT)   # GOOD status
+            GPIO.setup(config.get('GPIO', {}).get('YELLOW_LED_PIN', 22), GPIO.OUT) # WARNING status
+            GPIO.setup(config.get('GPIO', {}).get('RED_LED_PIN', 5), GPIO.OUT)     # CRITICAL status
+            
+            # Configure output pins for buzzer and pump
             GPIO.setup(config.get('GPIO', {}).get('BUZZER_PIN', 18), GPIO.OUT)
             GPIO.setup(config.get('GPIO', {}).get('PUMP_PIN', 16), GPIO.OUT)
 
+            # Initialize PWM for buzzer (1000 Hz frequency)
+            # PWM allows volume control via duty cycle
             self.pwm_buzzer = GPIO.PWM(config.get('GPIO', {}).get('BUZZER_PIN', 18), 1000)
-            self.pwm_buzzer.start(0)
+            self.pwm_buzzer.start(0)  # Start with 0% duty cycle (silent)
 
+            # Initialize all LEDs to OFF and pump to OFF (HIGH = relay off)
             self.set_leds(0, 0, 0)
             GPIO.output(config.get('GPIO', {}).get('PUMP_PIN', 16), GPIO.HIGH)
             logger.info("✅ GPIO initialized successfully")
@@ -261,32 +456,50 @@ class SmartFishPondMonitor:
             logger.error(f"GPIO initialization failed: {e}")
             raise
 
-        # --- Initialize Peripherals ---
-        self.lcd = self._init_lcd()
-        self.rs485_instrument = self._init_rs485()
-        self.device_file = self._init_ds18b20()
-        self.gsm = self._init_gsm()
+        # ====================================================================
+        # PERIPHERAL DEVICE INITIALIZATION
+        # ====================================================================
+        # Initialize all sensor and communication interfaces
+        self.lcd = self._init_lcd()                    # I2C LCD display
+        self.rs485_instrument = self._init_rs485()     # RS485 water quality sensor
+        self.device_file = self._init_ds18b20()        # DS18B20 temperature sensor
+        self.gsm = self._init_gsm()                    # GSM module for SMS
         
-        # Test ThingSpeak connection at startup
+        # Test ThingSpeak connection at startup to verify API key and connectivity
         logger.info("Testing ThingSpeak connection...")
         self.test_thingspeak_connection()
 
-        # --- Start Threads ---
+        # ====================================================================
+        # BACKGROUND THREAD INITIALIZATION
+        # ====================================================================
+        # Create daemon threads (automatically terminate when main program exits)
+        # Each thread handles a specific aspect of system operation
         self.monitor_thread = threading.Thread(target=self.monitor_loop, name="Monitor", daemon=True)
         self.display_thread = threading.Thread(target=self.display_loop, name="Display", daemon=True)
         self.pump_thread = threading.Thread(target=self.pump_control_loop, name="Pump", daemon=True)
         self.thingspeak_thread = threading.Thread(target=self.thingspeak_loop, name="ThingSpeak", daemon=True)
         self.watchdog_thread = threading.Thread(target=self.watchdog_loop, name="Watchdog", daemon=True)
 
+        # Start all background threads
         for t in [self.monitor_thread, self.display_thread, self.pump_thread,
                  self.thingspeak_thread, self.watchdog_thread]:
             t.start()
 
     def test_thingspeak_connection(self):
-        """Test ThingSpeak connection with minimal data."""
+        """
+        Test ThingSpeak API connection at system startup.
+        
+        Sends a minimal test payload to verify:
+        - API key is valid
+        - Network connectivity exists
+        - ThingSpeak service is accessible
+        
+        Returns:
+            bool: True if connection test succeeds, False otherwise
+        """
         test_payload = {
             "api_key": config.get('THINGSPEAK', {}).get('API_KEY'),
-            "field1": 25.0
+            "field1": 25.0  # Test value for temperature field
         }
         
         try:
@@ -298,6 +511,7 @@ class SmartFishPondMonitor:
             
             if response.status_code == 200:
                 result = response.text.strip()
+                # ThingSpeak returns entry ID (>0) on success, 0 on failure
                 if result.isdigit() and int(result) > 0:
                     logger.info(f"✅ ThingSpeak connection test PASSED (Entry: {result})")
                     return True
@@ -313,9 +527,20 @@ class SmartFishPondMonitor:
             return False
 
     def _init_lcd(self):
+        """
+        Initialize the I2C LCD display.
+        
+        Attempts to connect to LCD via I2C using PCF8574 I2C expander
+        at address 0x27. Implements retry logic for reliability.
+        
+        Returns:
+            CharLCD: LCD object if successful, None if initialization fails
+        """
         max_retries = 3
         for attempt in range(max_retries):
             try:
+                # PCF8574 is common I2C-to-parallel converter for LCDs
+                # Address 0x27 is default for many LCD modules
                 lcd = CharLCD('PCF8574', 0x27)
                 lcd.clear()
                 lcd.write_string("Initializing...")
@@ -324,21 +549,37 @@ class SmartFishPondMonitor:
             except Exception as e:
                 logger.error(f"LCD initialization failed (attempt {attempt + 1}/{max_retries}): {e}")
                 if attempt < max_retries - 1:
-                    time.sleep(2)
+                    time.sleep(2)  # Wait before retry
 
+        # Mark LCD as unavailable - system continues without display
         self.state['indicators']['lcd_available'] = False
         logger.warning("LCD unavailable - continuing without display")
         return None
 
     def _init_rs485(self):
+        """
+        Initialize RS485 Modbus communication with water quality sensor.
+        
+        Configures serial port parameters for Modbus RTU protocol:
+        - 9600 baud (standard for many Modbus devices)
+        - 8 data bits, no parity, 1 stop bit (8N1)
+        - 1 second timeout for register reads
+        
+        Returns:
+            Instrument: minimalmodbus Instrument object if successful, None otherwise
+        """
         try:
-            instrument = minimalmodbus.Instrument(config.get('SENSORS', {}).get('RS485_PORT', '/dev/ttyUSB0'),
-                                                   config.get('SENSORS', {}).get('RS485_SLAVE_ID', 1))
+            # Create Modbus instrument with port and slave ID
+            instrument = minimalmodbus.Instrument(
+                config.get('SENSORS', {}).get('RS485_PORT', '/dev/ttyUSB0'),
+                config.get('SENSORS', {}).get('RS485_SLAVE_ID', 1)
+            )
+            # Configure serial communication parameters
             instrument.serial.baudrate = 9600
             instrument.serial.bytesize = 8
             instrument.serial.parity = minimalmodbus.serial.PARITY_NONE
             instrument.serial.stopbits = 1
-            instrument.serial.timeout = 1
+            instrument.serial.timeout = 1  # 1 second timeout for reads
             logger.info("✅ RS485 sensor initialized")
             return instrument
         except Exception as e:
@@ -346,16 +587,31 @@ class SmartFishPondMonitor:
             return None
 
     def _init_ds18b20(self):
+        """
+        Initialize DS18B20 1-Wire temperature sensor.
+        
+        Loads required kernel modules and locates the sensor device file.
+        DS18B20 sensors appear in /sys/bus/w1/devices/ with prefix '28-'.
+        
+        Returns:
+            str: Path to sensor device file (w1_slave) if found, None otherwise
+        """
         try:
+            # Load kernel modules for 1-Wire GPIO and temperature support
             os.system('modprobe w1-gpio')
             os.system('modprobe w1-therm')
+            
+            # DS18B20 devices have family code 28 in their address
             base_dir = '/sys/bus/w1/devices/'
             device_folders = glob.glob(base_dir + '28-*')
+            
             if not device_folders:
                 logger.error("No DS18B20 temperature sensor found. Check wiring and kernel modules.")
                 return None
+                
+            # Use first found sensor (most systems have one)
             device_folder = device_folders[0]
-            device_file = device_folder + '/w1_slave'
+            device_file = device_folder + '/w1_slave'  # Temperature data file
             logger.info("✅ DS18B20 temperature sensor initialized")
             return device_file
         except (IndexError, Exception) as e:
@@ -461,19 +717,49 @@ class SmartFishPondMonitor:
         return None
 
     def calculate_ph(self, raw_value, temperature):
+        """
+        Convert raw pH sensor reading to calibrated pH value.
+        
+        Applies temperature compensation to account for sensor drift
+        with temperature changes. Reference temperature is 25°C.
+        
+        Args:
+            raw_value (float): Raw sensor reading (typically 0-45)
+            temperature (float): Current water temperature in Celsius
+            
+        Returns:
+            float: Calibrated pH value (0-14), or None if invalid reading
+        """
         if raw_value is None or raw_value <= 0.5:
             return None
+        # Convert raw value to pH (calibration factor from sensor datasheet)
         ph = raw_value / 3.13
+        # Temperature compensation: -0.01 pH per degree from 25°C
         temp_compensation = (temperature - 25) * 0.01
         return ph - temp_compensation
 
     def combine_temperatures(self, rs485_temp, ds18b20_temp):
+        """
+        Combine temperature readings from two sensors using weighted average.
+        
+        Uses both RS485 and DS18B20 sensors for improved accuracy and redundancy.
+        RS485 reading gets higher weight (0.6) as it's typically more stable,
+        while DS18B20 (0.4) provides independent verification.
+        
+        Args:
+            rs485_temp (float): Temperature from RS485 sensor in Celsius
+            ds18b20_temp (float): Temperature from DS18B20 sensor in Celsius
+            
+        Returns:
+            float: Combined temperature value, or single sensor value if only one available
+        """
         if rs485_temp is not None and ds18b20_temp is not None:
+            # Weighted average: RS485 (60%) + DS18B20 (40%)
             return 0.6 * rs485_temp + 0.4 * ds18b20_temp
         elif rs485_temp is not None:
-            return rs485_temp
+            return rs485_temp  # Fallback to RS485 if DS18B20 unavailable
         elif ds18b20_temp is not None:
-            return ds18b20_temp
+            return ds18b20_temp  # Fallback to DS18B20 if RS485 unavailable
         return None
 
     def update_historical_data(self, data, ds18b20_temp):
@@ -499,12 +785,30 @@ class SmartFishPondMonitor:
         return sum(history) / len(history)
 
     def get_trend(self, history):
+        """
+        Analyze trend direction from historical data.
+        
+        Compares first half vs second half of historical readings to determine
+        if values are increasing, decreasing, or stable. Uses adaptive threshold
+        based on magnitude of values to avoid false positives from noise.
+        
+        Args:
+            history (deque): Historical readings for a parameter
+            
+        Returns:
+            str: "INCREASING", "DECREASING", or "STABLE"
+        """
         if len(history) < 3:
-            return "STABLE"
+            return "STABLE"  # Need at least 3 readings for trend analysis
+            
         mid = len(history) // 2
+        # Calculate average of first half vs second half
         first_half_avg = sum(list(history)[:mid]) / mid
         second_half_avg = sum(list(history)[mid:]) / (len(history) - mid)
         diff = second_half_avg - first_half_avg
+        
+        # Adaptive threshold: 10% of value or minimum 0.2 units
+        # Prevents false trends from small fluctuations
         threshold = max(0.1 * abs(first_half_avg), 0.2)
 
         if diff > threshold:
@@ -514,6 +818,28 @@ class SmartFishPondMonitor:
         return "STABLE"
 
     def get_water_quality_status(self, data, ds18b20_temp):
+        """
+        Assess overall water quality status based on multiple parameters.
+        
+        This is the core decision-making function that evaluates all sensor readings
+        against aquaculture-specific thresholds. It calculates a risk score and
+        determines overall status (GOOD/WARNING/CRITICAL).
+        
+        Thresholds are calibrated for fish pond aquaculture where higher nutrient
+        levels (100-150 mg/kg) are normal compared to drinking water standards.
+        
+        Args:
+            data (dict): Current RS485 sensor readings (temperature, pH, EC, etc.)
+            ds18b20_temp (float): Temperature from DS18B20 sensor in Celsius
+            
+        Returns:
+            dict: Status dictionary containing:
+                - overall (str): 'GOOD', 'WARNING', or 'CRITICAL'
+                - score (int): Risk score (0-100+, higher = worse)
+                - alerts (list): List of alert messages
+                - recommendations (set): Suggested actions
+                - trends (dict): Trend analysis for each parameter
+        """
         self.update_historical_data(data, ds18b20_temp)
 
         status = {
@@ -533,70 +859,108 @@ class SmartFishPondMonitor:
         status['trends']['nitrogen'] = self.get_trend(self.history['nitrogen'])
         status['trends']['phosphorus'] = self.get_trend(self.history['phosphorus'])
 
+        # Check if we have any valid data
         if not any([avg_temp, avg_ph, avg_ec, avg_nitrogen, avg_phosphorus]):
             status['alerts'].append('⚠️ No valid sensor data available')
             status['score'] += 50
             status['overall'] = 'WARNING'
             return status
 
+        # === pH ASSESSMENT (MOST CRITICAL) ===
         if avg_ph is None:
             status['alerts'].append('⚠️ pH sensor not in water or faulty')
             status['score'] += 30
-        elif avg_ph < 6.0:
-            status['score'] += 40
-            status['alerts'].append(f"🚨 DANGER: pH {avg_ph:.1f} is too acidic")
-            status['recommendations'].add('Add agricultural lime (CaCO₃) or baking soda')
-        elif avg_ph < 6.5:
-            status['score'] += 20
-            status['alerts'].append(f"⚠️ pH {avg_ph:.1f} is slightly acidic")
-        elif avg_ph > 9.0:
-            status['score'] += 40
-            status['alerts'].append(f"🚨 DANGER: pH {avg_ph:.1f} is too alkaline")
-            status['recommendations'].add('Perform partial water change with neutral pH water')
-        elif avg_ph > 8.5:
-            status['score'] += 20
-            status['alerts'].append(f"⚠️ pH {avg_ph:.1f} is slightly alkaline")
+        elif avg_ph < 5.5:  # RAISED from 6.0 - truly dangerous
+            status['score'] += 50
+            status['alerts'].append(f"🚨 CRITICAL: pH {avg_ph:.1f} is dangerously acidic")
+            status['recommendations'].add('URGENT: Add agricultural lime (CaCO₃) immediately')
+        elif avg_ph < 6.0:  # RAISED from 6.5 - warning zone
+            status['score'] += 25
+            status['alerts'].append(f"⚠️ WARNING: pH {avg_ph:.1f} is acidic")
+            status['recommendations'].add('Consider adding agricultural lime gradually')
+        elif avg_ph < 6.5:  # NEW - monitoring zone
+            status['score'] += 10
+            status['alerts'].append(f"ℹ️ pH {avg_ph:.1f} is slightly low but acceptable")
+        elif avg_ph > 9.5:  # RAISED from 9.0 - truly dangerous
+            status['score'] += 50
+            status['alerts'].append(f"🚨 CRITICAL: pH {avg_ph:.1f} is dangerously alkaline")
+            status['recommendations'].add('URGENT: Perform large water change')
+        elif avg_ph > 9.0:  # RAISED from 8.5 - warning zone
+            status['score'] += 25
+            status['alerts'].append(f"⚠️ WARNING: pH {avg_ph:.1f} is too alkaline")
+            status['recommendations'].add('Perform partial water change')
+        elif avg_ph > 8.5:  # Monitoring zone
+            status['score'] += 10
+            status['alerts'].append(f"ℹ️ pH {avg_ph:.1f} is slightly high but acceptable")
 
+        # === TEMPERATURE ASSESSMENT ===
         if avg_temp is not None:
-            if avg_temp < 15:
-                status['score'] += 35
-                status['alerts'].append(f"🚨 Temperature {avg_temp:.1f}°C is too cold")
-                status['recommendations'].add('Add pond heater')
-            elif avg_temp < 20:
+            if avg_temp < 12:  # LOWERED from 15 - truly critical for most fish
+                status['score'] += 40
+                status['alerts'].append(f"🚨 CRITICAL: Temperature {avg_temp:.1f}°C is too cold")
+                status['recommendations'].add('Add pond heater immediately')
+            elif avg_temp < 18:  # LOWERED from 20 - just warning
                 status['score'] += 15
                 status['alerts'].append(f"⚠️ Temperature {avg_temp:.1f}°C is cool")
-            elif avg_temp > 32:
-                status['score'] += 35
-                status['alerts'].append(f"🚨 Temperature {avg_temp:.1f}°C is too hot")
-                status['recommendations'].add('Add shade and increase aeration')
-            elif avg_temp > 28:
+            elif avg_temp > 35:  # RAISED from 32 - truly dangerous
+                status['score'] += 40
+                status['alerts'].append(f"🚨 CRITICAL: Temperature {avg_temp:.1f}°C is too hot")
+                status['recommendations'].add('Add shade and emergency aeration')
+            elif avg_temp > 30:  # RAISED from 28 - just warning
                 status['score'] += 15
                 status['alerts'].append(f"⚠️ Temperature {avg_temp:.1f}°C is warm")
+                status['recommendations'].add('Monitor closely and increase aeration')
 
-        if avg_ec is not None and avg_ec > 1500:
+        # === ELECTRICAL CONDUCTIVITY (Salinity/TDS) ===
+        if avg_ec is not None and avg_ec > 2000:  # RAISED from 1500
             status['score'] += 30
-            status['alerts'].append(f"🚨 EC {avg_ec:.0f} μS/cm is too high")
-            status['recommendations'].add('Dilute with fresh water')
+            status['alerts'].append(f"⚠️ EC {avg_ec:.0f} μS/cm is high")
+            status['recommendations'].add('Consider diluting with fresh water')
 
-        if turbidity_ratio > 0.7:
-            status['score'] += 25
+        # === TURBIDITY ===
+        if turbidity_ratio > 0.8:  # RAISED from 0.7
+            status['score'] += 20
             status['alerts'].append(f"⚠️ Water is consistently turbid")
-            status['recommendations'].add('Check filter and perform water change')
+            status['recommendations'].add('Check filter and consider water change')
 
-        if avg_nitrogen is not None and avg_nitrogen > 5:
-            status['score'] += 30
-            status['alerts'].append(f"🚨 Nitrogen extremely high: {avg_nitrogen:.1f} mg/kg")
-            status['recommendations'].add('Reduce feeding and perform water change')
+        # === NITROGEN ASSESSMENT (REVISED - more realistic) ===
+        # Note: 100+ mg/kg nitrogen is actually common in aquaculture systems
+        # Critical levels are typically 200+ mg/kg
+        if avg_nitrogen is not None:
+            if avg_nitrogen > 200:  # NEW CRITICAL threshold
+                status['score'] += 35
+                status['alerts'].append(f"🚨 CRITICAL: Nitrogen extremely high: {avg_nitrogen:.1f} mg/kg")
+                status['recommendations'].add('URGENT: Stop feeding and perform large water change')
+            elif avg_nitrogen > 150:  # NEW WARNING threshold (was 5!)
+                status['score'] += 20
+                status['alerts'].append(f"⚠️ WARNING: Nitrogen high: {avg_nitrogen:.1f} mg/kg")
+                status['recommendations'].add('Reduce feeding and increase water changes')
+            elif avg_nitrogen > 100:  # NEW MONITORING threshold
+                status['score'] += 5
+                status['alerts'].append(f"ℹ️ Nitrogen elevated: {avg_nitrogen:.1f} mg/kg (monitor)")
 
-        if avg_phosphorus is not None and avg_phosphorus > 15:
-            status['score'] += 30
-            status['alerts'].append(f"🚨 Phosphorus extremely high: {avg_phosphorus:.1f} mg/kg")
-            status['recommendations'].add('Reduce feeding and perform water change')
+        # === PHOSPHORUS ASSESSMENT (REVISED - more realistic) ===
+        # Similar to nitrogen - 100+ mg/kg is common in productive systems
+        if avg_phosphorus is not None:
+            if avg_phosphorus > 200:  # NEW CRITICAL threshold
+                status['score'] += 35
+                status['alerts'].append(f"🚨 CRITICAL: Phosphorus extremely high: {avg_phosphorus:.1f} mg/kg")
+                status['recommendations'].add('URGENT: Stop feeding and perform large water change')
+            elif avg_phosphorus > 150:  # NEW WARNING threshold (was 15!)
+                status['score'] += 20
+                status['alerts'].append(f"⚠️ WARNING: Phosphorus high: {avg_phosphorus:.1f} mg/kg")
+                status['recommendations'].add('Reduce feeding and increase water changes')
+            elif avg_phosphorus > 100:  # NEW MONITORING threshold
+                status['score'] += 5
+                status['alerts'].append(f"ℹ️ Phosphorus elevated: {avg_phosphorus:.1f} mg/kg (monitor)")
 
-        if status['score'] >= 70:
+        # === FINAL STATUS DETERMINATION (ADJUSTED THRESHOLDS) ===
+        if status['score'] >= 80:  # RAISED from 70
             status['overall'] = 'CRITICAL'
-        elif status['score'] >= 40:
+        elif status['score'] >= 40:  # KEPT at 40
             status['overall'] = 'WARNING'
+        else:
+            status['overall'] = 'GOOD'
 
         return status
 
@@ -768,17 +1132,22 @@ class SmartFishPondMonitor:
                     alert = status['alerts'][0]
                     # Remove emoji and clean text
                     alert_clean = ''.join(c for c in alert if ord(c) < 128)
-                    alert_clean = alert_clean.replace('DANGER:', '').replace('WARNING:', '').strip()
+                    alert_clean = alert_clean.replace('CRITICAL:', '').replace('DANGER:', '').replace('WARNING:', '').replace('ℹ️', '').strip()
 
                     # Parse and format specific issues to fit exactly 16 chars
                     if 'pH' in alert_clean:
-                        ph_match = re.search(r'pH\s+([\d.]+)', alert_clean)
+                        # Match patterns like "pH 6.3" or "pH: 6.3"
+                        ph_match = re.search(r'pH[:\s]+([\d.]+)', alert_clean)
                         if ph_match:
                             ph_val = float(ph_match.group(1))
-                            if 'acidic' in alert_clean.lower():
+                            if 'acidic' in alert_clean.lower() or 'dangerously acidic' in alert_clean.lower():
                                 line2 = f"pH:{ph_val:4.1f} ACIDIC "
-                            elif 'alkaline' in alert_clean.lower():
+                            elif 'alkaline' in alert_clean.lower() or 'dangerously alkaline' in alert_clean.lower():
                                 line2 = f"pH:{ph_val:4.1f} ALKALIN"
+                            elif 'slightly low' in alert_clean.lower():
+                                line2 = f"pH:{ph_val:4.1f} LOW    "
+                            elif 'slightly high' in alert_clean.lower():
+                                line2 = f"pH:{ph_val:4.1f} HIGH   "
                             else:
                                 line2 = f"pH:{ph_val:4.1f} Problem"
                         else:
@@ -802,18 +1171,34 @@ class SmartFishPondMonitor:
                             line2 = "Temp issue      "
 
                     elif 'Nitrogen' in alert_clean:
+                        # Match patterns like "Nitrogen high: 109.6 mg/kg" or "Nitrogen extremely high: 109.6 mg/kg"
                         n_match = re.search(r'([\d.]+)\s*mg/kg', alert_clean)
                         if n_match:
                             n_val = float(n_match.group(1))
-                            line2 = f"N:{n_val:6.1f} HIGH  "
+                            if 'extremely high' in alert_clean.lower() or 'critical' in alert_clean.lower():
+                                line2 = f"N:{n_val:6.1f} CRIT  "
+                            elif 'high' in alert_clean.lower() or 'warning' in alert_clean.lower():
+                                line2 = f"N:{n_val:6.1f} HIGH  "
+                            elif 'elevated' in alert_clean.lower():
+                                line2 = f"N:{n_val:6.1f} ELEV  "
+                            else:
+                                line2 = f"N:{n_val:6.1f} HIGH  "
                         else:
                             line2 = "Nitrogen too HI "
 
                     elif 'Phosphorus' in alert_clean:
+                        # Match patterns like "Phosphorus high: 117.2 mg/kg" or "Phosphorus extremely high: 117.2 mg/kg"
                         p_match = re.search(r'([\d.]+)\s*mg/kg', alert_clean)
                         if p_match:
                             p_val = float(p_match.group(1))
-                            line2 = f"P:{p_val:6.1f} HIGH  "
+                            if 'extremely high' in alert_clean.lower() or 'critical' in alert_clean.lower():
+                                line2 = f"P:{p_val:6.1f} CRIT  "
+                            elif 'high' in alert_clean.lower() or 'warning' in alert_clean.lower():
+                                line2 = f"P:{p_val:6.1f} HIGH  "
+                            elif 'elevated' in alert_clean.lower():
+                                line2 = f"P:{p_val:6.1f} ELEV  "
+                            else:
+                                line2 = f"P:{p_val:6.1f} HIGH  "
                         else:
                             line2 = "Phosphorus HIGH "
 
@@ -913,7 +1298,7 @@ class SmartFishPondMonitor:
                     status_text = status['overall']
                     score = status['score']
                     line1 = f"Status: {status_text:7} "
-                    line2 = f"Score:{score:4}/100   "
+                    line2 = f"Score: {score:3}/100   "
 
             # Ensure exactly 16 chars per line
             line1 = line1[:16].ljust(16)
@@ -924,15 +1309,21 @@ class SmartFishPondMonitor:
 
             # Only update LCD if content has changed
             if content != self.state['indicators']['last_lcd_content']:
-                self.lcd.clear()
-                # Write line by line for 16x2 LCD
-                self.lcd.cursor_pos = (0, 0)
-                self.lcd.write_string(line1)
-                self.lcd.cursor_pos = (1, 0)
-                self.lcd.write_string(line2)
-                
-                self.state['indicators']['last_lcd_content'] = content
-                logger.debug(f"LCD Updated - Line1: '{line1}' Line2: '{line2}'")
+                try:
+                    self.lcd.clear()
+                    time.sleep(0.01)  # Small delay after clear
+                    # Write line by line for 16x2 LCD - explicitly set cursor positions
+                    self.lcd.cursor_pos = (0, 0)
+                    self.lcd.write_string(line1)
+                    time.sleep(0.01)  # Small delay between lines
+                    self.lcd.cursor_pos = (1, 0)
+                    self.lcd.write_string(line2)
+                    
+                    self.state['indicators']['last_lcd_content'] = content
+                    logger.debug(f"LCD Updated - Line1: '{line1}' Line2: '{line2}'")
+                except Exception as lcd_err:
+                    logger.error(f"LCD write error: {lcd_err}")
+                    raise
 
             self.state['indicators']['lcd_error_count'] = 0
 
@@ -995,6 +1386,30 @@ class SmartFishPondMonitor:
                    if k not in ['quality_score', 'quality_status'])
 
     def send_to_thingspeak(self, data, timestamp):
+        """
+        Upload sensor data to ThingSpeak cloud platform.
+        
+        Implements retry logic with exponential backoff for network reliability.
+        Converts quality status text to numeric codes for ThingSpeak chart compatibility.
+        Saves data to backup file if upload fails.
+        
+        ThingSpeak Field Mapping:
+            field1: Temperature (°C)
+            field2: pH
+            field3: Electrical Conductivity (μS/cm)
+            field4: Nitrogen (mg/kg)
+            field5: Phosphorus (mg/kg)
+            field6: Turbidity (0=clear, 1=turbid)
+            field7: Quality Score (0-100+)
+            field8: Quality Status Code (0=GOOD, 1=WARNING, 2=CRITICAL)
+        
+        Args:
+            data (dict): Sensor readings and quality assessment
+            timestamp (str): ISO format timestamp for backup file
+            
+        Returns:
+            bool: True if upload successful, False otherwise
+        """
         if not config.get('THINGSPEAK', {}).get('API_KEY'):
             logger.warning("ThingSpeak API key not configured")
             return False
@@ -1003,8 +1418,10 @@ class SmartFishPondMonitor:
             logger.debug("Data validation failed. Skipping send.")
             return False
 
+        # Build payload with API key and sensor data
         payload = {"api_key": config.get('THINGSPEAK', {}).get('API_KEY')}
         
+        # Map sensor data to ThingSpeak fields (only include non-None values)
         if data.get('temperature') is not None:
             payload['field1'] = data['temperature']
         if data.get('ph') is not None:
@@ -1016,15 +1433,17 @@ class SmartFishPondMonitor:
         if data.get('phosphorus') is not None:
             payload['field5'] = data['phosphorus']
         if data.get('turbidity') is not None:
-            payload['field6'] = 1 if data.get('turbidity') else 0
+            payload['field6'] = 1 if data.get('turbidity') else 0  # Convert boolean to 0/1
         if data.get('quality_score') is not None:
             payload['field7'] = data['quality_score']
         
-        # FIX: Ensure quality_status is sent as text string
+        # Convert quality status text to numeric code for ThingSpeak charts
+        # ThingSpeak charts require numeric values, not text strings
         if data.get('quality_status') is not None:
-            status_text = str(data['quality_status'])  # Convert to string
-            payload['field8'] = status_text
-            logger.debug(f"Sending status to Field 8: '{status_text}'")
+            status_text = str(data['quality_status']).upper()
+            status_code = QUALITY_STATUS_CODES.get(status_text, -1)  # -1 if unknown status
+            payload['field8'] = status_code
+            logger.debug(f"Sending status '{status_text}' as code {status_code} to Field 8")
 
         max_retries = config.get('THINGSPEAK', {}).get('MAX_RETRIES', 3)
         initial_delay = config.get('THINGSPEAK', {}).get('RETRY_DELAY', 5)
@@ -1057,7 +1476,11 @@ class SmartFishPondMonitor:
                 if response.status_code == 200:
                     result = response.text.strip()
                     if result.isdigit() and int(result) > 0:
-                        logger.info(f"✅ ThingSpeak upload (Entry: {result}) - Status: {payload.get('field8', 'N/A')}")
+                        logger.info(
+                            f"✅ ThingSpeak upload (Entry: {result}) - "
+                            f"Status: {data.get('quality_status', 'N/A')} "
+                            f"(code {payload.get('field8', 'N/A')})"
+                        )
                         self.state['thingspeak']['connection_errors'] = 0
                         self.state['thingspeak']['network_error_count'] = 0
                         return True
