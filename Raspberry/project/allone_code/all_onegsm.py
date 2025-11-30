@@ -528,9 +528,9 @@ class SmartFishPondMonitor:
                             self.state['critical']['start_time'] = time.time()
                             self.state['critical']['sustained'] = True
                             print("  -> INFO: Critical condition detected. Starting 5-minute timer before sending SMS.")
-                else:
-                    # If already sustained, check if it's time to send SMS
-                    self.send_sms_alert(status)
+                    else:
+                        # If already sustained, check if it's time to send SMS
+                        self.send_sms_alert(status)
                 else:
                     # If status is no longer critical, reset the critical state
                     if self.state['critical']['sustained']:
