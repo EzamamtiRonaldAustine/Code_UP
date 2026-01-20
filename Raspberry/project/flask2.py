@@ -1,3 +1,5 @@
+# Check in 2026 code still seems relevant and functional.
+# Flask-based web interface for Smart Fish Pond Monitor still in progess. 
 import os
 import glob
 import time
