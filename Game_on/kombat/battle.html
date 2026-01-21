@@ -634,4 +634,987 @@
         gameLoop();
     </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortal Arena - Fighting Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            overflow: hidden;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 1000px;
+            height: 600px;
+            background: #000;
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .health-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .player-info {
+            width: 400px;
+        }
+
+        .player-name {
+            color: #ffd700;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 3px 3px 6px #000;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .health-bar-outer {
+            width: 100%;
+            height: 40px;
+            background: #1a1a1a;
+            border: 4px solid #ffd700;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .health-bar-inner {
+            height: 100%;
+            background: linear-gradient(to bottom, #00ff00 0%, #00cc00 50%, #009900 100%);
+            transition: width 0.2s ease-out;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .health-bar-inner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+        }
+
+        .health-bar-inner.low {
+            background: linear-gradient(to bottom, #ffff00 0%, #ffcc00 50%, #ff9900 100%);
+        }
+
+        .health-bar-inner.critical {
+            background: linear-gradient(to bottom, #ff0000 0%, #cc0000 50%, #990000 100%);
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .player2 .health-bar-outer {
+            margin-left: auto;
+        }
+
+        #timer {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 64px;
+            color: #ffd700;
+            text-shadow: 4px 4px 8px #000, 0 0 20px #ff0000;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        #timer.warning {
+            color: #ff0000;
+            animation: timerPulse 1s infinite;
+        }
+
+        @keyframes timerPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        #roundText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 96px;
+            color: #ffd700;
+            text-shadow: 6px 6px 12px #000, 0 0 30px #ff0000;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+        }
+
+        .show-text {
+            display: block !important;
+            animation: textBurst 2s forwards;
+        }
+
+        @keyframes textBurst {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            30% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.3);
+            }
+            70% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 215, 0, 0.8);
+            font-size: 13px;
+            text-align: center;
+            text-shadow: 2px 2px 4px #000;
+            font-family: 'Courier New', monospace;
+        }
+
+        #winText {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            color: #ffd700;
+            text-shadow: 6px 6px 12px #000, 0 0 40px #ff0000;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            letter-spacing: 4px;
+        }
+
+        #debugToggle {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            color: #0f0;
+            font-size: 12px;
+            font-family: monospace;
+            pointer-events: all;
+            cursor: pointer;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border: 1px solid #0f0;
+        }
+
+        #fpsCounter {
+            position: absolute;
+            top: 130px;
+            right: 20px;
+            color: #0f0;
+            font-size: 12px;
+            font-family: monospace;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border: 1px solid #0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1000" height="600"></canvas>
+        <div id="ui">
+            <div class="health-container">
+                <div class="player-info player1">
+                    <div class="player-name">SCORPION</div>
+                    <div class="health-bar-outer">
+                        <div class="health-bar-inner" id="health1"></div>
+                    </div>
+                </div>
+                <div class="player-info player2">
+                    <div class="player-name">SUB-ZERO</div>
+                    <div class="health-bar-outer">
+                        <div class="health-bar-inner" id="health2"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="timer">99</div>
+            <div id="roundText">FIGHT!</div>
+            <div id="winText"></div>
+            <div id="debugToggle">DEBUG MODE: OFF (Press D)</div>
+            <div id="fpsCounter">FPS: 60</div>
+            <div id="controls">
+                P1: A/D-Move | W-Jump | S-Duck | J-Punch | K-Kick | L-Special<br>
+                P2: ←/→-Move | ↑-Jump | ↓-Duck | 1-Punch | 2-Kick | 3-Special
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CORE ENGINE ====================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Performance optimization
+        ctx.imageSmoothingEnabled = false;
+        
+        // Game State
+        const game = {
+            state: 'ready',
+            timer: 99,
+            debug: false,
+            paused: false,
+            winner: null
+        };
+
+        // Input System
+        const keys = {};
+        const keyPressed = {};
+
+        // FPS Counter
+        let fps = 60;
+        let lastTime = performance.now();
+        let frames = 0;
+        let fpsTime = 0;
+
+        // ==================== UTILITY CLASSES ====================
+        
+        class Vector2 {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        class Rectangle {
+            constructor(x, y, w, h) {
+                this.x = x;
+                this.y = y;
+                this.width = w;
+                this.height = h;
+            }
+
+            intersects(other) {
+                return this.x < other.x + other.width &&
+                       this.x + this.width > other.x &&
+                       this.y < other.y + other.height &&
+                       this.y + this.height > other.y;
+            }
+
+            draw(color = '#ff0000', alpha = 0.5) {
+                if (!game.debug) return;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+                ctx.restore();
+            }
+        }
+
+        // ==================== PARTICLE SYSTEM ====================
+        
+        class Particle {
+            constructor(x, y, vx, vy, color, life = 30, size = 4) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.life = life;
+                this.maxLife = life;
+                this.size = size;
+                this.gravity = 0.3;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += this.gravity;
+                this.vx *= 0.98;
+                this.life--;
+            }
+
+            draw() {
+                const alpha = this.life / this.maxLife;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        const particles = [];
+
+        function createHitEffect(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                const angle = (Math.PI * 2 * i) / 15;
+                const speed = 3 + Math.random() * 4;
+                particles.push(new Particle(
+                    x, y,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed,
+                    color,
+                    20 + Math.random() * 10,
+                    3 + Math.random() * 3
+                ));
+            }
+        }
+
+        // ==================== ANIMATION STATE MACHINE ====================
+        
+        const STATE = {
+            IDLE: 'idle',
+            WALK: 'walk',
+            JUMP: 'jump',
+            DUCK: 'duck',
+            PUNCH: 'punch',
+            KICK: 'kick',
+            SPECIAL: 'special',
+            HIT: 'hit',
+            BLOCK: 'block'
+        };
+
+        // ==================== FIGHTER CLASS ====================
+        
+        class Fighter {
+            constructor(x, y, name, colors, controls, facingRight = true) {
+                // Position & Physics
+                this.pos = new Vector2(x, y);
+                this.vel = new Vector2(0, 0);
+                this.facing = facingRight ? 1 : -1;
+                
+                // Dimensions
+                this.width = 80;
+                this.height = 140;
+                this.groundY = 450;
+                
+                // Combat Stats
+                this.health = 100;
+                this.maxHealth = 100;
+                
+                // State Machine
+                this.state = STATE.IDLE;
+                this.prevState = STATE.IDLE;
+                this.stateTimer = 0;
+                this.animFrame = 0;
+                
+                // Combat Flags
+                this.isGrounded = true;
+                this.canMove = true;
+                this.invincible = false;
+                this.stunned = false;
+                
+                // Cooldowns & Timers
+                this.attackCooldown = 0;
+                this.hitStunTimer = 0;
+                this.invincibleTimer = 0;
+                this.blockTimer = 0;
+                
+                // Visuals
+                this.name = name;
+                this.colors = colors;
+                this.controls = controls;
+                
+                // Hitbox/Hurtbox system
+                this.hurtbox = new Rectangle(0, 0, 60, 120);
+                this.hitbox = null;
+            }
+
+            setState(newState, duration = 0) {
+                if (this.state !== newState) {
+                    this.prevState = this.state;
+                    this.state = newState;
+                    this.stateTimer = duration;
+                }
+            }
+
+            updateHurtbox() {
+                const offsetX = 10;
+                const offsetY = 10;
+                this.hurtbox.x = this.pos.x + offsetX;
+                this.hurtbox.y = this.pos.y + offsetY;
+                
+                if (this.state === STATE.DUCK) {
+                    this.hurtbox.height = 70;
+                    this.hurtbox.y = this.pos.y + 60;
+                } else {
+                    this.hurtbox.height = 120;
+                }
+            }
+
+            createHitbox(offsetX, offsetY, width, height) {
+                const actualOffsetX = offsetX * this.facing;
+                this.hitbox = new Rectangle(
+                    this.pos.x + this.width/2 + actualOffsetX,
+                    this.pos.y + offsetY,
+                    width,
+                    height
+                );
+            }
+
+            clearHitbox() {
+                this.hitbox = null;
+            }
+
+            takeDamage(damage, knockbackX = 0, knockbackY = 0) {
+                if (this.invincible || this.state === STATE.BLOCK) return false;
+                
+                this.health -= damage;
+                this.health = Math.max(0, this.health);
+                
+                this.setState(STATE.HIT, 20);
+                this.hitStunTimer = 20;
+                this.stunned = true;
+                this.canMove = false;
+                
+                this.vel.x = knockbackX * this.facing;
+                this.vel.y = knockbackY;
+                
+                this.invincible = true;
+                this.invincibleTimer = 30;
+                
+                createHitEffect(this.pos.x + this.width/2, this.pos.y + this.height/2, '#ff0000');
+                
+                return true;
+            }
+
+            update(opponent) {
+                this.animFrame++;
+                this.stateTimer--;
+                
+                // Update timers
+                if (this.attackCooldown > 0) this.attackCooldown--;
+                if (this.hitStunTimer > 0) {
+                    this.hitStunTimer--;
+                    if (this.hitStunTimer === 0) {
+                        this.stunned = false;
+                        this.canMove = true;
+                    }
+                }
+                if (this.invincibleTimer > 0) {
+                    this.invincibleTimer--;
+                    if (this.invincibleTimer === 0) {
+                        this.invincible = false;
+                    }
+                }
+                
+                // Always face opponent
+                this.facing = this.pos.x < opponent.pos.x ? 1 : -1;
+                
+                // Handle input when not stunned
+                if (!this.stunned && this.canMove && game.state === 'playing') {
+                    this.handleInput(opponent);
+                }
+                
+                // Apply physics
+                this.vel.y += 0.8; // Gravity
+                this.pos.x += this.vel.x;
+                this.pos.y += this.vel.y;
+                
+                // Ground collision
+                if (this.pos.y >= this.groundY) {
+                    this.pos.y = this.groundY;
+                    this.vel.y = 0;
+                    this.isGrounded = true;
+                    
+                    if (this.state === STATE.JUMP) {
+                        this.setState(STATE.IDLE);
+                    }
+                } else {
+                    this.isGrounded = false;
+                }
+                
+                // Screen bounds
+                this.pos.x = Math.max(20, Math.min(900, this.pos.x));
+                
+                // Friction
+                this.vel.x *= 0.85;
+                
+                // State transitions
+                if (this.stateTimer <= 0 && this.canMove) {
+                    if ([STATE.PUNCH, STATE.KICK, STATE.SPECIAL, STATE.HIT].includes(this.state)) {
+                        this.setState(STATE.IDLE);
+                        this.clearHitbox();
+                    }
+                }
+                
+                // Update collision boxes
+                this.updateHurtbox();
+            }
+
+            handleInput(opponent) {
+                const c = this.controls;
+                
+                // Movement
+                if (this.isGrounded && this.attackCooldown === 0) {
+                    if (keys[c.left]) {
+                        this.vel.x = -4.5;
+                        if (this.state === STATE.IDLE) this.setState(STATE.WALK);
+                    } else if (keys[c.right]) {
+                        this.vel.x = 4.5;
+                        if (this.state === STATE.IDLE) this.setState(STATE.WALK);
+                    } else {
+                        if (this.state === STATE.WALK) this.setState(STATE.IDLE);
+                    }
+                    
+                    // Duck
+                    if (keys[c.duck]) {
+                        this.setState(STATE.DUCK);
+                        this.vel.x = 0;
+                    } else if (this.state === STATE.DUCK) {
+                        this.setState(STATE.IDLE);
+                    }
+                }
+                
+                // Jump
+                if (keyPressed[c.jump] && this.isGrounded && this.attackCooldown === 0) {
+                    this.vel.y = -16;
+                    this.setState(STATE.JUMP);
+                    keyPressed[c.jump] = false;
+                }
+                
+                // Attacks
+                if (this.attackCooldown === 0) {
+                    if (keyPressed[c.punch]) {
+                        this.performPunch(opponent);
+                        keyPressed[c.punch] = false;
+                    } else if (keyPressed[c.kick]) {
+                        this.performKick(opponent);
+                        keyPressed[c.kick] = false;
+                    } else if (keyPressed[c.special]) {
+                        this.performSpecial(opponent);
+                        keyPressed[c.special] = false;
+                    }
+                }
+            }
+
+            performPunch(opponent) {
+                this.setState(STATE.PUNCH, 15);
+                this.attackCooldown = 20;
+                this.vel.x = 0;
+                
+                // Create hitbox on frame 5
+                setTimeout(() => {
+                    if (this.state === STATE.PUNCH) {
+                        this.createHitbox(40, 35, 35, 20);
+                        this.checkHit(opponent, 6, 10, -2);
+                    }
+                }, 80);
+                
+                setTimeout(() => this.clearHitbox(), 150);
+            }
+
+            performKick(opponent) {
+                this.setState(STATE.KICK, 20);
+                this.attackCooldown = 25;
+                this.vel.x = 0;
+                
+                setTimeout(() => {
+                    if (this.state === STATE.KICK) {
+                        this.createHitbox(45, 70, 40, 20);
+                        this.checkHit(opponent, 9, 12, -3);
+                    }
+                }, 100);
+                
+                setTimeout(() => this.clearHitbox(), 200);
+            }
+
+            performSpecial(opponent) {
+                this.setState(STATE.SPECIAL, 30);
+                this.attackCooldown = 50;
+                this.vel.x = 0;
+                
+                // Visual effect
+                for (let i = 0; i < 20; i++) {
+                    const angle = (Math.PI * 2 * i) / 20;
+                    particles.push(new Particle(
+                        this.pos.x + this.width/2,
+                        this.pos.y + this.height/2,
+                        Math.cos(angle) * 5,
+                        Math.sin(angle) * 5,
+                        this.colors.secondary,
+                        30,
+                        5
+                    ));
+                }
+                
+                setTimeout(() => {
+                    if (this.state === STATE.SPECIAL) {
+                        this.createHitbox(50, 40, 50, 40);
+                        this.checkHit(opponent, 18, 15, -8);
+                    }
+                }, 150);
+                
+                setTimeout(() => this.clearHitbox(), 300);
+            }
+
+            checkHit(opponent, damage, knockbackX, knockbackY) {
+                if (this.hitbox && this.hitbox.intersects(opponent.hurtbox)) {
+                    const hit = opponent.takeDamage(damage, -knockbackX, knockbackY);
+                    if (hit) {
+                        updateHealthBars();
+                        checkWinCondition();
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                
+                // Invincibility flash
+                if (this.invincible && Math.floor(this.animFrame / 4) % 2 === 0) {
+                    ctx.globalAlpha = 0.5;
+                }
+                
+                const x = this.pos.x;
+                const y = this.pos.y;
+                const bobOffset = this.state === STATE.WALK ? Math.sin(this.animFrame / 4) * 2 : 0;
+                
+                // Draw character (simplified sprite)
+                this.drawCharacter(x, y, bobOffset);
+                
+                // Debug hitboxes
+                if (game.debug) {
+                    this.hurtbox.draw('#00ff00', 0.3);
+                    if (this.hitbox) this.hitbox.draw('#ff0000', 0.5);
+                }
+                
+                ctx.restore();
+            }
+
+            drawCharacter(x, y, bobOffset) {
+                const scale = this.facing;
+                
+                ctx.save();
+                ctx.translate(x + this.width/2, y + this.height/2);
+                if (scale < 0) ctx.scale(-1, 1);
+                ctx.translate(-this.width/2, -this.height/2);
+                
+                const drawY = this.state === STATE.DUCK ? 50 : 0;
+                const drawH = this.state === STATE.DUCK ? this.height - 50 : this.height;
+                
+                // Body
+                ctx.fillStyle = this.colors.primary;
+                ctx.fillRect(15, 40 + drawY, 50, 50 + (drawH - this.height));
+                
+                // Head
+                ctx.fillStyle = this.colors.skin;
+                ctx.fillRect(25, 10, 30, 35);
+                
+                // Mask
+                ctx.fillStyle = this.colors.primary;
+                ctx.fillRect(22, 5, 36, 15);
+                ctx.fillRect(25, 30, 30, 10);
+                
+                // Eyes
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(35, 12, 8, 5);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(37, 13, 3, 3);
+                
+                // Arms
+                ctx.fillStyle = this.colors.skin;
+                if (this.state === STATE.PUNCH) {
+                    ctx.fillRect(60, 45, 30, 10); // Extended arm
+                    ctx.fillStyle = this.colors.primary;
+                    ctx.fillRect(85, 43, 12, 14); // Fist
+                } else {
+                    ctx.fillRect(8, 50 + bobOffset, 12, 15);
+                    ctx.fillRect(60, 50 + bobOffset, 12, 15);
+                }
+                
+                // Legs
+                if (this.state !== STATE.DUCK) {
+                    ctx.fillStyle = this.colors.primary;
+                    if (this.state === STATE.KICK) {
+                        ctx.fillRect(25, 85, 15, 40);
+                        ctx.fillRect(60, 95, 35, 12); // Extended leg
+                    } else {
+                        ctx.fillRect(25, 85, 15, 45);
+                        ctx.fillRect(40, 85, 15, 45);
+                    }
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // ==================== FIGHTER INSTANCES ====================
+        
+        const player1 = new Fighter(150, 450, 'SCORPION', {
+            primary: '#FFA500',
+            secondary: '#FFFF00',
+            skin: '#D4A574'
+        }, {
+            left: 'a',
+            right: 'd',
+            jump: 'w',
+            duck: 's',
+            punch: 'j',
+            kick: 'k',
+            special: 'l'
+        }, true);
+
+        const player2 = new Fighter(800, 450, 'SUB-ZERO', {
+            primary: '#4169E1',
+            secondary: '#87CEEB',
+            skin: '#D4A574'
+        }, {
+            left: 'arrowleft',
+            right: 'arrowright',
+            jump: 'arrowup',
+            duck: 'arrowdown',
+            punch: '1',
+            kick: '2',
+            special: '3'
+        }, false);
+
+        // ==================== BACKGROUND ====================
+        
+        function drawBackground() {
+            // Sky gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 500);
+            gradient.addColorStop(0, '#1a1a3e');
+            gradient.addColorStop(1, '#0a0a1e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1000, 500);
+            
+            // Mountains
+            ctx.fillStyle = '#0f0f2e';
+            ctx.beginPath();
+            ctx.moveTo(0, 400);
+            ctx.lineTo(200, 280);
+            ctx.lineTo(400, 350);
+            ctx.lineTo(600, 260);
+            ctx.lineTo(800, 340);
+            ctx.lineTo(1000, 300);
+            ctx.lineTo(1000, 500);
+            ctx.lineTo(0, 500);
+            ctx.fill();
+            
+            // Moon
+            ctx.fillStyle = 'rgba(240, 240, 160, 0.8)';
+            ctx.beginPath();
+            ctx.arc(800, 100, 50, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Stars
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 173) % 1000;
+                const y = (i * 97) % 350;
+                ctx.fillRect(x, y, 2, 2);
+            }
+            
+            // Arena floor
+            ctx.fillStyle = '#2a2a4a';
+            ctx.fillRect(0, 550, 1000, 50);
+            
+            // Floor tiles
+            ctx.strokeStyle = '#1a1a3a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 1000; i += 80) {
+                ctx.strokeRect(i, 550, 80, 50);
+            }
+            
+            // Shadows
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.beginPath();
+            ctx.ellipse(player1.pos.x + 40, 552, 40, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(player2.pos.x + 40, 552, 40, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // ==================== UI FUNCTIONS ====================
+        
+        function updateHealthBars() {
+            const h1 = document.getElementById('health1');
+            const h2 = document.getElementById('health2');
+            
+            const p1Percent = (player1.health / player1.maxHealth) * 100;
+            const p2Percent = (player2.health / player2.maxHealth) * 100;
+            
+            h1.style.width = p1Percent + '%';
+            h2.style.width = p2Percent + '%';
+            
+            // Color coding
+            h1.className = 'health-bar-inner' + (p1Percent < 30 ? ' critical' : p1Percent < 50 ? ' low' : '');
+            h2.className = 'health-bar-inner' + (p2Percent < 30 ? ' critical' : p2Percent < 50 ? ' low' : '');
+        }
+
+        function checkWinCondition() {
+            if (player1.health <= 0) {
+                endGame('SUB-ZERO WINS!');
+            } else if (player2.health <= 0) {
+                endGame('SCORPION WINS!');
+            }
+        }
+
+        function endGame(message) {
+            game.state = 'ended';
+            game.winner = message;
+            document.getElementById('winText').textContent = message;
+            document.getElementById('winText').style.display = 'block';
+        }
+
+        function showRoundText() {
+            const rt = document.getElementById('roundText');
+            rt.classList.add('show-text');
+            setTimeout(() => {
+                rt.classList.remove('show-text');
+                game.state = 'playing';
+            }, 2000);
+        }
+
+        // ==================== GAME LOOP ====================
+        
+        function updateFPS() {
+            frames++;
+            const currentTime = performance.now();
+            fpsTime += currentTime - lastTime;
+            lastTime = currentTime;
+            
+            if (fpsTime >= 1000) {
+                fps = frames;
+                document.getElementById('fpsCounter').textContent = `FPS: ${fps}`;
+                frames = 0;
+                fpsTime = 0;
+            }
+        }
+
+        function gameLoop() {
+            updateFPS();
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, 1000, 600);
+            
+            // Draw background
+            drawBackground();
+            
+            // Update and draw particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].isDead()) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            // Update fighters
+            if (game.state === 'playing') {
+                player1.update(player2);
+                player2.update(player1);
+            }
+            
+            // Draw fighters
+            player1.draw();
+            player2.draw();
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ==================== INPUT HANDLERS ====================
+        
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            keys[key] = true;
+            
+            if (!keyPressed[key]) {
+                keyPressed[key] = true;
+            }
+            
+            // Debug toggle
+            if (key === 'd' && e.ctrlKey) {
+                e.preventDefault();
+                game.debug = !game.debug;
+                document.getElementById('debugToggle').textContent = 
+                    `DEBUG MODE: ${game.debug ? 'ON' : 'OFF'} (Press Ctrl+D)`;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            keys[key] = false;
+            keyPressed[key] = false;
+        });
+
+        // ==================== TIMER ====================
+        
+        let timerInterval = setInterval(() => {
+            if (game.state === 'playing') {
+                game.timer--;
+                const timerEl = document.getElementById('timer');
+                timerEl.textContent = game.timer;
+                
+                if (game.timer <= 10) {
+                    timerEl.classList.add('warning');
+                }
+                
+                if (game.timer <= 0) {
+                    if (player1.health > player2.health) {
+                        endGame('SCORPION WINS!');
+                    } else if (player2.health > player1.health) {
+                        endGame('SUB-ZERO WINS!');
+                    } else {
+                        endGame('DRAW!');
+                    }
+                }
+            }
+        }, 1000);
+
+        // ==================== INITIALIZATION ====================
+        
+        updateHealthBars();
+        showRoundText();
+        gameLoop();
+    </script>
+</body>
 </html>
