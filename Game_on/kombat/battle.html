@@ -141,13 +141,13 @@
         <div id="ui">
             <div class="health-container">
                 <div class="player-info player1">
-                    <div class="player-name">WARRIOR</div>
+                    <div class="player-name">SCORPION</div>
                     <div class="health-bar-outer">
                         <div class="health-bar-inner" id="health1"></div>
                     </div>
                 </div>
                 <div class="player-info player2">
-                    <div class="player-name">SHADOW</div>
+                    <div class="player-name">SUB-ZERO</div>
                     <div class="health-bar-outer">
                         <div class="health-bar-inner" id="health2"></div>
                     </div>
@@ -200,17 +200,18 @@
         const particles = [];
 
         class Fighter {
-            constructor(x, name, color1, color2, controls) {
+            constructor(x, name, primaryColor, secondaryColor, skinTone, controls) {
                 this.x = x;
-                this.y = 420;
-                this.width = 60;
-                this.height = 100;
+                this.y = 380;
+                this.width = 80;
+                this.height = 140;
                 this.velocityX = 0;
                 this.velocityY = 0;
                 this.health = 100;
                 this.name = name;
-                this.color1 = color1;
-                this.color2 = color2;
+                this.primaryColor = primaryColor;
+                this.secondaryColor = secondaryColor;
+                this.skinTone = skinTone;
                 this.controls = controls;
                 this.facing = x < 400 ? 1 : -1;
                 this.state = 'idle';
@@ -235,10 +236,10 @@
 
                 if (!this.isJumping && !this.isDucking) {
                     if (keys[this.controls.left]) {
-                        this.velocityX = -4;
+                        this.velocityX = -5;
                         this.state = 'walk';
                     } else if (keys[this.controls.right]) {
-                        this.velocityX = 4;
+                        this.velocityX = 5;
                         this.state = 'walk';
                     } else {
                         this.velocityX = 0;
@@ -276,8 +277,8 @@
                 this.x += this.velocityX;
                 this.y += this.velocityY;
 
-                if (this.y >= 420) {
-                    this.y = 420;
+                if (this.y >= 380) {
+                    this.y = 380;
                     this.velocityY = 0;
                     this.isJumping = false;
                     if (this.state === 'jump') this.state = 'idle';
@@ -290,7 +291,7 @@
                 this.state = type;
                 this.attackCooldown = 20;
 
-                const hitDistance = 80;
+                const hitDistance = 90;
                 const distance = Math.abs(this.x - opponent.x);
 
                 if (distance < hitDistance && !opponent.isDucking) {
@@ -301,8 +302,8 @@
 
                     for (let i = 0; i < 10; i++) {
                         particles.push(new Particle(
-                            opponent.x + 30,
-                            opponent.y + 50,
+                            opponent.x + 40,
+                            opponent.y + 60,
                             '#ff' + Math.floor(Math.random() * 100) + '00',
                             (Math.random() - 0.5) * 8,
                             (Math.random() - 0.5) * 8
@@ -322,33 +323,33 @@
                 this.state = 'special';
                 this.attackCooldown = 40;
 
-                for (let i = 0; i < 20; i++) {
+                for (let i = 0; i < 25; i++) {
                     particles.push(new Particle(
-                        this.x + 30,
-                        this.y + 50,
-                        this.color2,
-                        this.facing * (5 + Math.random() * 5),
-                        (Math.random() - 0.5) * 4
+                        this.x + 40,
+                        this.y + 60,
+                        this.secondaryColor,
+                        this.facing * (5 + Math.random() * 8),
+                        (Math.random() - 0.5) * 6
                     ));
                 }
 
-                const hitDistance = 120;
+                const hitDistance = 140;
                 const distance = Math.abs(this.x - opponent.x);
 
                 if (distance < hitDistance) {
                     opponent.health -= 15;
                     opponent.health = Math.max(0, opponent.health);
                     opponent.hitStun = 20;
-                    opponent.velocityX = this.facing * 12;
-                    opponent.velocityY = -10;
+                    opponent.velocityX = this.facing * 15;
+                    opponent.velocityY = -12;
 
-                    for (let i = 0; i < 30; i++) {
+                    for (let i = 0; i < 40; i++) {
                         particles.push(new Particle(
-                            opponent.x + 30,
-                            opponent.y + 50,
-                            '#ffff00',
-                            (Math.random() - 0.5) * 12,
-                            (Math.random() - 0.5) * 12
+                            opponent.x + 40,
+                            opponent.y + 60,
+                            this.secondaryColor,
+                            (Math.random() - 0.5) * 15,
+                            (Math.random() - 0.5) * 15
                         ));
                     }
 
@@ -362,89 +363,195 @@
             }
 
             draw() {
-                const actualHeight = this.isDucking ? this.height / 2 : this.height;
-                const actualY = this.isDucking ? this.y + this.height / 2 : this.y;
-
+                ctx.save();
+                
                 if (this.hitStun > 0 && this.hitStun % 4 < 2) {
                     ctx.globalAlpha = 0.5;
                 }
 
-                ctx.fillStyle = this.color1;
-                ctx.fillRect(this.x + 10, actualY, 40, actualHeight);
+                const baseX = this.x;
+                const baseY = this.isDucking ? this.y + 50 : this.y;
+                const bobOffset = this.state === 'walk' ? Math.sin(this.animFrame / 5) * 2 : 0;
 
-                ctx.fillStyle = this.color2;
-                ctx.fillRect(this.x + 20, actualY + 10, 20, 30);
-
-                ctx.fillStyle = '#8B4513';
+                // Legs
+                ctx.fillStyle = this.primaryColor;
                 if (!this.isDucking) {
-                    ctx.fillRect(this.x + 15, actualY + actualHeight, 12, 20);
-                    ctx.fillRect(this.x + 33, actualY + actualHeight, 12, 20);
+                    // Left leg
+                    ctx.fillRect(baseX + 20, baseY + 80, 16, 45);
+                    // Right leg
+                    ctx.fillRect(baseX + 44, baseY + 80, 16, 45);
+                    
+                    // Boots
+                    ctx.fillStyle = '#1a1a1a';
+                    ctx.fillRect(baseX + 18, baseY + 115, 20, 12);
+                    ctx.fillRect(baseX + 42, baseY + 115, 20, 12);
+                } else {
+                    // Crouched legs
+                    ctx.fillRect(baseX + 15, baseY + 50, 50, 25);
+                    ctx.fillStyle = '#1a1a1a';
+                    ctx.fillRect(baseX + 15, baseY + 70, 50, 10);
                 }
 
-                const bobOffset = this.state === 'walk' ? Math.sin(this.animFrame / 5) * 3 : 0;
+                // Torso/Body armor
+                ctx.fillStyle = this.primaryColor;
+                ctx.fillRect(baseX + 15, baseY + 35, 50, 50);
                 
+                // Armor details
+                ctx.fillStyle = this.secondaryColor;
+                ctx.fillRect(baseX + 20, baseY + 40, 40, 8);
+                ctx.fillRect(baseX + 25, baseY + 55, 10, 20);
+                ctx.fillRect(baseX + 45, baseY + 55, 10, 20);
+
+                // Belt
+                ctx.fillStyle = '#8B7355';
+                ctx.fillRect(baseX + 15, baseY + 75, 50, 8);
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(baseX + 35, baseY + 75, 10, 8);
+
+                // Arms
+                ctx.fillStyle = this.skinTone;
                 if (this.state === 'punch') {
-                    ctx.fillStyle = this.color2;
-                    ctx.fillRect(this.x + (this.facing > 0 ? 50 : -20), actualY + 30, 20, 10);
+                    // Punching arm extended
+                    const armX = this.facing > 0 ? baseX + 65 : baseX - 30;
+                    ctx.fillRect(armX, baseY + 45, 30, 12);
+                    // Fist
+                    ctx.fillStyle = this.primaryColor;
+                    ctx.fillRect(armX + (this.facing > 0 ? 25 : -8), baseY + 43, 10, 16);
+                    // Other arm
+                    ctx.fillStyle = this.skinTone;
+                    ctx.fillRect(baseX + (this.facing > 0 ? 10 : 60), baseY + 50 + bobOffset, 15, 12);
                 } else if (this.state === 'kick') {
-                    ctx.fillStyle = this.color2;
-                    ctx.fillRect(this.x + (this.facing > 0 ? 50 : -25), actualY + 60, 25, 12);
-                } else if (!this.isDucking) {
-                    ctx.fillStyle = this.color2;
-                    ctx.fillRect(this.x + (this.facing > 0 ? 5 : 45), actualY + 30 + bobOffset, 15, 8);
-                    ctx.fillRect(this.x + (this.facing > 0 ? -10 : 50), actualY + 35 + bobOffset, 15, 8);
+                    // Normal arms for kick
+                    ctx.fillRect(baseX + 5, baseY + 45 + bobOffset, 15, 12);
+                    ctx.fillRect(baseX + 60, baseY + 45 + bobOffset, 15, 12);
+                    // Extended leg
+                    ctx.fillStyle = this.primaryColor;
+                    const kickX = this.facing > 0 ? baseX + 70 : baseX - 35;
+                    ctx.fillRect(kickX, baseY + 90, 35, 14);
+                    ctx.fillStyle = '#1a1a1a';
+                    ctx.fillRect(kickX + (this.facing > 0 ? 30 : -8), baseY + 88, 12, 18);
+                } else {
+                    // Normal arms
+                    ctx.fillRect(baseX + 5, baseY + 45 + bobOffset, 15, 12);
+                    ctx.fillRect(baseX + 60, baseY + 45 + bobOffset, 15, 12);
+                    // Forearms
+                    ctx.fillRect(baseX, baseY + 52 + bobOffset, 12, 18);
+                    ctx.fillRect(baseX + 68, baseY + 52 + bobOffset, 12, 18);
+                    // Gloves
+                    ctx.fillStyle = this.primaryColor;
+                    ctx.fillRect(baseX - 2, baseY + 68 + bobOffset, 14, 10);
+                    ctx.fillRect(baseX + 68, baseY + 68 + bobOffset, 14, 10);
                 }
 
-                ctx.fillStyle = '#FFE4B5';
-                ctx.fillRect(this.x + 22, actualY - 5, 16, 20);
+                // Head
+                ctx.fillStyle = this.skinTone;
+                ctx.fillRect(baseX + 28, baseY + 8, 24, 30);
+                
+                // Mask/hood
+                ctx.fillStyle = this.primaryColor;
+                ctx.fillRect(baseX + 25, baseY, 30, 12);
+                ctx.fillRect(baseX + 23, baseY + 8, 4, 15);
+                ctx.fillRect(baseX + 53, baseY + 8, 4, 15);
+                ctx.fillRect(baseX + 25, baseY + 22, 30, 8);
+                
+                // Eyes - menacing!
+                ctx.fillStyle = '#fff';
+                const eyeY = baseY + 14;
+                if (this.facing > 0) {
+                    ctx.fillRect(baseX + 42, eyeY, 8, 6);
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(baseX + 45, eyeY + 1, 3, 4);
+                } else {
+                    ctx.fillRect(baseX + 30, eyeY, 8, 6);
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(baseX + 32, eyeY + 1, 3, 4);
+                }
 
-                ctx.fillStyle = '#000';
-                const eyeX = this.facing > 0 ? this.x + 32 : this.x + 24;
-                ctx.fillRect(eyeX, actualY + 3, 3, 3);
+                // Shoulder pads
+                ctx.fillStyle = this.secondaryColor;
+                ctx.fillRect(baseX + 8, baseY + 35, 12, 14);
+                ctx.fillRect(baseX + 60, baseY + 35, 12, 14);
+
+                // Special move effects
+                if (this.state === 'special') {
+                    ctx.fillStyle = this.secondaryColor;
+                    ctx.globalAlpha = 0.7;
+                    const handX = this.facing > 0 ? baseX + 68 : baseX + 12;
+                    ctx.fillRect(handX, baseY + 65, 20, 20);
+                    ctx.fillRect(handX + (this.facing > 0 ? 15 : -15), baseY + 60, 15, 30);
+                }
 
                 ctx.globalAlpha = 1;
+                ctx.restore();
             }
         }
 
-        const player1 = new Fighter(100, 'WARRIOR', '#FF4444', '#CC0000', {
+        const player1 = new Fighter(100, 'SCORPION', '#FFA500', '#FFFF00', '#D4A574', {
             left: 'a', right: 'd', jump: 'w', duck: 's',
             punch: 'j', kick: 'k', special: 'l'
         });
 
-        const player2 = new Fighter(700, 'SHADOW', '#4444FF', '#0000CC', {
+        const player2 = new Fighter(700, 'SUB-ZERO', '#4169E1', '#87CEEB', '#D4A574', {
             left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', duck: 'ArrowDown',
             punch: '1', kick: '2', special: '3'
         });
 
         function drawBackground() {
-            ctx.fillStyle = '#1a1a2e';
+            // Sky
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, '#1a1a3e');
+            gradient.addColorStop(1, '#0a0a1e');
+            ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 800, 400);
 
-            ctx.fillStyle = '#0f0f1e';
-            for (let i = 0; i < 5; i++) {
-                ctx.globalAlpha = 0.3;
-                ctx.fillRect(i * 200 - (timer * 2) % 200, 300, 150, 100);
-            }
+            // Mountains in background
+            ctx.fillStyle = '#0f0f2e';
+            ctx.beginPath();
+            ctx.moveTo(0, 350);
+            ctx.lineTo(200, 250);
+            ctx.lineTo(400, 320);
+            ctx.lineTo(600, 230);
+            ctx.lineTo(800, 340);
+            ctx.lineTo(800, 400);
+            ctx.lineTo(0, 400);
+            ctx.fill();
+
+            // Moon
+            ctx.fillStyle = '#f0f0a0';
+            ctx.globalAlpha = 0.8;
+            ctx.beginPath();
+            ctx.arc(650, 100, 40, 0, Math.PI * 2);
+            ctx.fill();
             ctx.globalAlpha = 1;
 
-            ctx.fillStyle = '#8B4513';
-            ctx.fillRect(0, 520, 800, 80);
-
-            ctx.strokeStyle = '#654321';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < 800; i += 80) {
-                ctx.beginPath();
-                ctx.moveTo(i, 520);
-                ctx.lineTo(i + 40, 600);
-                ctx.stroke();
-            }
-
-            for (let i = 0; i < 20; i++) {
-                const x = Math.random() * 800;
-                const y = Math.random() * 300;
+            // Stars
+            for (let i = 0; i < 30; i++) {
+                const x = (i * 127) % 800;
+                const y = (i * 67) % 300;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                 ctx.fillRect(x, y, 2, 2);
             }
+
+            // Arena floor
+            ctx.fillStyle = '#2a2a4a';
+            ctx.fillRect(0, 520, 800, 80);
+            
+            // Floor tiles
+            ctx.strokeStyle = '#1a1a3a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 800; i += 60) {
+                for (let j = 520; j < 600; j += 60) {
+                    ctx.strokeRect(i, j, 60, 60);
+                }
+            }
+
+            // Floor shadows
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.ellipse(player1.x + 40, 522, 35, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(player2.x + 40, 522, 35, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         function updateHealth() {
@@ -454,9 +561,9 @@
 
         function checkWin() {
             if (player1.health <= 0) {
-                endGame('SHADOW WINS!');
+                endGame('SUB-ZERO WINS!');
             } else if (player2.health <= 0) {
-                endGame('WARRIOR WINS!');
+                endGame('SCORPION WINS!');
             }
         }
 
@@ -513,9 +620,9 @@
                 document.getElementById('timer').textContent = timer;
                 if (timer <= 0) {
                     if (player1.health > player2.health) {
-                        endGame('WARRIOR WINS!');
+                        endGame('SCORPION WINS!');
                     } else if (player2.health > player1.health) {
-                        endGame('SHADOW WINS!');
+                        endGame('SUB-ZERO WINS!');
                     } else {
                         endGame('DRAW!');
                     }
