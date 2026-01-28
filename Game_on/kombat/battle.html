@@ -881,20 +881,15 @@
                 ctx.translate(-this.width/2, -this.height/2);
                 
                 const drawY = this.state === STATE.DUCK ? 50 : 0;
-                const drawH = this.state === STATE.DUCK ? this.height - 50 : this.height;
+                const isDucking = this.state === STATE.DUCK;
                 
-                // Enhanced character rendering
-                
-                // Legs
-                ctx.fillStyle = this.colors.primary;
-                if (!this.state === STATE.DUCK) {
-                    // Shadow under feet
-                    if (!isTrail) {
-                        ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                        ctx.fillRect(18, 135, 44, 5);
-                    }
+                // Add outline for depth
+                if (!isTrail) {
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+                    ctx.lineWidth = 2;
                 }
                 
+                // === LEGS ===
                 ctx.fillStyle = this.colors.primary;
                 if (this.state === STATE.KICK) {
                     // Kicking pose
