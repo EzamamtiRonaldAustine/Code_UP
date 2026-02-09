@@ -762,7 +762,7 @@ function loop() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     // Perspective lines
-    for(let i=-500; i<1500; i+=100) {
+    for(let i=-500; i<1500; i+=10) {
         ctx.moveTo(i, GROUND_Y);
         ctx.lineTo(i - 400, H + 100);
     }
