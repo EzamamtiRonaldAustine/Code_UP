@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MORTAL ARENA: REALISM (FIXED)</title>
+    <title>MORTAL ARENA: ULTIMATE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap');
         
         :root {
-            --p1-color: #ff4d00;
-            --p2-color: #0088ff;
-            --bg-top: #1a1a2e;
-            --bg-bot: #000000;
+            --p1-color: #ff5500;
+            --p2-color: #00ccff;
+            --super-color: #ffd700;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
         body {
-            background: #111;
+            background: #050505;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -31,36 +30,27 @@
             position: relative;
             width: 1000px;
             height: 600px;
-            background: #000; /* Fallback */
-            box-shadow: 0 0 50px rgba(0,0,0,0.9);
-            border: 4px solid #444;
+            background: #000;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
+            border: 4px solid #333;
             overflow: hidden;
         }
 
-        /* Canvases layered on top of each other */
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: block;
-        }
+        canvas { position: absolute; top: 0; left: 0; display: block; }
+        #gameCanvas { z-index: 2; }
+        #bloodCanvas { z-index: 1; pointer-events: none; }
 
-        #gameCanvas { z-index: 2; } /* Main gameplay */
-        #bloodCanvas { z-index: 1; pointer-events: none; } /* Persistent blood */
-        
-        /* Cinematic letterbox bars */
         .bar {
-            position: absolute; left: 0; right: 0; height: 60px;
+            position: absolute; left: 0; right: 0; height: 50px;
             background: #000; z-index: 100; pointer-events: none;
+            box-shadow: 0 0 20px #000;
         }
-        .top-bar { top: 0; }
-        .bottom-bar { bottom: 0; }
+        .top-bar { top: 0; border-bottom: 2px solid #333; }
+        .bottom-bar { bottom: 0; border-top: 2px solid #333; }
 
         #ui {
-            position: absolute;
-            top: 0; left: 0; right: 0; padding: 70px 20px 0 20px;
+            position: absolute; top: 0; left: 0; right: 0; padding: 60px 20px 0 20px;
             pointer-events: none; z-index: 10;
-            display: flex; justify-content: space-between;
         }
 
         .hud-side {
@@ -69,27 +59,33 @@
 
         .name-tag {
             font-family: 'Press Start 2P', cursive; font-size: 14px;
-            margin-bottom: 5px; text-shadow: 2px 2px 0 #000;
+            margin-bottom: 2px; text-shadow: 2px 2px 0 #000;
             display: flex; justify-content: space-between;
+            align-items: center;
         }
-        .p1-name { color: var(--p1-color); }
-        .p2-name { color: var(--p2-color); flex-direction: row-reverse; }
+        .p1-name { color: var(--p1-color); text-align: left; }
+        .p2-name { color: var(--p2-color); text-align: right; flex-direction: row-reverse; }
 
-        .health-box {
-            height: 25px; background: #333;
-            border: 2px solid #555;
+        .bars-wrapper {
             transform: skewX(-15deg);
-            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
+            border: 2px solid #555;
+            background: #111;
+            padding: 2px;
+            margin-bottom: 5px;
         }
 
         .hp-bar {
-            height: 100%; width: 100%;
+            height: 20px; width: 100%;
             transition: width 0.1s linear;
         }
-        .p1-hp { background: linear-gradient(180deg, #ff3333, #880000); float: right; }
-        .p2-hp { background: linear-gradient(180deg, #3388ff, #003388); float: left; }
+        .p1-hp { background: linear-gradient(90deg, #500, #ff0000); float: right; }
+        .p2-hp { background: linear-gradient(90deg, #0055aa, #00ccff); float: left; }
+
+        .super-bar {
+            height: 8px; width: 0%; background: #ffd700;
+            box-shadow: 0 0 5px #ffd700;
+            transition: width 0.1s;
+        }
 
         .timer-box {
             position: absolute; left: 50%; transform: translateX(-50%);
@@ -105,16 +101,24 @@
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0);
             font-size: 80px; font-family: 'Press Start 2P', cursive;
-            text-shadow: 5px 5px 0 #500; color: #fff;
+            text-shadow: 5px 5px 0 #a00, 0 0 20px #fff; color: #fff;
             pointer-events: none; z-index: 20;
             text-align: center; white-space: nowrap;
             opacity: 0; transition: opacity 0.2s;
         }
         .show { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
 
+        #comboUI {
+            position: absolute; top: 150px; left: 100px;
+            font-family: 'Press Start 2P', cursive;
+            color: #ffd700; text-shadow: 2px 2px 0 #000;
+            font-size: 40px; pointer-events: none; display: none;
+            z-index: 8;
+        }
+
         .menu {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.9);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 50;
         }
@@ -128,63 +132,90 @@
             font-size: 16px; cursor: pointer; margin: 10px;
             transition: 0.2s;
         }
-        button:hover { background: #f00; color: #000; }
+        button:hover { background: #f00; color: #000; transform: scale(1.05); }
 
         .controls {
-            margin-top: 30px; color: #aaa; font-family: monospace;
-            text-align: center; line-height: 1.8;
-            background: rgba(0,0,0,0.5); padding: 20px;
-            border: 1px solid #444;
+            margin-top: 20px; color: #aaa; font-family: monospace;
+            text-align: center; line-height: 1.6;
+            background: rgba(255,255,255,0.05); padding: 20px;
+            border: 1px solid #444; font-size: 13px;
         }
-        .key { color: #fff; border-bottom: 2px solid #fff; padding: 0 2px; }
+        .key { color: #fff; border-bottom: 2px solid #fff; padding: 0 3px; font-weight: bold;}
+        
+        .toggle-box {
+            margin: 15px 0; display: flex; align-items: center; gap: 10px; font-size: 24px; font-family: 'Bangers';
+        }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border: 1px solid #fff;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s;
+        }
+        input:checked + .slider { background-color: var(--p2-color); }
+        input:checked + .slider:before { transform: translateX(24px); }
 
-        /* Visual Vignette */
         #vignette {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.9) 100%);
             pointer-events: none; z-index: 15;
         }
-
     </style>
 </head>
 <body>
 
     <div id="gameContainer">
-        <!-- Layers -->
         <canvas id="bloodCanvas" width="1000" height="600"></canvas>
         <canvas id="gameCanvas" width="1000" height="600"></canvas>
         <div id="vignette"></div>
 
-        <!-- UI Overlay -->
         <div class="top-bar"></div>
         <div class="bottom-bar"></div>
 
         <div id="ui">
             <div class="hud-side p1-name">
                 <div class="name-tag"><span>SCORPION</span></div>
-                <div class="health-box"><div class="hp-bar p1-hp" id="h1"></div></div>
+                <div class="bars-wrapper">
+                    <div class="hp-bar p1-hp" id="h1"></div>
+                    <div class="super-bar" id="s1"></div>
+                </div>
             </div>
             
             <div class="timer-box"><span id="timer">99</span></div>
 
             <div class="hud-side p2-name">
                 <div class="name-tag"><span>SUB-ZERO</span></div>
-                <div class="health-box"><div class="hp-bar p2-hp" id="h2"></div></div>
+                <div class="bars-wrapper">
+                    <div class="hp-bar p2-hp" id="h2"></div>
+                    <div class="super-bar" id="s2"></div>
+                </div>
             </div>
         </div>
 
+        <div id="comboUI">2 HITS</div>
         <div id="centerText">FIGHT!</div>
 
-        <!-- Menus -->
         <div id="startMenu" class="menu">
-            <h1>MORTAL ARENA<br><span style="font-size:20px; color:#fff;">REALISM MODE</span></h1>
+            <h1>MORTAL ARENA<br><span style="font-size:18px; color:#fff;">ULTIMATE EDITION</span></h1>
+            
+            <div class="toggle-box">
+                VS CPU
+                <label class="switch">
+                    <input type="checkbox" id="cpuToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
             <button onclick="startGame()">START FIGHT</button>
             <div class="controls">
-                <span style="color:var(--p1-color)">P1:</span> <span class="key">A</span><span class="key">D</span> Move | <span class="key">W</span> Jump | <span class="key">S</span> Block/Crouch<br>
-                <span class="key">J</span> Punch | <span class="key">K</span> Kick | <span class="key">L</span> Throw<br><br>
-                <span style="color:var(--p2-color)">P2:</span> <span class="key">←</span><span class="key">→</span> Move | <span class="key">↑</span> Jump | <span class="key">↓</span> Block/Crouch<br>
-                <span class="key">1</span> Punch | <span class="key">2</span> Kick | <span class="key">3</span> Throw<br><br>
-                <em>Hold BACK to block attacks.</em>
+                <span style="color:var(--p1-color)">P1:</span> <span class="key">A</span><span class="key">D</span> Move | <span class="key">W</span> Jump | <span class="key">S</span> Block<br>
+                <span class="key">J</span> Punch | <span class="key">K</span> Kick | <span class="key">L</span> Throw | <span class="key">;</span> Special<br><br>
+                <span style="color:var(--p2-color)">P2:</span> <span class="key">←</span><span class="key">→</span> Move | <span class="key">↑</span> Jump | <span class="key">↓</span> Block<br>
+                <span class="key">1</span> Punch | <span class="key">2</span> Kick | <span class="key">3</span> Throw | <span class="key">4</span> Special<br><br>
+                <em>Special costs 100% Super Meter.</em>
             </div>
         </div>
 
@@ -196,8 +227,8 @@
 
 <script>
 /**
- * FIXED ENGINE
- * Robust loop, better visuals, crash prevention.
+ * ULTIMATE ENGINE
+ * Features: Vector Graphics, Super Meter, Projectiles, AI, Combo System.
  */
 
 const cvs = document.getElementById('gameCanvas');
@@ -207,86 +238,85 @@ const bloodCtx = bloodCvs.getContext('2d');
 
 // --- CONFIG ---
 const W = 1000, H = 600;
-const GROUND_Y = 500; // Floor position
+const GROUND_Y = 500;
 const GRAVITY = 0.6;
 
 // --- STATE ---
-let gameState = 'MENU'; // MENU, PLAY, END
+let gameState = 'MENU';
 let frame = 0;
 let timer = 99;
 let timerInt;
 let p1 = null;
 let p2 = null;
+let projectiles = [];
 
-// Camera
-let camera = { x: 0, y: 0, scale: 1, targetScale: 1 };
-let shake = 0;
-let slowMo = 1.0; 
+let camera = { scale: 1, shake: 0 };
+let slowMo = 1.0;
+let combo = { count: 0, attacker: null, timer: 0 };
 
-// --- BLOOD SYSTEM ---
-const bloodParticles = [];
+// --- INPUT ---
+const keys = {};
+const justPressed = {};
+document.addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    justPressed[e.key.toLowerCase()] = true;
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) e.preventDefault();
+});
+document.addEventListener('keyup', e => {
+    keys[e.key.toLowerCase()] = false;
+    justPressed[e.key.toLowerCase()] = false;
+});
 
-class BloodDrop {
-    constructor(x, y, color) {
+// --- CLASSES ---
+
+class Projectile {
+    constructor(x, y, dir, color, type) {
         this.x = x;
         this.y = y;
-        this.vx = (Math.random() - 0.5) * 15;
-        this.vy = (Math.random() - 1) * 15; 
-        this.life = 100 + Math.random() * 50;
+        this.vx = dir * 12;
+        this.radius = 15;
         this.color = color;
-        this.size = Math.random() * 3 + 1;
-        this.onGround = false;
+        this.type = type; // 'fire' or 'ice'
+        this.life = 100;
+        this.active = true;
     }
-
     update() {
-        if (this.onGround) return;
-        this.x += this.vx * slowMo;
-        this.y += this.vy * slowMo;
-        this.vy += 0.5 * slowMo; 
-
-        if (this.y > GROUND_Y) {
-            this.y = GROUND_Y + (Math.random() * 5);
-            this.splatter();
-            this.onGround = true;
-            this.life = 0;
-        }
-        this.life--;
-    }
-
-    draw(c) {
-        if (this.onGround) return;
-        c.fillStyle = this.color;
-        c.beginPath();
-        c.arc(this.x, this.y, this.size, 0, Math.PI*2);
-        c.fill();
-    }
-
-    splatter() {
-        // Permanent stain
-        bloodCtx.fillStyle = this.color;
-        bloodCtx.globalAlpha = 0.8;
-        bloodCtx.beginPath();
-        bloodCtx.arc(this.x, this.y, this.size * (1 + Math.random()), 0, Math.PI*2);
-        bloodCtx.fill();
-        bloodCtx.globalAlpha = 1.0;
+        if (slowMo < 1.0) this.x += this.vx * slowMo;
+        else this.x += this.vx;
         
-        // Drips
-        for(let i=0; i<3; i++) {
-            bloodCtx.fillStyle = this.color;
-            bloodCtx.globalAlpha = 0.4;
-            let sx = this.x + (Math.random()-0.5)*10;
-            let sy = this.y - (Math.random()*10);
-            bloodCtx.fillRect(sx, sy, Math.random()*3, 2);
+        this.life--;
+        if (this.life <= 0 || this.x < -100 || this.x > W + 100) this.active = false;
+        
+        // Trail particles
+        if (this.active && frame % 2 === 0) {
+            createParticles(this.x, this.y, this.color, 1, 5, 'trail');
         }
-        bloodCtx.globalAlpha = 1.0;
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = this.color;
+        ctx.fillStyle = this.color;
+        
+        // Core
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI*2);
+        ctx.fill();
+        
+        // Inner
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius * 0.6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
     }
 }
 
-// --- FIGHTER CLASS ---
 class Fighter {
     constructor(x, color, isP1) {
         this.startX = x;
-        this.color = color;
+        this.color = color; // Primary uniform color
         this.isP1 = isP1;
         this.reset();
     }
@@ -297,10 +327,11 @@ class Fighter {
         this.vx = 0;
         this.vy = 0;
         this.facing = this.isP1 ? 1 : -1;
-        this.state = 'IDLE'; 
+        this.state = 'IDLE';
         this.animTimer = 0;
         this.health = 100;
         this.maxHealth = 100;
+        this.super = 0;
         this.stun = 0;
         this.invincible = 0;
         this.hitbox = null;
@@ -313,41 +344,49 @@ class Fighter {
 
         const spd = slowMo;
 
+        // Timers
         if (this.stun > 0) this.stun -= spd;
         if (this.invincible > 0) this.invincible -= spd;
+        if (this.animTimer > 0) this.animTimer -= spd;
         
-        if (this.state === 'IDLE' || this.state === 'WALK' || this.state === 'CROUCH' || this.state === 'BLOCK') {
+        // Friction
+        if (['IDLE', 'WALK', 'CROUCH', 'BLOCK'].includes(this.state)) {
             this.vx *= 0.85;
         }
 
+        // Physics
         this.vy += GRAVITY * spd;
         this.x += this.vx * spd;
         this.y += this.vy * spd;
 
+        // Ground
         if (this.y >= GROUND_Y) {
             this.y = GROUND_Y;
             this.vy = 0;
             if (this.state === 'JUMP') this.state = 'IDLE';
         }
 
-        if (this.x < 20) this.x = 20;
-        if (this.x > 980) this.x = 980;
+        // Walls
+        if (this.x < 30) this.x = 30;
+        if (this.x > 970) this.x = 970;
 
-        // Auto-face
+        // Auto Face
         if (!this.hitbox && this.stun <= 0 && Math.abs(this.x - enemy.x) > 20) {
             this.facing = this.x < enemy.x ? 1 : -1;
         }
 
+        // Input
         if (this.stun <= 0 && gameState === 'PLAY') {
             this.handleInput(enemy);
         }
         
+        // Attack Cleanup
         if (this.hitbox && this.animTimer <= 0) {
             this.hitbox = null;
             this.state = 'IDLE';
         }
         
-        if (this.animTimer > 0) this.animTimer -= spd;
+        // Hit Recovery
         if (this.animTimer <= 0 && this.state === 'HIT') this.state = 'IDLE';
     }
 
@@ -359,6 +398,13 @@ class Fighter {
         const P = this.isP1 ? 'j' : '1';
         const K = this.isP1 ? 'k' : '2';
         const T = this.isP1 ? 'l' : '3';
+        const SP = this.isP1 ? ';' : '4'; // Special Key
+
+        // AI Override
+        if (!this.isP1 && document.getElementById('cpuToggle').checked) {
+            this.runAI(enemy, L, R, U, D, P, K, T, SP);
+            return;
+        }
 
         const movingBack = (this.facing === 1 && keys[L]) || (this.facing === -1 && keys[R]);
         this.isBlocking = movingBack && !this.hitbox && this.stun <= 0;
@@ -368,7 +414,11 @@ class Fighter {
             if (keys[R]) this.vx = 5;
             
             if (keys[L] || keys[R]) {
-                if (!this.isBlocking) this.state = 'WALK';
+                if (!this.isBlocking) {
+                    this.state = 'WALK';
+                    // Dust particles
+                    if(frame % 10 === 0) createParticles(this.x, this.y, '#555', 1, 10, 'dust');
+                }
             } else if (!this.isBlocking) {
                 this.state = 'IDLE';
             }
@@ -381,17 +431,53 @@ class Fighter {
             }
 
             if (keys[U] && justPressed[U]) {
-                this.vy = -14;
+                this.vy = -15;
                 this.state = 'JUMP';
+                createParticles(this.x, this.y, '#555', 5, 15, 'dust');
             }
 
             if (justPressed[T]) this.attemptThrow(enemy);
-            if (justPressed[P] && !this.isBlocking) this.attack('PUNCH', 15, 10, 8, 40, 0, 35, 30);
-            if (justPressed[K] && !this.isBlocking) this.attack('KICK', 20, 12, 12, 50, 10, 40, 40);
+            if (justPressed[P] && !this.isBlocking) this.attack('PUNCH', 15, 10, 8, 40, 0, 40, 30);
+            if (justPressed[K] && !this.isBlocking) this.attack('KICK', 20, 12, 12, 55, 10, 50, 40);
+            if (justPressed[SP] && this.super >= 100 && !this.isBlocking) this.doSpecial();
         } else {
-            if (keys[L]) this.vx = -3;
-            if (keys[R]) this.vx = 3;
+            if (keys[L]) this.vx = -4;
+            if (keys[R]) this.vx = 4;
         }
+    }
+
+    runAI(enemy, L, R, U, D, P, K, T, SP) {
+        const dist = Math.abs(this.x - enemy.x);
+        
+        // Reset fake keys
+        keys[L] = false; keys[R] = false; keys[U] = false; 
+        justPressed[U] = false; justPressed[P] = false; justPressed[K] = false;
+
+        if (this.stun > 0) return;
+
+        if (dist > 150) {
+            // Approach
+            keys[this.x < enemy.x ? R : L] = true;
+            // Random Jump
+            if (Math.random() < 0.01) justPressed[U] = true;
+        } else if (dist < 80) {
+            // Close combat
+            if (enemy.isAttacking && Math.random() < 0.3) {
+                keys[D] = true; // Block
+            } else {
+                keys[D] = false;
+                // Attack
+                if (Math.random() < 0.05) justPressed[K] = true;
+                if (Math.random() < 0.02) justPressed[P] = true;
+                if (Math.random() < 0.01) justPressed[T] = true;
+                if (this.super >= 100 && Math.random() < 0.005) justPressed[SP] = true;
+            }
+        }
+        
+        // Re-inject input logic (recursive call to human logic is easier but we need to be careful of infinite loops.
+        // We'll just set the global 'keys' object and let handleInput read them.
+        // Note: Since this is called *inside* handleInput, we must exit to avoid double processing.
+        return; 
     }
 
     attack(type, duration, hitFrame, dmg, w, yOff, hbW, hbH) {
@@ -405,9 +491,31 @@ class Fighter {
             if (this.state === type) {
                 const dir = this.facing;
                 this.hitbox.x = this.x + (dir * this.hitbox.xOff) - (this.hitbox.w/2);
-                this.hitbox.y = this.y - 120 + this.hitbox.yOff;
+                this.hitbox.y = this.y - 130 + this.hitbox.yOff;
             }
         }, (hitFrame / 60) * 1000);
+    }
+
+    doSpecial() {
+        this.super = 0;
+        this.state = 'SPECIAL';
+        this.animTimer = 30;
+        this.vx = 0;
+        
+        // Charge effect
+        createParticles(this.x, this.y - 80, this.color, 20, 10, 'trail');
+
+        setTimeout(() => {
+            if (gameState === 'PLAY') {
+                projectiles.push(new Projectile(
+                    this.x + (this.facing * 50),
+                    this.y - 80,
+                    this.facing,
+                    this.color,
+                    this.isP1 ? 'fire' : 'ice'
+                ));
+            }
+        }, 300);
     }
 
     attemptThrow(enemy) {
@@ -418,13 +526,12 @@ class Fighter {
             this.vx = 0;
             
             setTimeout(() => {
-                if (gameState === 'PLAY') {
-                    if (Math.abs(this.x - enemy.x) < 80) {
-                        triggerShake(10);
-                        triggerSlowMo(0.2, 20); 
-                        enemy.takeDamage(12, this.facing * 15, -10, false); // Unblockable
-                        createBlood(enemy.x, enemy.y - 80, 20); 
-                    }
+                if (gameState === 'PLAY' && Math.abs(this.x - enemy.x) < 80) {
+                    camera.shake = 10;
+                    triggerSlowMo(0.2, 15); 
+                    enemy.takeDamage(15, this.facing * 12, -8, false); 
+                    createBlood(enemy.x, enemy.y - 80, 20); 
+                    addSuper(this, 20); // Gain meter on throw
                 }
             }, 300);
         }
@@ -432,17 +539,19 @@ class Fighter {
 
     takeDamage(dmg, knockX, knockY, isBlocked) {
         if (isBlocked) {
-            dmg = dmg * 0.1; 
+            dmg = dmg * 0.05; // Low chip damage
             triggerSlowMo(0.8, 5);
             createSparks(this.x, this.y - 80);
+            addSuper(this, 5); // Gain meter on block
         } else {
             this.stun = 20;
             this.state = 'HIT';
             this.animTimer = 20;
             this.invincible = 15;
-            this.vy = -5;
-            triggerShake(5 + (dmg/2));
+            this.vy = -4;
+            camera.shake = 5 + (dmg/2);
             createBlood(this.x, this.y - 80, dmg);
+            addSuper(this, 15); // Gain meter on hit
         }
 
         this.health -= dmg;
@@ -451,13 +560,26 @@ class Fighter {
         this.vx = knockX;
         this.vy = knockY;
         
+        // Combo Logic
+        if (!isBlocked) {
+            if (combo.attacker === this) {
+                combo.count = 0; // Self hit resets
+            }
+            // Note: combo tracker is handled in the collision logic usually, 
+            // but here we just reset if victim is hit.
+        }
+        
         updateUI();
         
         if (this.health <= 0) {
             this.dead = true;
-            for(let i=0; i<30; i++) setTimeout(() => createBlood(this.x, this.y - 10, 5), i*20);
+            this.die();
             endGame(this.isP1 ? 'SUB-ZERO WINS' : 'SCORPION WINS');
         }
+    }
+
+    die() {
+        for(let i=0; i<30; i++) setTimeout(() => createBlood(this.x, this.y - 10, 5), i*20);
     }
 
     draw() {
@@ -466,91 +588,119 @@ class Fighter {
             return;
         }
 
+        // Crouch Offset
         let yOff = 0;
         if (this.state === 'CROUCH') yOff = 40;
 
-        if (this.invincible > 0 && Math.floor(frame/3)%2===0) ctx.globalAlpha = 0.5;
+        // Flicker
+        if (this.invincible > 0 && Math.floor(frame/4)%2===0) ctx.globalAlpha = 0.5;
 
         ctx.save();
         ctx.translate(this.x, this.y);
         if (this.facing === -1) ctx.scale(-1, 1);
 
         // Shadow
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.beginPath();
-        ctx.ellipse(0, 5, 35, 10, 0, 0, Math.PI*2);
+        ctx.ellipse(0, 5, 40, 12, 0, 0, Math.PI*2);
         ctx.fill();
 
-        // Leg Animation
-        const legMove = (this.state === 'WALK') ? Math.sin(frame * 0.3) * 15 : 0;
+        // --- VECTOR CHARACTER ART ---
         
-        // Back Leg
-        this.drawLimb(-15 + legMove, -50 - yOff, 20, 50, true);
-        
-        // Torso
-        const torsoGrad = ctx.createLinearGradient(-20, -90 - yOff, 20, -50 - yOff);
-        torsoGrad.addColorStop(0, '#222');
-        torsoGrad.addColorStop(0.5, this.color);
-        torsoGrad.addColorStop(1, '#000');
-        ctx.fillStyle = torsoGrad;
-        ctx.fillRect(-20, -90 - yOff, 40, 50);
-        
-        // Abs
-        ctx.fillStyle = '#111';
-        ctx.fillRect(-15, -75 - yOff, 30, 20);
+        // Animation Offsets
+        const breath = Math.sin(frame * 0.05) * 2;
+        const legAnim = (this.state === 'WALK') ? Math.sin(frame * 0.3) * 20 : 0;
 
-        // Belt
-        ctx.fillStyle = '#554433';
-        ctx.fillRect(-22, -45 - yOff, 44, 8);
+        // BACK LEG
+        this.drawLeg(-15 + legAnim, -50 - yOff, 22, 55, true);
+
+        // TORSO
+        ctx.fillStyle = '#111';
+        ctx.beginPath();
+        // Shoulders to Waist
+        ctx.moveTo(-25, -90 - yOff + breath);
+        ctx.lineTo(25, -90 - yOff + breath);
+        ctx.lineTo(20, -40 - yOff);
+        ctx.lineTo(-20, -40 - yOff);
+        ctx.fill();
+        // Muscle Definition
+        ctx.fillStyle = '#222';
+        ctx.fillRect(-10, -80 - yOff + breath, 20, 35);
+        
+        // ARMOR/Chest
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(-22, -85 - yOff + breath);
+        ctx.lineTo(22, -85 - yOff + breath);
+        ctx.lineTo(18, -55 - yOff);
+        ctx.lineTo(-18, -55 - yOff);
+        ctx.fill();
+        // Armor Detail
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(-5, -80 - yOff + breath, 10, 20);
+
+        // BELT
+        ctx.fillStyle = '#443322';
+        ctx.fillRect(-24, -42 - yOff, 48, 10);
         ctx.fillStyle = '#ffd700';
-        ctx.fillRect(-5, -45 - yOff, 10, 8);
+        ctx.fillRect(-6, -42 - yOff, 12, 10);
 
-        // Front Leg
-        this.drawLimb(15 - legMove, -50 - yOff, 20, 50, false);
+        // FRONT LEG
+        this.drawLeg(15 - legAnim, -50 - yOff, 22, 55, false);
 
-        // Head
-        ctx.fillStyle = '#dcb'; 
+        // HEAD
+        // Hood
+        ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(0, -100 - yOff, 16, 0, Math.PI*2);
+        ctx.arc(0, -110 - yOff + breath, 18, 0, Math.PI*2);
         ctx.fill();
-        
         // Mask
-        ctx.fillStyle = '#111';
+        ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.moveTo(-16, -100 - yOff);
-        ctx.lineTo(16, -100 - yOff);
-        ctx.lineTo(0, -75 - yOff);
+        ctx.moveTo(-18, -110 - yOff + breath);
+        ctx.lineTo(18, -110 - yOff + breath);
+        ctx.lineTo(12, -90 - yOff + breath);
+        ctx.lineTo(-12, -90 - yOff + breath);
         ctx.fill();
-
         // Eyes
         ctx.fillStyle = '#fff';
-        ctx.fillRect(-6, -105 - yOff, 4, 3);
-        ctx.fillRect(2, -105 - yOff, 4, 3);
+        ctx.fillRect(-8, -115 - yOff + breath, 5, 4);
+        ctx.fillRect(3, -115 - yOff + breath, 5, 4);
 
-        // Arms
-        let armX = 20, armY = -80 - yOff;
+        // ARMS
+        let armX = 25, armY = -85 - yOff + breath;
         
-        if (this.state === 'PUNCH') { armX = 40; }
-        else if (this.state === 'KICK') { armY = -90 - yOff; }
-        else if (this.state === 'THROW') { armX = 30; armY = -90 - yOff; }
-        else if (this.state === 'BLOCK') { armX = 10; armY = -90 - yOff; }
-        else if (this.state === 'CROUCH') { armY = -70; }
-        else { armY += Math.sin(frame * 0.1) * 2; } 
+        if (this.state === 'PUNCH') { armX = 55; armY -= 5; }
+        else if (this.state === 'KICK') { armY = -90 - yOff + breath; armX = 20; }
+        else if (this.state === 'THROW') { armX = 35; armY = -90 - yOff + breath; }
+        else if (this.state === 'BLOCK') { armX = 15; armY = -95 - yOff + breath; }
+        else if (this.state === 'SPECIAL') { armX = 30; armY = -90 - yOff + breath; }
+        else if (this.state === 'CROUCH') { armY = -75; }
+        else { armY += 0; } 
 
-        this.drawLimb(-25, -80 - yOff, 10, 40, true);
-        this.drawLimb(armX - 10, armY, 12, 40 + (this.state==='PUNCH'?30:0), false);
+        // Back Arm
+        this.drawArm(-30, -80 - yOff + breath, 14, 45, true);
+        // Front Arm
+        this.drawArm(armX - 10, armY, 15, 50 + (this.state==='PUNCH'?40:0), false);
 
         ctx.restore();
         ctx.globalAlpha = 1;
     }
 
-    drawLimb(x, y, w, h, isBack) {
-        const grad = ctx.createLinearGradient(x - w/2, y, x + w/2, y);
-        grad.addColorStop(0, '#111');
-        grad.addColorStop(0.5, isBack ? '#1a1a1a' : '#444');
-        grad.addColorStop(1, '#000');
-        ctx.fillStyle = grad;
+    drawLeg(x, y, w, h, isBack) {
+        ctx.fillStyle = '#111';
         ctx.fillRect(x - w/2, y, w, h);
+        // Boot
+        ctx.fillStyle = '#222';
+        ctx.fillRect(x - w/2, y + h - 15, w, 18);
+    }
+
+    drawArm(x, y, w, h, isBack) {
+        ctx.fillStyle = '#111';
+        ctx.fillRect(x, y, w, h);
+        // Glove/Hand
+        ctx.fillStyle = isBack ? '#444' : (this.isP1 ? '#ffcc00' : '#00ffff');
+        ctx.fillRect(x - 2, y + h - 10, w + 4, 14);
     }
 
     drawDead() {
@@ -569,50 +719,90 @@ class Fighter {
     }
 }
 
-// --- FX SYSTEM ---
+// --- FX & LOGIC ---
+
+function addSuper(fighter, amount) {
+    fighter.super += amount;
+    if (fighter.super > 100) fighter.super = 100;
+    updateUI();
+}
+
 function createBlood(x, y, intensity) {
     const color = '#8a0000'; 
     const count = Math.min(50, intensity * 2);
-    
     for(let i=0; i<count; i++) {
-        const b = new BloodDrop(x, y, color);
-        b.update(); 
-        b.draw(bloodCtx); 
+        // Immediate stain
+        const b = { x: x + (Math.random()-0.5)*20, y: y + (Math.random()-0.5)*20 };
+        bloodCtx.fillStyle = color;
+        bloodCtx.globalAlpha = 0.6 + Math.random()*0.4;
+        bloodCtx.beginPath();
+        bloodCtx.arc(b.x, b.y, Math.random()*5, 0, Math.PI*2);
+        bloodCtx.fill();
     }
-    
+    // Flying particles
     for(let i=0; i<count/2; i++) {
-        bloodParticles.push(new BloodDrop(x, y, color));
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10 - 5,
+            life: 30 + Math.random()*20, type: 'blood'
+        });
     }
+    bloodCtx.globalAlpha = 1.0;
 }
 
 function createSparks(x, y) {
     for(let i=0; i<10; i++) {
-        bloodParticles.push(new BloodDrop(x, y, '#ffffaa'));
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15,
+            life: 15, type: 'spark'
+        });
     }
 }
 
-// --- INPUT & LOGIC ---
-const keys = {};
-const justPressed = {};
+function createParticles(x, y, color, count, life, type) {
+    for(let i=0; i<count; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5 - 2,
+            life: life, type: type, color: color
+        });
+    }
+}
 
-document.addEventListener('keydown', e => {
-    keys[e.key.toLowerCase()] = true;
-    justPressed[e.key.toLowerCase()] = true;
-});
-document.addEventListener('keyup', e => {
-    keys[e.key.toLowerCase()] = false;
-    justPressed[e.key.toLowerCase()] = false;
-});
+let particles = [];
+function updateParticles() {
+    for(let i=particles.length-1; i>=0; i--) {
+        let p = particles[i];
+        p.x += p.vx * slowMo;
+        p.y += p.vy * slowMo;
+        if (p.type === 'blood') p.vy += 0.5;
+        p.life--;
+        
+        // Draw
+        ctx.globalAlpha = p.life / 30;
+        ctx.fillStyle = p.type === 'blood' ? '#8a0000' : (p.color || '#fff');
+        ctx.beginPath();
+        if (p.type === 'trail') ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+        else ctx.fillRect(p.x, p.y, 3, 3);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+}
 
 function startGame() {
     document.getElementById('startMenu').classList.add('hidden');
     document.getElementById('gameOverMenu').classList.add('hidden');
     document.getElementById('centerText').classList.remove('show');
-    
     bloodCtx.clearRect(0,0,W,H);
     
-    p1 = new Fighter(250, '#ff4d00', true);
-    p2 = new Fighter(750, '#0088ff', false);
+    p1 = new Fighter(250, '#ff5500', true);
+    p2 = new Fighter(750, '#00ccff', false);
+    projectiles = [];
+    particles = [];
+    combo = { count: 0, attacker: null, timer: 0 };
     updateUI();
     
     gameState = 'PLAY';
@@ -654,21 +844,60 @@ function updateUI() {
     if (p1 && p2) {
         document.getElementById('h1').style.width = (p1.health/p1.maxHealth)*100 + '%';
         document.getElementById('h2').style.width = (p2.health/p2.maxHealth)*100 + '%';
+        document.getElementById('s1').style.width = p1.super + '%';
+        document.getElementById('s2').style.width = p2.super + '%';
     }
 }
 
 function checkHitboxes() {
     if (!p1 || !p2) return;
     
-    if (p1.hitbox && rectHit(p1.hitbox, p2)) {
-        const blocked = p2.isBlocking;
-        p2.takeDamage(p1.hitbox.dmg, p1.facing * 8, -5, blocked);
-        p1.hitbox = null;
-    }
-    if (p2.hitbox && rectHit(p2.hitbox, p1)) {
-        const blocked = p1.isBlocking;
-        p1.takeDamage(p2.hitbox.dmg, p2.facing * 8, -5, blocked);
-        p2.hitbox = null;
+    // Physical Hits
+    const check = (attacker, defender) => {
+        if (attacker.hitbox && rectHit(attacker.hitbox, defender)) {
+            const blocked = defender.isBlocking;
+            defender.takeDamage(attacker.hitbox.dmg, attacker.facing * 8, -5, blocked);
+            attacker.hitbox = null;
+            
+            if (!blocked) {
+                // Combo tracking
+                if (combo.attacker === attacker && combo.timer > 0) {
+                    combo.count++;
+                } else {
+                    combo.count = 1;
+                }
+                combo.attacker = attacker;
+                combo.timer = 60; // 1 second window
+                
+                // UI Update
+                const ui = document.getElementById('comboUI');
+                ui.innerText = combo.count + " HIT COMBO";
+                ui.style.display = 'block';
+                ui.style.left = attacker.x + 'px';
+                ui.style.color = attacker.isP1 ? '#ff5500' : '#00ccff';
+            } else {
+                combo.count = 0;
+                document.getElementById('comboUI').style.display = 'none';
+            }
+        }
+    };
+    
+    check(p1, p2);
+    check(p2, p1);
+
+    // Projectile Hits
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        let p = projectiles[i];
+        // P1 Proj hits P2
+        if (p.facing === 1 && rectHit({x:p.x-15, y:p.y-15, w:30, h:30}, p2)) {
+            p.active = false;
+            p2.takeDamage(15, 8, -10, p2.isBlocking);
+        }
+        // P2 Proj hits P1
+        if (p.facing === -1 && rectHit({x:p.x-15, y:p.y-15, w:30, h:30}, p1)) {
+            p.active = false;
+            p1.takeDamage(15, -8, -10, p1.isBlocking);
+        }
     }
 }
 
@@ -676,10 +905,9 @@ function rectHit(hb, char) {
     return hb.x < char.x + 30 &&
            hb.x + hb.w > char.x - 30 &&
            hb.y < char.y &&
-           hb.y + hb.h > char.y - 120;
+           hb.y + hb.h > char.y - 130;
 }
 
-function triggerShake(amount) { shake = amount; }
 function triggerSlowMo(factor, duration) {
     slowMo = factor;
     setTimeout(() => { slowMo = 1.0; }, duration * 1000 / (60 * factor));
@@ -688,102 +916,93 @@ function triggerSlowMo(factor, duration) {
 // --- MAIN LOOP ---
 function loop() {
     requestAnimationFrame(loop);
-    
     frame++;
     
-    if (shake > 0) shake *= 0.9;
-    if (shake < 0.5) shake = 0;
+    if (camera.shake > 0) camera.shake *= 0.9;
 
-    // Logic Update (Crash Protected)
     if (p1 && p2) {
         if (gameState === 'PLAY' || gameState === 'END') {
             p1.update(p2);
             p2.update(p1);
             checkHitboxes();
             
-            // Camera update
+            // Update Projectiles
+            for(let i=projectiles.length-1; i>=0; i--) {
+                projectiles[i].update();
+                if(!projectiles[i].active) projectiles.splice(i, 1);
+            }
+
+            // Camera Zoom
             const dist = Math.abs(p1.x - p2.x);
-            const idealScale = Math.max(0.7, 1000 / (dist + 400));
+            const idealScale = Math.max(0.75, 1000 / (dist + 350));
             if (slowMo >= 0.9) camera.scale += (idealScale - camera.scale) * 0.1;
         }
     }
-
-    // Particles
-    for(let i=bloodParticles.length-1; i>=0; i--) {
-        const b = bloodParticles[i];
-        b.update();
-        b.draw(ctx);
-        if(b.life <= 0) bloodParticles.splice(i, 1);
+    
+    // Combo Timer
+    if (combo.timer > 0) {
+        combo.timer--;
+        if (combo.timer <= 0) document.getElementById('comboUI').style.display = 'none';
     }
 
-    // --- RENDERING ---
+    updateParticles();
+
+    // RENDER
     ctx.clearRect(0, 0, W, H);
 
-    // 1. Background Gradient
+    // Background
     const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-    bgGrad.addColorStop(0, '#1a1a2e');
+    bgGrad.addColorStop(0, '#1a0b2e');
     bgGrad.addColorStop(1, '#000000');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0,0,W,H);
-
-    // 2. Moon
+    
+    // Moon
     ctx.save();
-    ctx.shadowBlur = 50;
+    ctx.shadowBlur = 40;
     ctx.shadowColor = '#500';
     ctx.fillStyle = '#300';
     ctx.beginPath();
-    ctx.arc(800, 150, 60, 0, Math.PI*2);
+    ctx.arc(800, 150, 70, 0, Math.PI*2);
     ctx.fill();
     ctx.restore();
 
     // Camera Transform
     ctx.save();
-    
     ctx.translate(W/2, H/2);
     ctx.scale(camera.scale, camera.scale);
+    if (camera.shake > 0) ctx.translate((Math.random()-0.5)*camera.shake, (Math.random()-0.5)*camera.shake);
     
-    if (shake > 0) {
-        ctx.translate((Math.random()-0.5)*shake, (Math.random()-0.5)*shake);
-    }
-    
-    // Center on players
-    let midX = 500; // Default center
-    if (p1 && p2) {
-        midX = (p1.x + p2.x) / 2;
-    }
+    let midX = (p1 && p2) ? (p1.x + p2.x) / 2 : 500;
     ctx.translate(-midX, -H/2); 
 
-    // 3. Floor (Visible Grid)
-    ctx.fillStyle = '#0a0a0a'; // Floor color
+    // Floor
+    ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(-500, GROUND_Y, 2000, 200);
     
-    // Floor Grid Lines (for depth perception)
+    // Grid
     ctx.strokeStyle = '#222';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    // Perspective lines
-    for(let i=-500; i<1500; i+=10) {
+    for(let i=-500; i<1500; i+=100) {
         ctx.moveTo(i, GROUND_Y);
-        ctx.lineTo(i - 400, H + 100);
-    }
-    // Horizontal lines
-    for(let i=0; i<200; i+=40) {
-        ctx.moveTo(-500, GROUND_Y + i);
-        ctx.lineTo(1500, GROUND_Y + i);
+        ctx.lineTo(i - 300, H + 100);
     }
     ctx.stroke();
 
-    // 4. Persistent Blood Layer
+    // Objects
     ctx.drawImage(bloodCvs, 0, 0);
-
-    // 5. Fighters
+    
+    // Draw Fighters & Projectiles
     if (p1) p1.draw();
     if (p2) p2.draw();
+    
+    projectiles.forEach(p => p.draw());
 
     ctx.restore();
 }
 
-// Start
+// Init
 loop();
 
 </script>
