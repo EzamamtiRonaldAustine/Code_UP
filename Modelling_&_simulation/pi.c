@@ -8,9 +8,10 @@
 
 #define SEED 1234567  /* initial seed for PRNG */
 
-#define DEBUG 1     /* verbose debugging */
+#define DEBUG 0     /* verbose debugging */
 
-int main(int argc, char* argv)
+/* CHANGE: Fixed main signature to use char* argv[] for standard compliance */
+int main(int argc, char* argv[])
   {
     int i, num;
     double x, y, z, pi;
@@ -19,17 +20,18 @@ int main(int argc, char* argv)
     printf("Enter the number of iterations to use in estimating pi: ");
     scanf("%d", &num);
 
-    /* initialize random numbers */
-    srandom(SEED);  /* to use the seed specified above */
+    /* CHANGE: Replaced srandom with srand for Windows/MinGW portability */
+    srand(SEED);  /* use fixed seed for reproducibility */
     /*    srandom(time(NULL)); /* to use the time of day as the seed */
    
     /* do the Monte Carlo simulation */
     count = 0;
     for( i = 0; i < num; i++ )
       {
-	/* generate a uniformly random U(0,1) point in x-y dimensions */
-	x = (double) random()/RAND_MAX;
-	y = (double) random()/RAND_MAX;
+	/* CHANGE: Replaced random() with rand() for Windows/MinGW portability */
+	/* Logic: Map random integer to [0, 1] range */
+	x = (double) rand()/RAND_MAX;
+	y = (double) rand()/RAND_MAX;
 #ifdef DEBUG
 	printf("Random point is: (%g,%g)\n", x, y);
 #endif
@@ -50,7 +52,8 @@ int main(int argc, char* argv)
 #endif
       }
 
-    /* scale the estimate back up to the full circle */
+    /* Logic: Pi estimate = 4 * (Points inside Quadrant / Total iterations) */
+    /* Area of Circle / Area of Square = Pi*r^2 / (2r)^2 = Pi/4 */
     pi = (double) 4.0*count/num;
     
     printf("Number of trials: %d\n", num);

@@ -18,7 +18,8 @@
 
 #include <stdio.h>                              
 
-#define FILENAME   "ssq1.dat"                  /* input data file */
+/* CHANGE: Updated filename to match the actual file 'ssq1 dat.txt' on disk */
+#define FILENAME   "ssq1 dat.txt"                  /* input data file */
 #define START      0.0
 
 /* =========================== */
@@ -65,16 +66,17 @@
     return (1);
   }
 
-  while (!feof(fp)) {
+  /* CHANGE: Use fscanf return check instead of feof() for robust loop termination */
+  /* Logic: Read arrival and service pairs from file until EOF */
+  while (fscanf(fp, "%lf %lf", &arrival, &service) == 2) {
     index++;
-    arrival      = GetArrival(fp);
+    /* Logic: Calculate delay based on whether the server is idle or busy */
     if (arrival < departure) 
-      delay      = departure - arrival;        /* delay in queue    */
+      delay      = departure - arrival;        /* Job arrives while previous job is processing */
     else 
-      delay      = 0.0;                        /* no delay          */
-    service      = GetService(fp);
-    wait         = delay + service;
-    departure    = arrival + wait;             /* time of departure */
+      delay      = 0.0;                        /* Server is idle upon arrival */
+    wait         = delay + service;            /* Total time in system */
+    departure    = arrival + wait;             /* Timestamp of departure */
     sum.delay   += delay;
     sum.wait    += wait;
     sum.service += service;
