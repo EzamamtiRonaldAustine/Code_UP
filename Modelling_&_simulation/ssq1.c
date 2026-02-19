@@ -66,21 +66,38 @@
     return (1);
   }
 
-  /* CHANGE: Use fscanf return check instead of feof() for robust loop termination */
-  /* Logic: Read arrival and service pairs from file until EOF */
-  while (fscanf(fp, "%lf %lf", &arrival, &service) == 2) {
-    index++;
-    /* Logic: Calculate delay based on whether the server is idle or busy */
+  /* -------------------------------------------------------------------------
+   * Main simulation loop: Process each job in the input file one by one.
+   * The loop continues until end-of-file is reached.
+   * ------------------------------------------------------------------------- */
+  while (!feof(fp)) {
+    index++;                                      /* Increment job counter to track total number of jobs processed */
+    
+    arrival = GetArrival(fp);                    /* Read the arrival time of the current job from the input file */
+    
+    /* Calculate delay: If the job arrives before the previous job departs,
+     * it must wait in the queue. The delay is the difference between when
+     * the previous job departs and when the current job arrives.
+     * If arrival >= departure, the server is idle, so no delay occurs. */
     if (arrival < departure) 
-      delay      = departure - arrival;        /* Job arrives while previous job is processing */
+      delay = departure - arrival;                /* Job must wait in queue: server is busy */
     else 
-      delay      = 0.0;                        /* Server is idle upon arrival */
-    wait         = delay + service;            /* Total time in system */
-    departure    = arrival + wait;             /* Timestamp of departure */
-    sum.delay   += delay;
-    sum.wait    += wait;
-    sum.service += service;
+      delay = 0.0;                                /* No delay: server was idle, job starts immediately */
+    
+    service = GetService(fp);                    /* Read the service time (processing duration) for current job */
+    
+    wait = delay + service;                      /* Total time in system = waiting time in queue + service time */
+    
+    departure = arrival + wait;                  /* Calculate the time when this job will leave the server */
+    
+    /* Accumulate statistics for computing averages at the end of simulation */
+    sum.delay += delay;                           /* Sum of all queue delays */
+    sum.wait += wait;                            /* Sum of all wait times (delay + service) */
+    sum.service += service;                      /* Sum of all service times */
   }
+  
+  /* Calculate total interarrival time: difference between last arrival and simulation start time.
+   * This is used to compute the average interarrival time in the output. */
   sum.interarrival = arrival - START;
 
   printf("\nfor %ld jobs\n", index);

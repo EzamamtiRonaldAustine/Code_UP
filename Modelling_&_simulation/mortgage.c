@@ -19,9 +19,7 @@
 /* randomization at all. Extension to variable-rate  */
 /* mortgages remains for future work!                */
 
-#include <stddef.h> /* CHANGE: Added to define size_t for MinGW system headers */
 #include <stdio.h>
-#include <stdlib.h> /* CHANGE: Added for general utility functions and compatibility */
 #include <math.h>
 
 /* If this flag is on, the program interactively asks you */
