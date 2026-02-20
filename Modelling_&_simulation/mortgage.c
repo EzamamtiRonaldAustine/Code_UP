@@ -106,6 +106,23 @@ int main()
     paymentnum = 1;
 
     intsemi = 0;
+    
+    /* ================================================================= */
+    /* BUG FIX: Infinite loop guard                                       */
+    /* If (payment - taxes) <= first period interest, the balance will    */
+    /* never decrease. The loan can never be paid off. Warn and exit.     */
+    /* Without this check the while(amount > 0) loop runs forever.       */
+    /* ================================================================= */
+    if( (payment - taxes) <= (amount * pif) )
+      {
+        printf("\nERROR: Payment cannot cover interest!\n");
+        printf("  Net payment (payment - taxes) = $%.2f\n", payment - taxes);
+        printf("  First period interest          = $%.2f\n", amount * pif);
+        printf("  The loan balance will grow, not shrink.\n");
+        printf("  Increase your payment or reduce taxes/insurance.\n");
+        return 1;
+      }
+
     while( amount > 0 )
       {
 	/* Simulation Step: Incrementally update balance and interest for each period */
