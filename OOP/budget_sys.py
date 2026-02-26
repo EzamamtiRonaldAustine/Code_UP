@@ -1,6 +1,30 @@
-def main():
-    # --- Predefined expense categories for easy selection ---
-    categories = {
+import sys
+
+class Expense:
+    """
+    Data Class to represent a single financial transaction.
+    """
+    def __init__(self, category, description, amount):
+        self.category = category
+        self.description = description
+        self.amount = amount
+
+    def __str__(self):
+        """Returns a formatted string for the transaction log."""
+        return f"[{self.category}] {self.description} - {self.amount:.2f}"
+
+
+class BudgetTracker:
+    """
+    The 'Engine' of the application. 
+    Manages the budget logic, category definitions, and expense collection.
+    """
+    # --- Constants to replace 'Magic Numbers' ---
+    EXIT_CODE = 0
+    MIN_BUDGET = 1
+    
+    # Predefined categories stored within the class context
+    CATEGORIES = {
         1: "Sacks",
         2: "Lunch",
         3: "Breakfast",
@@ -8,97 +32,113 @@ def main():
         5: "Utilities"
     }
 
+    def __init__(self, budget):
+        self.budget = budget
+        self.expenses = []
+
+    def get_total_spent(self):
+        """Calculates total spending dynamically from the list of objects."""
+        return sum(exp.amount for exp in self.expenses)
+
+    def get_remaining_balance(self):
+        """Calculates the difference between budget and spending."""
+        return self.budget - self.get_total_spent()
+
+    def add_expense(self, category_index, description, amount):
+        """Creates an Expense object and adds it to the internal list."""
+        category_name = self.CATEGORIES.get(category_index, "Unknown")
+        new_expense = Expense(category_name, description, amount)
+        self.expenses.append(new_expense)
+        return new_expense
+
+
+def main():
+    """
+    The 'User Interface' layer.
+    Handles all print() and input() calls, delegating logic to the BudgetTracker.
+    """
     print("=" * 40)
-    print("   Personal Financial Assistant")
+    print("    Personal Financial Assistant (OOP)")
     print("=" * 40)
 
-    # --- Step 1: Get the user's budget ---
     while True:
         try:
-            budget = float(input("\nEnter your budget for this period: "))
-            if budget <= 0:
-                print("Budget must be greater than zero. Try again.")
+            user_budget = float(input("\nEnter your budget for this period: "))
+            if user_budget < BudgetTracker.MIN_BUDGET:
+                print(f"Budget must be at least {BudgetTracker.MIN_BUDGET}. Try again.")
                 continue
             break
         except ValueError:
             print("Invalid input. Please enter a numeric value.")
 
-    expenses = []      
-    total_spent = 0.0   
+    # Create the tracker instance (The Object)
+    tracker = BudgetTracker(user_budget)
 
-    # --- Step 2: Show available categories and log transactions ---
-    print("\n--- Expense Categories ---")
-    for number, name in categories.items():
-        print(f"  {number}. {name}")
-
-    print("\nStart entering your expenses. Type '0' number to exit.\n")
-
+    # --- Transaction Loop ---
+    print(f"\nStart entering expenses. Type '{BudgetTracker.EXIT_CODE}' to finish.")
+    
     while True:
-        print("Select a category:")
-        for number, name in categories.items():
-            print(f"  {number}. {name}")
+        print("\n--- Categories ---")
+        for num, name in tracker.CATEGORIES.items():
+            print(f"  {num}. {name}")
 
         try:
-            choice = int(input("Enter category number (0 to finish): "))
+            choice = int(input(f"Select category ({BudgetTracker.EXIT_CODE} to exit): "))
         except ValueError:
-            print("Please enter a valid number.\n")
+            print("Please enter a valid number.")
             continue
 
-        if choice == 0:
+        if choice == BudgetTracker.EXIT_CODE:
             break
 
-        # Validate the category choice
-        if choice not in categories:
-            print("Invalid category. Please choose a number from the list.\n")
+        if choice not in tracker.CATEGORIES:
+            print("Invalid choice. Please pick from the list.")
             continue
 
-        category_name = categories[choice]
+        description = input(f"Description for '{tracker.CATEGORIES[choice]}': ")
 
-        description = input(f"Enter a short description for '{category_name}' (e.g. 'Bought posho'): ")
-
-        # --- Step 3: Get expense amount (must be greater than zero) ---
         try:
-            amount = float(input(f"Enter amount spent on {category_name}: "))
+            amount = float(input(f"Amount spent: "))
             if amount <= 0:
-                print("Expense amount must be greater than zero. Entry skipped.\n")
+                print("Amount must be positive. Entry skipped.")
                 continue
         except ValueError:
-            print("Invalid amount. Please enter a number.\n")
+            print("Invalid amount. Entry skipped.")
             continue
 
-        # (category, description, amount)
-        expenses.append((category_name, description, amount))
-        total_spent += amount
+        # Use the tracker object to record the expense
+        tracker.add_expense(choice, description, amount)
 
-        # --- Step 4: Real-time balance check after each entry ---
-        if total_spent > budget:
-            print(f"⚠️  Warning: You are OVER budget by {total_spent - budget:.2f}!\n")
+        # Real-time feedback using object methods
+        current_balance = tracker.get_remaining_balance()
+        if current_balance < 0:
+            print(f"⚠️  Warning: Over budget by {abs(current_balance):.2f}!")
         else:
-            remaining = budget - total_spent
-            print(f"✅  Remaining balance: {remaining:.2f}\n")
+            print(f"✅  Remaining: {current_balance:.2f}")
 
-    # --- Step 5: Print the final financial summary ---
+    # --- Final Summary ---
     print("\n" + "=" * 40)
-    print("        Financial Summary")
+    print("          FINANCIAL SUMMARY")
     print("=" * 40)
-    print(f"Initial Budget : {budget:.2f}")
-    print(f"Total Spent    : {total_spent:.2f}")
+    print(f"Initial Budget : {tracker.budget:.2f}")
+    print(f"Total Spent    : {tracker.get_total_spent():.2f}")
 
-    if total_spent > budget:
-        print(f"Deficit        : {total_spent - budget:.2f}  ⚠️")
+    balance = tracker.get_remaining_balance()
+    if balance < 0:
+        print(f"Deficit        : {abs(balance):.2f} ⚠️")
     else:
-        print(f"Balance Left   : {budget - total_spent:.2f}  ✅")
+        print(f"Balance Left   : {balance:.2f} ✅")
 
-    # Print a numbered log of all transactions
     print("\n--- Transaction Log ---")
-    if not expenses:
-        print("No expenses were recorded.")
+    if not tracker.expenses:
+        print("No records found.")
     else:
-        for i, (category, description, amount) in enumerate(expenses, start=1):
-            print(f"  {i}. [{category}] {description} - {amount:.2f}")
+        # Loop through the list of Expense objects
+        for i, exp in enumerate(tracker.expenses, 1):
+            print(f"  {i}. {exp}") # Calls the __str__ method of Expense
 
     print("=" * 40)
-    print("Thank you for using your Financial Assistant!")
+    print("Stay financially savvy!")
 
 
 if __name__ == "__main__":
