@@ -1,169 +1,302 @@
-/* This program demonstrates random numbers generated from       */
-/* geometric, exponential, normal, and log normal distributions. */
+/* ===============================================================
+   RANDOM DISTRIBUTION DEMONSTRATION PROGRAM
+   ---------------------------------------------------------------
+   This program generates random numbers from several probability
+   distributions:
 
-/* Usage: cc -o demo demo.c -lm                                  */
-/*        demo                                                   */
+   1. Uniform Distribution U(0,1)
+   2. Geometric Distribution
+   3. Exponential Distribution
+   4. Normal Distribution
+   5. Lognormal Distribution
+
+   The program prints 20 observations from each distribution.
+
+   IMPORTANT CHANGES FROM ORIGINAL VERSION
+   ---------------------------------------
+   1. Removed erand48() (not supported on Windows)
+   2. Replaced rejection method with Box-Muller method
+      for Normal distribution.
+   3. Added srand(time(NULL)) for true randomness.
+   4. FIXED Uniform01() using RAND_MAX.
+   5. Added definition of M_PI for Windows.
+
+   Compile:
+
+   gcc demo.c -o demo -lm
+
+   Run:
+
+   demo
+   =============================================================== */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> /* use man 3 log for the math functions */
+#include <math.h>
+#include <time.h>
 
-#define NUM_VALUES 20 /* number of samples to generate */
 
-double ceil(double x);
-double erand48(unsigned short []); 
+/* ===============================================================
+   ASSIGNMENT UPDATE 1
+   Define M_PI constant for Windows compatibility
+   ---------------------------------------------------------------
+   Some Windows compilers do not define M_PI in math.h.
+   The Box-Muller formula requires π.
+
+   Without this definition:
+   Compilation may fail.
+   =============================================================== */
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+
+/* Number of samples to generate */
+#define NUM_VALUES 200
+
+
+
+/* Function Prototypes */
+
 double Uniform01();
-double Normal(float, float); 
-double Lognormal(float, float);
-double Exponential(double);
-int Geometric(double);
+double Normal(float mean, float std);
+double Lognormal(float mean, float std);
+double Exponential(double mu);
+int Geometric(double m);
 
-/* array used for initializing seeds for Normal distribution */
-unsigned short Nvar1_seed[3] = {4,7,2};
-unsigned short Nvar2_seed[3] = {5,8,1};
-unsigned short Nvar3_seed[3] = {9,6,3};
 
-/* array used for initializing seeds for Exponential distribution */
-unsigned short Evar1_seed[3] = {2,5,7};
-unsigned short Evar2_seed[3] = {3,1,7}; 
 
-main(int argc, char *argv[])
+/* ===============================================================
+   MAIN PROGRAM
+   =============================================================== */
+
+int main()
 {
-  FILE *datafile;
-  double white_noise;
-  int i, geom;
-  float nmean, nstd, logmean, logstd, emean, gmean;
-  double norm, lognorm, expo, uni;
+    int i, geom;
 
-  /* choose your own values for these next six variables if you wish */
+    double norm, lognorm, expo, uni;
 
-  /* mean for geometric distribution is 1/p */
-  gmean = 14.0; /* example: mean scene duration in Oz MPEG video trace */
+    float nmean, nstd;
+    float logmean, logstd;
+    float emean, gmean;
 
-  /* mean for exponential distribution */
-  emean = 0.352;   /* example: mean on time in seconds */
 
-  /* mean for Normal distribution */
-  nmean = 0.0;   /* example: mean for N(0,1) distribution */
 
-  /* standard deviation for Normal distribution */
-  nstd = 1.0;    /* example: std dev for N(0,1) distribution */
+    /* -----------------------------------------------------------
+       Initialize Random Seed
 
-  /* mean for lognormal distribution */
-  logmean = 5.9651; /* example: mean size of I frames in Oz MPEG video */
+       Ensures different random numbers each run.
+       ----------------------------------------------------------- */
 
-  /* standard deviation for lognormal distribution */
-  logstd = 0.4832;  /* example: std dev for I frames in Oz MPEG video */
+    srand(time(NULL));
 
-  printf(" Obs     U(0,1)   Geom     Exp     Norm(0,1)  LogNorm(m,s)\n");
-  printf("---------------------------------------------------------\n");
 
-  for(i = 1; i <= NUM_VALUES; i++)
+
+    /* -----------------------------------------------------------
+       Distribution Parameters
+       ----------------------------------------------------------- */
+
+    gmean = 14.0;      /* Mean of geometric distribution */
+    emean = 0.352;     /* Mean of exponential distribution */
+
+    nmean = 0.0;       /* Normal mean */
+    nstd  = 1.0;       /* Normal standard deviation */
+
+    logmean = 5.9651;  /* Lognormal mean */
+    logstd  = 0.4832;  /* Lognormal standard deviation */
+
+
+
+    printf(" Obs     U(0,1)   Geom     Exp     Norm(0,1)  LogNorm(m,s)\n");
+    printf("---------------------------------------------------------\n");
+
+
+
+    /* Generate Samples */
+
+    for(i = 1; i <= NUM_VALUES; i++)
     {
-      /* generate a value from a uniform distribution */
-      uni = Uniform01();
+        uni = Uniform01();
 
-      /* generate a value from a geometric distribution */
-      geom = Geometric(gmean);
+        geom = Geometric(gmean);
 
-      /* generate a value from an exponential distribution */
-      expo = Exponential(emean);
+        expo = Exponential(emean);
 
-      /* generate a value from a normal distribution */
-      norm = Normal(nmean, nstd);   
+        norm = Normal(nmean, nstd);
 
-      /* generate a value from a normal distribution */
-      lognorm = Lognormal(logmean, logstd);
+        lognorm = Lognormal(logmean, logstd);
 
-      /* print them all out */
-      printf(" %3d  %10.6f %4d  %10.6f %10.6f %10.3f\n",
-	     i, uni, geom, expo, norm, lognorm);
 
-    } /* end of for loop */
-} /* end of main */
+        printf(" %3d  %10.6f %4d  %10.6f %10.6f %10.3f\n",
+               i, uni, geom, expo, norm, lognorm);
+    }
 
-/***********************************************************************/
-/*                 RANDOM NUMBER GENERATION STUFF                      */
-/***********************************************************************/
+    return 0;
+}
 
-/* Parameters for random number generation. */
-#define MAX_INT 2147483647       /* Maximum positive integer 2^31 - 1 */
 
-/* Generate a random floating point number uniformly distributed in [0,1] */
+
+/* ===============================================================
+   RANDOM NUMBER GENERATION FUNCTIONS
+   =============================================================== */
+
+
+
+/* ===============================================================
+   ASSIGNMENT UPDATE 2
+   Correct Uniform Distribution Generator
+   =============================================================== */
+
+/* ---------------------------------------------------------------
+   Uniform Distribution U(0,1)
+
+   Generates a floating-point number between 0 and 1.
+
+   IMPORTANT CORRECTION:
+   ---------------------
+
+   Previous version divided by 2,147,483,647 (MAX_INT).
+
+   However Windows rand() returns values only up to RAND_MAX
+   (typically 32767).
+
+   Dividing by MAX_INT produced extremely small values:
+
+        Example:
+        rand() = 1000
+
+        1000 / 2147483647 ≈ 0.00000046
+
+   This caused major problems:
+
+   ✔ Normal distribution shifted incorrectly
+   ✔ Geometric distribution always returned 1
+   ✔ Exponential values incorrect
+
+   Correct Method:
+
+        U = rand() / RAND_MAX
+
+   This produces true U(0,1) values.
+   --------------------------------------------------------------- */
+
 double Uniform01()
-  {
-    double randnum;
-    /* get a random positive integer from random() */
-    randnum = (double) 1.0 * random();
-    /* divide by max int to get something in 0..1  */
-    randnum = (float) randnum / (1.0 * MAX_INT); 
-    return( randnum );
-  }
+{
+    return (double)rand() / (double)RAND_MAX;
+}
 
-/* Generate a random floating point number from an exponential    */
-/* distribution with mean mu.                                     */
 
-double Exponential(mu)
-    double mu;
- {
-    double randnum, ans;
 
-    randnum = Uniform01();
-    ans = -(mu) * log(randnum);
-    return( ans );
-  }
+/* ---------------------------------------------------------------
+   Exponential Distribution
 
-/* Generate random positive integer geometrically distributed with mean m */
-int Geometric(m)
-    double m;
-  {
-    double p;    /* p is the probability of "success" for each trial */
-    int k;
+   Uses the Inverse Transform Method:
 
-    k = 1;
-    p = 1.0 / m;                          /* the inverse of the mean */
-    while( Uniform01() > p )
-      k++;
-    return( k );
-  }
+       X = -μ ln(U)
 
-/* the rejection method is used for normal distribution 
-   (a) Generate two uniform U(0,1) variates u1 and u2. 
-   (b) Let x = -log(u1).
-   (c) If u2 > e to the power -(x - 1)square by 2, go back to step
-   [a].
-   (d) Generate u3.
-   (e) If u3 > 0.5, return (mean + (std * x)); otherwise return
-   (mean - (std * x)). */
+   where:
+
+       U ~ Uniform(0,1)
+
+   This transforms uniform random numbers into
+   exponentially distributed values.
+   --------------------------------------------------------------- */
+
+double Exponential(double mu)
+{
+    double U;
+
+    U = Uniform01();
+
+    return -mu * log(U);
+}
+
+
+
+/* ---------------------------------------------------------------
+   Geometric Distribution
+
+   Generates number of trials until first success.
+
+   Mean = 1/p
+
+   Therefore:
+
+       p = 1/m
+
+   Uses repeated Uniform samples.
+   --------------------------------------------------------------- */
+
+int Geometric(double m)
+{
+    double p;
+    int k = 1;
+
+    p = 1.0 / m;
+
+    while(Uniform01() > p)
+        k++;
+
+    return k;
+}
+
+
+
+/* ===============================================================
+   Normal Distribution (Box-Muller Method)
+   =============================================================== */
+
+/* ---------------------------------------------------------------
+   Generates Normal Random Variables.
+
+   Box-Muller Transform:
+
+       Z = sqrt(-2 ln(U1)) cos(2πU2)
+
+   where:
+
+       U1,U2 ~ Uniform(0,1)
+
+   Then:
+
+       X = mean + std*Z
+   --------------------------------------------------------------- */
 
 double Normal(float mean, float std)
 {
-  double var_u1, var_u2, var_u3;
-  double x, tmp_val;
-  
-  var_u1 = erand48(Nvar1_seed);
-  var_u2 = erand48(Nvar2_seed);
-  x = -log(var_u1);
-  tmp_val = exp(-((x - 1)*(x - 1)) / 2);
-  while(var_u2 > tmp_val)
-    {
-      var_u1 = erand48(Nvar1_seed);
-      var_u2 = erand48(Nvar2_seed);
-      x = -log(var_u1);
-      tmp_val = exp(-((x - 1)*(x - 1)) / 2);
-    }
-  var_u3 = erand48(Nvar3_seed);
-  if(var_u3 > 0.5)
-    return(mean + (std * x));
-  else 
-    return(mean - (std * x));
+    double U1, U2;
+    double Z;
+
+    U1 = Uniform01();
+    U2 = Uniform01();
+
+    Z = sqrt(-2.0 * log(U1)) * cos(2 * M_PI * U2);
+
+    return mean + std * Z;
 }
+
+
+
+/* ---------------------------------------------------------------
+   Lognormal Distribution
+
+   If:
+
+       Z ~ Normal(0,1)
+
+   Then:
+
+       X = exp(mean + stdZ)
+
+   is Lognormally distributed.
+   --------------------------------------------------------------- */
 
 double Lognormal(float mean, float std)
 {
-  double lognormal_x, tmp_var;
-  
-  lognormal_x = Normal(0,1);
-  tmp_var = mean + (std * lognormal_x);
-  return(exp(tmp_var));
+    double Z;
+
+    Z = Normal(0,1);
+
+    return exp(mean + std * Z);
 }
