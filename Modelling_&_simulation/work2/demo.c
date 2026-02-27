@@ -10,16 +10,21 @@
    4. Normal Distribution
    5. Lognormal Distribution
 
-   The program prints 20 observations from each distribution.
+   The program prints 200 observations and then computes:
+
+   • Mean
+   • Minimum
+   • Maximum
+   • Expected values
 
    IMPORTANT CHANGES FROM ORIGINAL VERSION
    ---------------------------------------
    1. Removed erand48() (not supported on Windows)
    2. Replaced rejection method with Box-Muller method
-      for Normal distribution.
-   3. Added srand(time(NULL)) for true randomness.
-   4. FIXED Uniform01() using RAND_MAX.
-   5. Added definition of M_PI for Windows.
+   3. Added srand(time(NULL))
+   4. FIXED Uniform01() using RAND_MAX
+   5. Added M_PI definition
+   6. ADDED statistical summary table
 
    Compile:
 
@@ -38,13 +43,7 @@
 
 /* ===============================================================
    ASSIGNMENT UPDATE 1
-   Define M_PI constant for Windows compatibility
-   ---------------------------------------------------------------
-   Some Windows compilers do not define M_PI in math.h.
-   The Box-Muller formula requires π.
-
-   Without this definition:
-   Compilation may fail.
+   Define PI constant for Windows
    =============================================================== */
 
 #ifndef M_PI
@@ -52,9 +51,7 @@
 #endif
 
 
-/* Number of samples to generate */
 #define NUM_VALUES 200
-
 
 
 /* Function Prototypes */
@@ -77,34 +74,46 @@ int main()
 
     double norm, lognorm, expo, uni;
 
-    float nmean, nstd;
-    float logmean, logstd;
-    float emean, gmean;
+    float nmean = 0.0;
+    float nstd  = 1.0;
+    float logmean = 5.9651;
+    float logstd  = 0.4832;
+    float emean = 0.352;
+    float gmean = 14.0;
 
 
 
-    /* -----------------------------------------------------------
-       Initialize Random Seed
+    /* ===========================================================
+       ASSIGNMENT UPDATE 3 – STATISTICS VARIABLES
 
-       Ensures different random numbers each run.
-       ----------------------------------------------------------- */
+       These variables accumulate data in order to compute:
+
+       • Mean
+       • Minimum
+       • Maximum
+
+       at the end of simulation.
+       =========================================================== */
+
+    double sumU = 0, sumG = 0, sumE = 0, sumN = 0, sumL = 0;
+
+    double minU = 1.0;
+    double minG = 1e9;
+    double minE = 1e9;
+    double minN = 1e9;
+    double minL = 1e9;
+
+    double maxU = 0.0;
+    double maxG = 0.0;
+    double maxE = 0.0;
+    double maxN = -1e9;
+    double maxL = 0.0;
+
+
+
+    /* Initialize random seed */
 
     srand(time(NULL));
-
-
-
-    /* -----------------------------------------------------------
-       Distribution Parameters
-       ----------------------------------------------------------- */
-
-    gmean = 14.0;      /* Mean of geometric distribution */
-    emean = 0.352;     /* Mean of exponential distribution */
-
-    nmean = 0.0;       /* Normal mean */
-    nstd  = 1.0;       /* Normal standard deviation */
-
-    logmean = 5.9651;  /* Lognormal mean */
-    logstd  = 0.4832;  /* Lognormal standard deviation */
 
 
 
@@ -113,24 +122,91 @@ int main()
 
 
 
-    /* Generate Samples */
+    /* ===========================================================
+       Generate Random Samples
+       =========================================================== */
 
     for(i = 1; i <= NUM_VALUES; i++)
     {
+
         uni = Uniform01();
-
         geom = Geometric(gmean);
-
         expo = Exponential(emean);
-
         norm = Normal(nmean, nstd);
-
         lognorm = Lognormal(logmean, logstd);
 
 
+
+        /* Print Results */
+
         printf(" %3d  %10.6f %4d  %10.6f %10.6f %10.3f\n",
                i, uni, geom, expo, norm, lognorm);
+
+
+
+        /* =======================================================
+           Update Statistics
+           ======================================================= */
+
+        sumU += uni;
+        sumG += geom;
+        sumE += expo;
+        sumN += norm;
+        sumL += lognorm;
+
+
+
+        /* Update Minimum Values */
+
+        if(uni < minU) minU = uni;
+        if(geom < minG) minG = geom;
+        if(expo < minE) minE = expo;
+        if(norm < minN) minN = norm;
+        if(lognorm < minL) minL = lognorm;
+
+
+
+        /* Update Maximum Values */
+
+        if(uni > maxU) maxU = uni;
+        if(geom > maxG) maxG = geom;
+        if(expo > maxE) maxE = expo;
+        if(norm > maxN) maxN = norm;
+        if(lognorm > maxL) maxL = lognorm;
     }
+
+
+
+    /* ===========================================================
+       SUMMARY TABLE
+       =========================================================== */
+
+    printf("\n---------------------------------------------------------\n");
+    printf(" SUMMARY STATISTICS (N = %d)\n", NUM_VALUES);
+    printf("---------------------------------------------------------\n");
+
+    printf(" Metric      U(0,1)      Geom        Exp       Norm      LogNorm\n");
+
+    printf(" Mean:    %10.4f  %10.4f  %10.4f  %10.4f  %10.4f\n",
+            sumU/NUM_VALUES,
+            sumG/NUM_VALUES,
+            sumE/NUM_VALUES,
+            sumN/NUM_VALUES,
+            sumL/NUM_VALUES);
+
+    printf(" Min:     %10.4f  %10.4f  %10.4f  %10.4f  %10.4f\n",
+            minU,minG,minE,minN,minL);
+
+    printf(" Max:     %10.4f  %10.4f  %10.4f  %10.4f  %10.4f\n",
+            maxU,maxG,maxE,maxN,maxL);
+
+
+    /* Expected Theoretical Values */
+
+    printf(" Expected:    0.5000     14.0000      0.3520      0.0000    437.8000\n");
+
+    printf("---------------------------------------------------------\n");
+
 
     return 0;
 }
@@ -138,48 +214,11 @@ int main()
 
 
 /* ===============================================================
-   RANDOM NUMBER GENERATION FUNCTIONS
+   RANDOM NUMBER FUNCTIONS
    =============================================================== */
 
 
-
-/* ===============================================================
-   ASSIGNMENT UPDATE 2
-   Correct Uniform Distribution Generator
-   =============================================================== */
-
-/* ---------------------------------------------------------------
-   Uniform Distribution U(0,1)
-
-   Generates a floating-point number between 0 and 1.
-
-   IMPORTANT CORRECTION:
-   ---------------------
-
-   Previous version divided by 2,147,483,647 (MAX_INT).
-
-   However Windows rand() returns values only up to RAND_MAX
-   (typically 32767).
-
-   Dividing by MAX_INT produced extremely small values:
-
-        Example:
-        rand() = 1000
-
-        1000 / 2147483647 ≈ 0.00000046
-
-   This caused major problems:
-
-   ✔ Normal distribution shifted incorrectly
-   ✔ Geometric distribution always returned 1
-   ✔ Exponential values incorrect
-
-   Correct Method:
-
-        U = rand() / RAND_MAX
-
-   This produces true U(0,1) values.
-   --------------------------------------------------------------- */
+/* Uniform Distribution */
 
 double Uniform01()
 {
@@ -188,20 +227,7 @@ double Uniform01()
 
 
 
-/* ---------------------------------------------------------------
-   Exponential Distribution
-
-   Uses the Inverse Transform Method:
-
-       X = -μ ln(U)
-
-   where:
-
-       U ~ Uniform(0,1)
-
-   This transforms uniform random numbers into
-   exponentially distributed values.
-   --------------------------------------------------------------- */
+/* Exponential Distribution */
 
 double Exponential(double mu)
 {
@@ -214,19 +240,7 @@ double Exponential(double mu)
 
 
 
-/* ---------------------------------------------------------------
-   Geometric Distribution
-
-   Generates number of trials until first success.
-
-   Mean = 1/p
-
-   Therefore:
-
-       p = 1/m
-
-   Uses repeated Uniform samples.
-   --------------------------------------------------------------- */
+/* Geometric Distribution */
 
 int Geometric(double m)
 {
@@ -243,54 +257,23 @@ int Geometric(double m)
 
 
 
-/* ===============================================================
-   Normal Distribution (Box-Muller Method)
-   =============================================================== */
-
-/* ---------------------------------------------------------------
-   Generates Normal Random Variables.
-
-   Box-Muller Transform:
-
-       Z = sqrt(-2 ln(U1)) cos(2πU2)
-
-   where:
-
-       U1,U2 ~ Uniform(0,1)
-
-   Then:
-
-       X = mean + std*Z
-   --------------------------------------------------------------- */
+/* Normal Distribution (Box-Muller) */
 
 double Normal(float mean, float std)
 {
-    double U1, U2;
-    double Z;
+    double U1,U2,Z;
 
     U1 = Uniform01();
     U2 = Uniform01();
 
-    Z = sqrt(-2.0 * log(U1)) * cos(2 * M_PI * U2);
+    Z = sqrt(-2.0 * log(U1)) * cos(2*M_PI*U2);
 
-    return mean + std * Z;
+    return mean + std*Z;
 }
 
 
 
-/* ---------------------------------------------------------------
-   Lognormal Distribution
-
-   If:
-
-       Z ~ Normal(0,1)
-
-   Then:
-
-       X = exp(mean + stdZ)
-
-   is Lognormally distributed.
-   --------------------------------------------------------------- */
+/* Lognormal Distribution */
 
 double Lognormal(float mean, float std)
 {
@@ -298,5 +281,5 @@ double Lognormal(float mean, float std)
 
     Z = Normal(0,1);
 
-    return exp(mean + std * Z);
+    return exp(mean + std*Z);
 }
