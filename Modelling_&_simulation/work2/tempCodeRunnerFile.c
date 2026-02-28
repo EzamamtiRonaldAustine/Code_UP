@@ -7,7 +7,7 @@
 #include <stdlib.h>  /* ADDED: Required for rand() and srand() */
 #include <time.h>    /* ADDED: Required if using time(NULL) */
 
-#define NUMFLIPS 100
+#define NUMFLIPS 10
 #define DEBUG 1
 
 /***********************************************************************/
