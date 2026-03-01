@@ -7,7 +7,7 @@
 #include <stdlib.h>  /* ADDED: Required for rand() and srand() */
 #include <time.h>    /* ADDED: Required if using time(NULL) */
 
-#define NUMFLIPS 100
+#define NUMFLIPS 1000
 #define DEBUG 1
 
 /***********************************************************************/
@@ -40,7 +40,8 @@ int main()
     /* FIXED: Use srand() instead of srandom() 
        Note: using time(NULL) makes it truly random every run. 
        If you want the SAME sequence every time, use srand(1234567); */
-    srand((unsigned int)time(NULL));
+    // srand((unsigned int)time(NULL));
+    srand(1234567);
 
     flips = 0;
     heads = 0;
