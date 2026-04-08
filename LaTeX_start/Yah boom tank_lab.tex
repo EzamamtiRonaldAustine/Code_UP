@@ -1,0 +1,1989 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage{helvet}
+
+\usepackage[
+  a4paper,
+  top=25mm, bottom=25mm,
+  left=25mm, right=25mm,
+  headheight=15pt
+]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{colortbl}
+
+\usepackage{listings}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable, skins, theorems}
+
+\usepackage{fancyhdr}
+
+\usepackage{titlesec}
+
+\usepackage{enumitem}
+
+\usepackage{hyperref}
+
+\usepackage{mdframed}
+\usepackage{microtype}
+\usepackage{parskip}
+
+\definecolor{PrimaryBlue}{RGB}{31,78,121}
+\definecolor{MidBlue}{RGB}{46,117,182}
+\definecolor{LightBlue}{RGB}{189,215,238}
+\definecolor{VeryLightBlue}{RGB}{235,243,251}
+\definecolor{DarkGray}{RGB}{64,64,64}
+\definecolor{MedGray}{RGB}{120,120,120}
+\definecolor{LightGray}{RGB}{242,242,242}
+\definecolor{SuccessGreen}{RGB}{55,86,35}
+\definecolor{SuccessBG}{RGB}{226,239,218}
+\definecolor{WarnOrange}{RGB}{127,79,0}
+\definecolor{WarnBG}{RGB}{255,242,204}
+\definecolor{DangerRed}{RGB}{123,0,0}
+\definecolor{DangerBG}{RGB}{252,228,214}
+\definecolor{InfoBG}{RGB}{222,235,247}
+\definecolor{CodeBG}{RGB}{30,30,30}
+\definecolor{CodeText}{RGB}{212,212,212}
+\definecolor{CodeKeyword}{RGB}{86,156,214}
+\definecolor{CodeComment}{RGB}{106,153,85}
+\definecolor{CodeString}{RGB}{206,145,120}
+\definecolor{CodeNumber}{RGB}{181,206,168}
+\definecolor{RuleLine}{RGB}{46,117,182}
+
+\lstdefinestyle{arduino}{
+  language=C++,
+  backgroundcolor=\color{CodeBG},
+  basicstyle=\ttfamily\footnotesize\color{CodeText},
+  keywordstyle=\color{CodeKeyword}\bfseries,
+  commentstyle=\color{CodeComment}\itshape,
+  stringstyle=\color{CodeString},
+  numberstyle=\tiny\color{MedGray},
+  numbers=left,
+  numbersep=10pt,
+  stepnumber=1,
+  frame=single,
+  framerule=0pt,
+  rulecolor=\color{CodeBG},
+  tabsize=2,
+  breaklines=true,
+  breakatwhitespace=false,
+  showspaces=false,
+  showstringspaces=false,
+  captionpos=b,
+  xleftmargin=16pt,
+  xrightmargin=4pt,
+  literate=
+    {°}{{\textdegree}}1
+    {Σ}{{$\Sigma$}}1
+    {→}{{$\rightarrow$}}1,
+}
+
+\lstdefinestyle{python}{
+  language=Python,
+  backgroundcolor=\color{CodeBG},
+  basicstyle=\ttfamily\footnotesize\color{CodeText},
+  keywordstyle=\color{CodeKeyword}\bfseries,
+  commentstyle=\color{CodeComment}\itshape,
+  stringstyle=\color{CodeString},
+  numberstyle=\tiny\color{MedGray},
+  numbers=left,
+  numbersep=10pt,
+  stepnumber=1,
+  frame=single,
+  framerule=0pt,
+  rulecolor=\color{CodeBG},
+  tabsize=4,
+  breaklines=true,
+  showspaces=false,
+  showstringspaces=false,
+  captionpos=b,
+  xleftmargin=16pt,
+  xrightmargin=4pt,
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=VeryLightBlue,
+  colframe=MidBlue,
+  coltitle=white,
+  fonttitle=\bfseries\small,
+  title={#1},
+  breakable,
+  boxrule=0.8pt,
+  arc=4pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+}
+
+\newtcolorbox{donebox}[1]{
+  colback=SuccessBG,
+  colframe=SuccessGreen,
+  coltitle=white,
+  fonttitle=\bfseries\small,
+  title={#1},
+  breakable,
+  boxrule=0.8pt,
+  arc=4pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+}
+
+\newtcolorbox{warnbox}[1]{
+  colback=WarnBG,
+  colframe=WarnOrange,
+  coltitle=white,
+  fonttitle=\bfseries\small,
+  title={#1},
+  breakable,
+  boxrule=0.8pt,
+  arc=4pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+}
+
+\newtcolorbox{dangerbox}[1]{
+  colback=DangerBG,
+  colframe=DangerRed,
+  coltitle=white,
+  fonttitle=\bfseries\small,
+  title={#1},
+  breakable,
+  boxrule=0.8pt,
+  arc=4pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+}
+
+\newtcolorbox{mathbox}[1]{
+  colback=VeryLightBlue,
+  colframe=PrimaryBlue,
+  coltitle=white,
+  fonttitle=\bfseries\small,
+  title={#1},
+  breakable,
+  boxrule=1pt,
+  arc=4pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+}
+
+\newtcolorbox{resultbox}{
+  colback=LightBlue!40,
+  colframe=PrimaryBlue,
+  boxrule=1.5pt,
+  arc=4pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+}
+
+\titleformat{\section}
+  {\color{PrimaryBlue}\Large\bfseries}
+  {\thesection}{1em}{}
+  [\color{MidBlue}\titlerule]
+
+\titleformat{\subsection}
+  {\color{MidBlue}\large\bfseries}
+  {\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+  {\color{DarkGray}\normalsize\bfseries}
+  {\thesubsubsection}{1em}{}
+
+\titlespacing*{\section}{0pt}{18pt}{8pt}
+\titlespacing*{\subsection}{0pt}{14pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{MidBlue}\textbf{Yahboom G1 Tank Robot} --- Laboratory Report}
+\fancyhead[R]{\small\color{MedGray}Arduino UNO Version}
+\fancyfoot[L]{}
+\fancyfoot[R]{\small\color{MedGray}Page \thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\color{MidBlue}\hrule width\headwidth height\headrulewidth}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=MidBlue,
+  urlcolor=MidBlue,
+  citecolor=MidBlue,
+  pdftitle={Yahboom G1 Tank Robot -- Laboratory Report},
+  pdfauthor={Lab Student},
+}
+
+\renewcommand{\contentsname}{Table of Contents}
+
+\newcommand{\status}[2]{%
+  \begin{tcolorbox}[
+    colback=#1!15,colframe=#1,boxrule=0.6pt,arc=3pt,
+    left=6pt,right=6pt,top=4pt,bottom=4pt
+  ]
+  \small\textbf{#2}
+  \end{tcolorbox}%
+}
+
+\renewcommand{\skew}[1]{\left[#1\right]}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\SO}{\mathrm{SO}(3)}
+\newcommand{\SE}{\mathrm{SE}(3)}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+
+  % University / institution logo
+  \includegraphics[width=0.8\textwidth]{img/UCU.png}\\[1.5cm]
+
+  % Main project title and course
+  {\color{PrimaryBlue}\Huge\bfseries Yahboom G1 Tank Robot}\\[0.4em]
+  {\color{MidBlue}\Large Laboratory Tasks}\\[0.6em]
+  {\large Advanced Robotics \& Control Systems}\\[2cm]
+
+  % Author block
+  {\large By}\\[0.3cm]
+  {\Large\bfseries EZAMAMTI RONALD AUSTINE}\\[0.4cm]
+  {\large Registration No.: S23B23-018}\\[0.2cm]
+  {\large Access No.: B24252}\\[2cm]
+
+  % Technical summary box
+  \begin{tcolorbox}[
+    colback=VeryLightBlue,colframe=MidBlue,
+    boxrule=1pt,arc=6pt,
+    left=16pt,right=16pt,top=12pt,bottom=12pt,
+    width=0.9\linewidth
+  ]
+  \centering
+  \begin{tabular}{ll}
+    \textbf{Platform:}    & Yahboom G1 Tank Robot \\[4pt]
+    \textbf{Controller:}  & Arduino UNO (Bluetooth) \\[4pt]
+    \textbf{Constraint:}  & \color{DangerRed}\bfseries Raspberry Pi image failed --- UNO only \\[4pt]
+    \textbf{Tasks:}       & DOF, End-effector angles, POE, Per-actuator verification \\
+  \end{tabular}
+  \end{tcolorbox}
+
+  \vfill
+
+  % Hardware constraint note
+  \begin{tcolorbox}[
+    colback=DangerBG,colframe=DangerRed,
+    boxrule=0.8pt,arc=4pt,
+    left=10pt,right=10pt,top=6pt,bottom=6pt,
+    width=0.85\linewidth
+  ]
+  \centering\small
+  \textbf{Hardware Constraint Note:} The Yahboom Raspberry Pi OS image failed to boot
+  during the lab session. The Arduino UNO configuration was used instead. Camera
+  pan and tilt servos (DOF 4 \& 5) are wired only to the Pi GPIO and were not
+  physically tested; their results are therefore \textbf{THEORETICAL}.
+  \end{tcolorbox}
+
+\end{titlepage}
+{
+\hypersetup{linkcolor=black}
+\tableofcontents
+}
+\newpage
+
+\section{Hardware Constraint \& Setup}
+
+\begin{dangerbox}{CONSTRAINT --- Raspberry Pi Image Failure}
+During the laboratory session, the Yahboom OS image provided for the Raspberry Pi
+board failed to boot after multiple attempts. The decision was made to switch to
+the Arduino UNO configuration. The Yahboom Bluetooth app then successfully
+connected, enabling movement and ultrasonic servo control. However, the camera
+pan and tilt servos are wired exclusively to the Raspberry Pi GPIO header and
+are inaccessible from the UNO.
+\end{dangerbox}
+
+\vspace{6pt}
+\begin{table}[h!]
+\centering
+\caption{Component operational status}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{L{3.5cm} L{2.8cm} C{3cm} X}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Component} &
+\color{white}\textbf{Controller} &
+\color{white}\textbf{Status} &
+\color{white}\textbf{Impact} \\
+\midrule
+Left \& Right Track Motors & Arduino UNO & \cellcolor{SuccessBG}\color{SuccessGreen}OPERATIONAL & Full physical testing done \\
+Ultrasonic Servo (J3) & UNO Pin 3 & \cellcolor{SuccessBG}\color{SuccessGreen}OPERATIONAL & Full physical testing done \\
+HC-SR04 Sensor & UNO Pins 12/13 & \cellcolor{SuccessBG}\color{SuccessGreen}OPERATIONAL & Distance readings verified \\
+Camera Pan Servo (J4) & Pi GPIO J2 & \cellcolor{DangerBG}\color{DangerRed}INACCESSIBLE & Theoretical analysis only \\
+Camera Tilt Servo (J5) & Pi GPIO J2 & \cellcolor{DangerBG}\color{DangerRed}INACCESSIBLE & Theoretical analysis only \\
+Pi Camera (CSI) & Raspberry Pi & \cellcolor{DangerBG}\color{DangerRed}INACCESSIBLE & No visual confirmation \\
+RGB LED & UNO Pins 9/10/11 & \cellcolor{SuccessBG}\color{SuccessGreen}OPERATIONAL & Used for visual feedback \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Task 1 --- Degrees of Freedom (DOF) Analysis}
+
+\begin{donebox}{STATUS: COMPLETE }
+DOF analysis is purely analytical. All results physically verified for the 3
+accessible actuators; DOF 4 \& 5 verified mathematically.
+\end{donebox}
+
+\subsection{Fundamental Concepts}
+
+\begin{conceptbox}{What is DOF?}
+\textbf{Degree of Freedom (DOF)} is the number of independent parameters needed
+to completely specify the configuration of a mechanical system. It answers the
+question: \emph{``How many things can move independently?''}
+
+A system with $n$ DOF requires exactly $n$ independent coordinates to describe
+its configuration at any instant.
+\end{conceptbox}
+
+\vspace{6pt}
+
+\begin{table}[h!]
+\centering
+\caption{Key concepts in mechanism analysis}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{L{3cm} X}
+\toprule
+\rowcolor{LightBlue}
+\textbf{Concept} & \textbf{Definition} \\
+\midrule
+\textbf{Link} & Any rigid body that does not deform during motion. Bodies bolted
+  together with no relative motion count as \emph{one} link. \\
+\midrule
+\textbf{Joint} & A connection between two links that constrains their relative
+  motion. Each joint allows a specific number of relative DOF. \\
+\midrule
+\textbf{Ground Link} & The fixed reference body. It is assigned \emph{no joint
+  relative to itself}. Everything else moves relative to it. This is the most
+  commonly violated rule in DOF analysis. \\
+\midrule
+\textbf{Revolute Joint} & Allows exactly one rotation about a fixed axis.
+  $f_i = 1$. All G1 Tank joints are revolute. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\textbf{Choosing $m = 3$ (planar):} The G1 Tank operates on a flat 2D ground
+surface. The chassis does not fly, pitch, or roll. All mechanism motion is
+analysed relative to the chassis (ground link), and the robot's operational
+space is fundamentally planar. Therefore $m = 3$.
+
+\subsection{Link Identification}
+
+The chassis frame and the top plate (which holds the microcontroller) are
+rigidly bolted together with no relative motion between them. By the
+\emph{rigid body merging rule}, they are treated as one single link --- the
+\textbf{ground link} $L_1$.
+
+\begin{table}[h!]
+\centering
+\caption{All six links of the G1 Tank}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{C{1cm} L{3.5cm} X L{2.5cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Link} &
+\color{white}\textbf{Name} &
+\color{white}\textbf{Description} &
+\color{white}\textbf{Type} \\
+\midrule
+$L_1$ & Chassis + Body & Bottom frame + top plate merged --- fixed reference & \cellcolor{WarnBG}\textbf{Ground link} \\
+$L_2$ & Left Track & Left rubber track + sprocket, driven by left 370 DC motor & Moving \\
+$L_3$ & Right Track & Right rubber track + sprocket, driven by right 370 DC motor & Moving \\
+$L_4$ & Ultrasonic Sensor & HC-SR04 on servo bracket; pans left/right & Moving \\
+$L_5$ & Camera Pan Bracket & Acrylic bracket on pan servo horn; rotates horizontally & Moving \\
+$L_6$ & Camera + Tilt & Pi camera on tilt servo horn; rotates vertically on $L_5$ & Moving \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\[
+  \boxed{n = 6}
+\]
+
+\subsection{Joint Identification}
+
+All joints are \textbf{revolute} ($f_i = 1$ each).
+
+\begin{table}[h!]
+\centering
+\caption{All five joints of the G1 Tank}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{C{1cm} C{2cm} C{1.5cm} C{0.8cm} L{3cm} L{4.5cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Joint} &
+\color{white}\textbf{Between} &
+\color{white}\textbf{Type} &
+\color{white}$f_i$ &
+\color{white}\textbf{Actuator} &
+\color{white}\textbf{Physical Description} \\
+\midrule
+$J_1$ & $L_1 \leftrightarrow L_2$ & Revolute & 1 & Left DC Motor & Left track rotates about horizontal axle \\
+$J_2$ & $L_1 \leftrightarrow L_3$ & Revolute & 1 & Right DC Motor & Right track rotates about horizontal axle \\
+$J_3$ & $L_1 \leftrightarrow L_4$ & Revolute & 1 & Ultrasonic Servo & Sensor pans left/right about vertical axis \\
+$J_4$ & $L_1 \leftrightarrow L_5$ & Revolute & 1 & Camera Pan Servo & Pan bracket rotates horizontally \\
+$J_5$ & $L_5 \leftrightarrow L_6$ & Revolute & 1 & Camera Tilt Servo & Camera tilts up/down about horizontal axis \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\[
+  \boxed{j = 5}, \qquad \boxed{\sum f_i = 5 \times 1 = 5}
+\]
+
+\subsection{Grubler Calculation}
+
+\begin{mathbox}{G1 Tank --- DOF Calculation}
+\begin{align*}
+  \mathrm{DOF} &= m(n - 1 - j) + \sum f_i \\[6pt]
+               &= 3(6 - 1 - 5) + 5 \\[6pt]
+               &= 3(0) + 5 \\[6pt]
+               &= \boxed{5}
+\end{align*}
+\end{mathbox}
+
+\newpage
+\section{Task 2 --- Programming End Effectors at Specific Angles}
+
+\begin{warnbox}{STATUS: PARTIAL --- Ultrasonic + tracks physical; camera servos theoretical}
+The ultrasonic servo (DOF 3) and both DC track motors (DOF 1 \& 2) are fully
+accessible from the Arduino UNO and were physically programmed and verified.
+Camera pan and tilt servos require the Raspberry Pi and could not be physically
+commanded.
+\end{warnbox}
+
+\subsection{Background Knowledge --- How Servo Motors Work}
+
+\begin{conceptbox}{What You Need to Know Before Programming a Servo}
+A servo motor is a motor that can be commanded to move to a \textbf{specific
+angular position} and hold it. It does this by using internal feedback (a
+potentiometer or encoder). The controller speaks to the servo using
+\textbf{PWM --- Pulse Width Modulation}:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item A square wave signal is sent at \textbf{50\,Hz} (one pulse every 20\,ms).
+  \item The \textbf{width of the HIGH pulse} tells the servo what angle to go to.
+  \item Standard servos: 500\,$\mu$s pulse $= 0^\circ$, 2500\,$\mu$s pulse $= 180^\circ$.
+  \item The servo \emph{ignores} the LOW part of the wave --- only the HIGH duration matters.
+\end{itemize}
+
+On the Arduino UNO, because the available hardware PWM pins are used for the
+motors, the servo signal is generated in \textbf{software} (bit-banging) by the
+existing code. This is slightly less precise than hardware PWM but sufficient for
+a standard SG90-class servo.
+\end{conceptbox}
+
+\subsubsection{Pulse Width Formula (from existing code)}
+
+The code uses:
+\[
+  \text{PulseWidth} [\mu\text{s}] = (\theta \times 11) + 500
+\]
+
+where $\theta$ is the angle in degrees. This maps:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Angle} $\theta$ & \textbf{Pulse Width} & \textbf{Position} \\
+\midrule
+$0^\circ$   & $500\,\mu$s  & Full right limit \\
+$45^\circ$  & $995\,\mu$s  & Right of centre \\
+$90^\circ$  & $1490\,\mu$s & Centre (faces forward) \\
+$135^\circ$ & $1985\,\mu$s & Left of centre \\
+$180^\circ$ & $2480\,\mu$s & Full left limit \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Why 30 iterations in the loop?} The \texttt{servo\_appointed\_detection}
+function calls \texttt{servo\_pulse} 30 times, generating 30 PWM cycles.
+Each cycle is $\approx 20$\,ms, so the total drive time is $30 \times 20 = 600$\,ms.
+This ensures the servo physically reaches and settles at the target angle before
+the function returns.
+
+\subsection{Original Servo Functions (Existing Code)}
+
+\begin{lstlisting}[style=arduino,caption={Original servo\_pulse and servo\_appointed\_detection}]
+// Generates one PWM pulse of the correct width for the given angle
+void servo_pulse(int ServoPin, int myangle)
+{
+  int PulseWidth;
+  PulseWidth = (myangle * 11) + 500;  // Map angle (0-180) to pulse (500-2480 us)
+
+  digitalWrite(ServoPin, HIGH);       // Start of HIGH pulse
+  delayMicroseconds(PulseWidth);      // Hold HIGH for pulse width duration
+  digitalWrite(ServoPin, LOW);        // End of HIGH pulse
+  delay(20 - PulseWidth / 1000);      // Fill remainder of 20 ms period
+}
+
+// Moves servo to 'pos' degrees and holds it (30 PWM cycles = ~600 ms)
+void servo_appointed_detection(int pos)
+{
+  int i = 0;
+  for (i = 0; i <= 30; i++)
+  {
+    servo_pulse(ServoPin, pos);       // Repeat pulse to drive servo to position
+  }
+}
+\end{lstlisting}
+
+\subsection{Task 2 --- Modified Code: Specific Angle Test}
+
+\begin{lstlisting}[style=arduino,caption={Task 2 modification --- ultrasonic servo at specific angles}]
+// ================================================================
+// TASK 2 -- Specific angle test routine for ultrasonic servo (J3)
+// Define named positions matching the 5 test angles
+// ================================================================
+
+#define INITIAL_ANGLE   90   // Center: sensor faces directly forward
+#define ANGLE_45R       45   // 45 degrees to the right of center
+#define ANGLE_MAX_R      0   // Maximum right extent
+#define ANGLE_45L      135   // 45 degrees to the left of center
+#define ANGLE_MAX_L    180   // Maximum left extent
+#define HOLD_TIME     2000   // Hold each position 2 seconds for measurement
+
+void task2_ultrasonic_angles()
+{
+  // Test sequence: initial -> right -> full right -> left -> full left -> return
+  int positions[] = {INITIAL_ANGLE, ANGLE_45R, ANGLE_MAX_R,
+                     ANGLE_45L, ANGLE_MAX_L, INITIAL_ANGLE};
+  const char* labels[] = {"INITIAL (90)", "45 Right", "MAX Right (0)",
+                           "45 Left", "MAX Left (180)", "FINAL (90)"};
+  int count = 6;
+
+  whistle();   // Audible signal: test starting
+  delay(500);
+
+  for (int i = 0; i < count; i++)
+  {
+    // --- Move servo to target angle ---
+    servo_appointed_detection(positions[i]);
+
+    // --- LED color feedback by position type ---
+    if (positions[i] == 90)                          // Center
+      corlor_led(OFF, ON, OFF);   // Green
+    else if (positions[i] == 0 || positions[i] == 180) // Limit
+      corlor_led(ON, OFF, OFF);   // Red
+    else                                             // Intermediate
+      corlor_led(OFF, OFF, ON);   // Blue
+
+    // --- Serial output for logging & verification ---
+    Serial.print("[Task 2] ");
+    Serial.print(labels[i]);
+    Serial.print(" | Pulse width: ");
+    Serial.print((positions[i] * 11) + 500);
+    Serial.println(" us");
+
+    // --- Hold position for physical measurement ---
+    delay(HOLD_TIME);
+  }
+
+  whistle();   // Audible signal: test complete
+  corlor_led(OFF, OFF, OFF);
+  Serial.println("[Task 2] Ultrasonic servo test COMPLETE.");
+}
+\end{lstlisting}
+
+\subsection{Task 2 --- Track Motor Position Demonstrations}
+
+\begin{conceptbox}{DC Motor vs Servo: Key Difference}
+DC motors (used for the tracks) do \emph{not} have position control.
+They have \textbf{direction} and \textbf{speed} control via an H-bridge
+circuit. Instead of angles, you program them with:
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Direction}: forward or backward (two digital pins per motor)
+  \item \textbf{Speed}: PWM duty cycle, 0--255 via \texttt{analogWrite()}
+\end{itemize}
+The G1 Tank uses \emph{differential drive}: independent control of left and
+right track speeds produces all navigation behaviours.
+\end{conceptbox}
+
+\begin{lstlisting}[style=arduino,caption={Task 2 --- DC motor position/state demonstration}]
+// ================================================================
+// TASK 2 -- Track motor state demonstration
+// Shows all independent motion states (DOF 1 and DOF 2)
+// ================================================================
+
+void task2_track_motors()
+{
+  CarSpeedControl = 150;    // Medium speed (0-255 PWM range)
+  Serial.println("[Task 2] Track motor demonstration starting...");
+
+  // State 1: Both forward -- straight ahead
+  Serial.println("State 1: FORWARD");
+  run();   delay(1200);   brake();   delay(500);
+
+  // State 2: Both backward -- straight back
+  Serial.println("State 2: BACKWARD");
+  back();  delay(1200);   brake();   delay(500);
+
+  // State 3: Left backward, right forward -- spin left in place
+  Serial.println("State 3: SPIN LEFT");
+  spin_left();   delay(900);   brake();   delay(500);
+
+  // State 4: Left forward, right backward -- spin right in place
+  Serial.println("State 4: SPIN RIGHT");
+  spin_right();  delay(900);   brake();   delay(500);
+
+  // State 5: Left stop, right forward -- pivot around left track
+  Serial.println("State 5: PIVOT LEFT");
+  left();   delay(900);   brake();   delay(500);
+
+  // State 6: Left forward, right stop -- pivot around right track
+  Serial.println("State 6: PIVOT RIGHT");
+  right();  delay(900);   brake();   delay(500);
+
+  Serial.println("[Task 2] Track motor test COMPLETE.");
+}
+\end{lstlisting}
+
+\subsection{Task 2 --- Camera Servo Code (Theoretical --- Pi Required)}
+
+\begin{dangerbox}{BLOCKED --- Pi image failure}
+The camera pan and tilt servos are wired to the Raspberry Pi GPIO header.
+The following Python code \emph{would} execute these tests if the Pi were
+operational. It is provided for completeness.
+\end{dangerbox}
+
+\begin{lstlisting}[style=python,caption={Task 2 camera servo code --- Pi version (theoretical)}]
+import pigpio
+import time
+
+pi = pigpio.pi()          # Connect to local Pi GPIO daemon
+
+PAN_PIN  = 2              # BCM GPIO pin for pan servo  (J4)
+TILT_PIN = 3              # BCM GPIO pin for tilt servo (J5)
+
+def angle_to_pw(angle):
+    """Map 0-180 degrees to 500-2500 microsecond pulse width."""
+    return int(500 + (angle / 180.0) * 2000)
+
+def move_servo(pin, angle, label):
+    pw = angle_to_pw(angle)
+    pi.set_servo_pulsewidth(pin, pw)
+    print(f"[Task 2] {label} -> {angle} deg | PW: {pw} us")
+    time.sleep(2.0)          # Hold for physical measurement
+
+def test_pan_servo():
+    print("--- Pan servo (J4) test ---")
+    for angle, label in [(90,"INITIAL"), (45,"45 right"), (0,"MAX right"),
+                         (135,"45 left"), (180,"MAX left"), (90,"FINAL")]:
+        move_servo(PAN_PIN, angle, f"Pan {label}")
+
+def test_tilt_servo():
+    print("--- Tilt servo (J5) test ---")
+    for angle, label in [(90,"INITIAL horizontal"), (50,"Tilt up"),
+                         (40,"MAX up"), (120,"Tilt down"),
+                         (130,"MAX down"), (90,"FINAL horizontal")]:
+        move_servo(TILT_PIN, angle, f"Tilt {label}")
+
+test_pan_servo()
+test_tilt_servo()
+pi.stop()
+\end{lstlisting}
+
+\newpage
+\section{Task 3 --- Position Verification using Product of Exponentials (POE)}
+
+\begin{warnbox}{STATUS: PARTIAL --- J3 (ultrasonic) physical; J4, J5 (camera) theoretical}
+The POE framework is applied to all five joints. Physical measurement against
+POE predictions was possible only for joint $J_3$ (ultrasonic servo, UNO-accessible).
+Camera joints $J_4$ and $J_5$ are verified analytically only.
+\end{warnbox}
+
+\subsection{What is the Product of Exponentials?}
+
+\begin{conceptbox}{The Core Idea: Why POE?}
+When a robot arm has multiple joints, you need to track where the
+\emph{end-effector} (the tool at the tip) ends up after all joints move.
+The classical approach (Denavit-Hartenberg) is error-prone to set up.
+\textbf{Product of Exponentials (POE)} is the modern alternative:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item Every joint rotation is expressed as a $4\times4$ matrix called a
+        \textbf{matrix exponential}.
+  \item You \emph{multiply} these matrices together (hence ``product'') along
+        with the \textbf{home configuration} matrix $M$.
+  \item The result is a $4\times4$ \textbf{transformation matrix} $T$ that
+        tells you exactly where the end-effector is and how it is oriented.
+\end{itemize}
+\end{conceptbox}
+
+\subsubsection{The Transformation Matrix T in SE(3)}
+
+A $4 \times 4$ \textbf{homogeneous transformation matrix} encodes both
+\emph{rotation} and \emph{translation} in one compact form:
+
+\[
+  T = \begin{pmatrix} \mat{R} & \vect{p} \\ \vect{0}^\top & 1 \end{pmatrix}
+  \in \SE
+\]
+
+where $\mat{R} \in \SO$ is a $3\times3$ rotation matrix ($\mat{R}^\top\mat{R}=\mat{I}$,
+$\det\mat{R}=+1$) and $\vect{p}\in\R^3$ is the position vector of the frame
+origin.
+
+\subsubsection{The Screw Axis $\mathcal{S}$}
+
+\begin{conceptbox}{Screw Axis --- The Key Building Block}
+Every revolute joint has a \textbf{screw axis} $\mathcal{S}$ that
+encodes \emph{both} the axis of rotation and the geometry of where that
+axis sits in space:
+\[
+  \mathcal{S} = \begin{pmatrix}\vect{\hat\omega} \\ \vect{v}\end{pmatrix}
+  \in \R^6,
+  \qquad
+  \vect{v} = -\vect{\hat\omega} \times \vect{q}
+\]
+
+\begin{tabular}{cl}
+  $\vect{\hat\omega}$ & Unit vector along the axis of rotation \\
+  $\vect{q}$          & Any point on the axis of rotation (in the space frame) \\
+  $\vect{v}$          & Linear velocity component (computed from $\vect{\hat\omega}$ and $\vect{q}$) \\
+\end{tabular}
+
+For a \emph{pure revolute} joint (no translation), the pitch is zero, so
+$\mathcal{S}$ is determined entirely by $\vect{\hat\omega}$ and any point
+$\vect{q}$ on the axis.
+\end{conceptbox}
+
+\subsubsection{The Matrix Exponential $e^{[\mathcal{S}]\theta}$}
+
+The screw axis $\mathcal{S}$ is converted to a $6\times6$
+\textbf{bracket} form $[\mathcal{S}]$, then exponentiated. For a revolute
+joint (pure rotation), the $4\times4$ matrix exponential is computed via the
+\textbf{Rodrigues rotation formula}:
+
+\begin{mathbox}{Rodrigues Rotation Formula}
+For unit axis $\vect{\hat\omega}$ and angle $\theta$:
+\[
+  \mat{R}(\vect{\hat\omega},\theta)
+  = \mat{I}
+  + \sin\theta\,[\vect{\hat\omega}]
+  + (1 - \cos\theta)\,[\vect{\hat\omega}]^2
+\]
+
+where $[\vect{\hat\omega}]$ is the \textbf{skew-symmetric matrix} of
+$\vect{\hat\omega} = (\omega_1,\omega_2,\omega_3)$:
+\[
+  [\vect{\hat\omega}]
+  = \begin{pmatrix}
+      0        & -\omega_3 &  \omega_2 \\
+      \omega_3 &  0        & -\omega_1 \\
+     -\omega_2 &  \omega_1 &  0
+    \end{pmatrix}
+\]
+
+The full $4\times4$ matrix exponential is:
+\[
+  e^{[\mathcal{S}]\theta}
+  = \begin{pmatrix}
+      \mat{R} & (\mat{I}-\mat{R})\,[\vect{\hat\omega}]\vect{v}
+              + \vect{\hat\omega}\,\vect{\hat\omega}^\top\vect{v}\,\theta \\
+      \vect{0}^\top & 1
+    \end{pmatrix}
+\]
+
+For a joint whose axis passes through the origin, the translation
+simplifies to $\vect{p} = \vect{0}$.
+\end{mathbox}
+
+\subsection{The POE Forward Kinematics Formula}
+
+\begin{mathbox}{Product of Exponentials --- Space Form}
+\[
+  T(\vect{\theta})
+  = e^{[\mathcal{S}_1]\theta_1}
+    \cdot e^{[\mathcal{S}_2]\theta_2}
+    \cdots
+    e^{[\mathcal{S}_n]\theta_n}
+    \cdot M
+\]
+
+\begin{tabular}{cl}
+$M$                    & Home configuration matrix (all $\theta_i = 0$) \\
+$\mathcal{S}_i$        & Screw axis of joint $i$ in the \emph{space frame at home config} \\
+$\theta_i$             & Angle of joint $i$ \\
+$e^{[\mathcal{S}_i]\theta_i}$ & $4\times4$ matrix exponential \\
+\end{tabular}
+
+\textbf{Key insight:} Each exponential is computed using the joint's
+geometry as it was \emph{at the home configuration} --- you do not need
+to track how previous joints moved first. This is what makes POE elegant.
+\end{mathbox}
+
+\subsection{Space Frame Definition}
+
+The \textbf{space frame} $\{S\}$ is fixed at the chassis center (ground link $L_1$):
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+\textbf{Axis} & \textbf{Direction} \\
+\midrule
+$\hat{x}$ & Pointing forward (direction of travel) \\
+$\hat{y}$ & Pointing left (lateral) \\
+$\hat{z}$ & Pointing upward (vertical) \\
+\midrule
+\multicolumn{2}{l}{Origin at geometric center of chassis, at ground level} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{6pt}
+\textbf{Estimated dimensions from manual and physical measurement:}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Dimension} & \textbf{Symbol} & \textbf{Value (m)} \\
+\midrule
+Ultrasonic servo axis forward offset & $q_{3x}$ & $0.08$ \\
+Ultrasonic servo axis height & $q_{3z}$ & $0.08$ \\
+Camera pan axis forward offset & $q_{4x}$ & $0.04$ \\
+Camera pan axis height & $q_{4z}$ & $0.12$ \\
+Camera tilt axis forward offset & $q_{5x}$ & $0.08$ \\
+Camera tilt axis height & $q_{5z}$ & $0.15$ \\
+Sensor tip from pan axis & $d_s$ & $0.045$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Screw Axis Calculations}
+
+\subsubsection{Joint $J_3$ --- Ultrasonic Servo}
+
+\begin{mathbox}{Screw Axis $\mathcal{S}_3$}
+Joint $J_3$ rotates about the vertical ($z$) axis:
+\[
+  \vect{\hat\omega}_3 = \begin{pmatrix}0\\0\\1\end{pmatrix}, \qquad
+  \vect{q}_3 = \begin{pmatrix}0.08\\0\\0.08\end{pmatrix}
+\]
+\[
+  \vect{v}_3
+  = -\vect{\hat\omega}_3 \times \vect{q}_3
+  = -\begin{pmatrix}0\\0\\1\end{pmatrix} \times \begin{pmatrix}0.08\\0\\0.08\end{pmatrix}
+  = -\begin{pmatrix}(0)(0.08)-(1)(0)\\(1)(0.08)-(0)(0.08)\\(0)(0)-(0)(0.08)\end{pmatrix}
+  = -\begin{pmatrix}0\\0.08\\0\end{pmatrix}
+\]
+\[
+  \boxed{\mathcal{S}_3 = (0,\;0,\;1,\;0,\;-0.08,\;0)^\top}
+\]
+\end{mathbox}
+
+\subsubsection{Joint $J_4$ --- Camera Pan Servo}
+
+\begin{mathbox}{Screw Axis $\mathcal{S}_4$}
+Joint $J_4$ also rotates about the vertical ($z$) axis:
+\[
+  \vect{\hat\omega}_4 = \begin{pmatrix}0\\0\\1\end{pmatrix}, \qquad
+  \vect{q}_4 = \begin{pmatrix}0.04\\0\\0.12\end{pmatrix}
+\]
+\[
+  \vect{v}_4
+  = -\begin{pmatrix}0\\0\\1\end{pmatrix} \times \begin{pmatrix}0.04\\0\\0.12\end{pmatrix}
+  = -\begin{pmatrix}0\\0.04\\0\end{pmatrix}
+  = \begin{pmatrix}0\\-0.04\\0\end{pmatrix}
+\]
+\end{mathbox}
+\[
+  \boxed{\mathcal{S}_4 = (0,\;0,\;1,\;0,\;-0.04,\;0)^\top}
+\]
+
+\subsubsection{Joint $J_5$ --- Camera Tilt Servo}
+
+\begin{mathbox}{Screw Axis $\mathcal{S}_5$}
+Joint $J_5$ rotates about the lateral ($y$) axis (tilts in the $xz$-plane):
+\[
+  \vect{\hat\omega}_5 = \begin{pmatrix}0\\1\\0\end{pmatrix}, \qquad
+  \vect{q}_5 = \begin{pmatrix}0.08\\0\\0.15\end{pmatrix}
+\]
+\[
+  \vect{v}_5
+  = -\begin{pmatrix}0\\1\\0\end{pmatrix} \times \begin{pmatrix}0.08\\0\\0.15\end{pmatrix}
+  = -\begin{pmatrix}(1)(0.15)-(0)(0)\\(0)(0.08)-(0)(0.15)\\(0)(0)-(1)(0.08)\end{pmatrix}
+  = -\begin{pmatrix}0.15\\0\\-0.08\end{pmatrix}
+  = \begin{pmatrix}-0.15\\0\\0.08\end{pmatrix}
+\]
+\end{mathbox}
+\[
+  \boxed{\mathcal{S}_5 = (0,\;1,\;0,\;-0.15,\;0,\;0.08)^\top}
+\]
+
+\subsection{Skew-Symmetric Matrices for Each Joint Axis}
+
+\begin{mathbox}{Bracket Forms $[\vect{\hat\omega}]$}
+\textbf{For $J_3$ and $J_4$} (both rotate about $z$, $\vect{\hat\omega} = (0,0,1)$):
+\[
+  [\vect{\hat\omega}_{3,4}]
+  = \begin{pmatrix}0&-1&0\\1&0&0\\0&0&0\end{pmatrix},
+  \qquad
+  [\vect{\hat\omega}_{3,4}]^2
+  = \begin{pmatrix}-1&0&0\\0&-1&0\\0&0&0\end{pmatrix}
+\]
+
+\textbf{For $J_5$} (rotates about $y$, $\vect{\hat\omega} = (0,1,0)$):
+\[
+  [\vect{\hat\omega}_5]
+  = \begin{pmatrix}0&0&1\\0&0&0\\-1&0&0\end{pmatrix},
+  \qquad
+  [\vect{\hat\omega}_5]^2
+  = \begin{pmatrix}-1&0&0\\0&0&0\\0&0&-1\end{pmatrix}
+\]
+\end{mathbox}
+
+\subsection{POE Calculation Examples}
+
+\subsubsection{Ultrasonic Sensor at $\theta_3 = 90^\circ$ (Faces Left)}
+
+\begin{mathbox}{Full calculation: $e^{[\mathcal{S}_3]\,90^\circ}$}
+\textbf{Step 1: Rotation matrix} $\mat{R}_3(90^\circ)$ via Rodrigues:
+\begin{align*}
+  \mat{R}_3
+  &= \mat{I} + \sin(90^\circ)[\vect{\hat\omega}_3] + (1-\cos(90^\circ))[\vect{\hat\omega}_3]^2 \\
+  &= \mat{I} + 1.0\begin{pmatrix}0&-1&0\\1&0&0\\0&0&0\end{pmatrix}
+           + 1.0\begin{pmatrix}-1&0&0\\0&-1&0\\0&0&0\end{pmatrix} \\[6pt]
+  &= \begin{pmatrix}1&0&0\\0&1&0\\0&0&1\end{pmatrix}
+   + \begin{pmatrix}0&-1&0\\1&0&0\\0&0&0\end{pmatrix}
+   + \begin{pmatrix}-1&0&0\\0&-1&0\\0&0&0\end{pmatrix}
+   = \begin{pmatrix}0&-1&0\\1&0&0\\0&0&1\end{pmatrix}
+\end{align*}
+
+\textbf{Step 2: Translation vector} $\vect{p}_3$:
+\[
+  \vect{p}_3
+  = (\mat{I}-\mat{R}_3)[\vect{\hat\omega}_3]\vect{v}_3
+  = \begin{pmatrix}1&1&0\\-1&1&0\\0&0&0\end{pmatrix}
+    \begin{pmatrix}0&-1&0\\1&0&0\\0&0&0\end{pmatrix}
+    \begin{pmatrix}0\\-0.08\\0\end{pmatrix}
+  = \begin{pmatrix}0.08\\-0.08\\0\end{pmatrix}
+\]
+
+\textbf{Step 3: Full transformation matrix:}
+\[
+  e^{[\mathcal{S}_3]\,90^\circ}
+  = \begin{pmatrix}0&-1&0&0.08\\1&0&0&-0.08\\0&0&1&0\\0&0&0&1\end{pmatrix}
+\]
+
+\textbf{Interpretation:} The sensor has rotated $90^\circ$ CCW (now faces left),
+and its mounting point has shifted $+8$\,cm in $x$ and $-8$\,cm in $y$
+from the chassis center.
+\end{mathbox}
+
+\subsubsection{Ultrasonic Sensor at $\theta_3 = 45^\circ$ (Faces $45^\circ$ Right)}
+
+\begin{mathbox}{Calculation: $e^{[\mathcal{S}_3]\,45^\circ}$}
+\[
+  \sin(45^\circ) = \cos(45^\circ) = \frac{\sqrt{2}}{2} \approx 0.7071
+\]
+
+\textbf{Rotation matrix:}
+\[
+  \mat{R}_3(45^\circ)
+  = \mat{I} + 0.7071[\vect{\hat\omega}_3] + (1-0.7071)[\vect{\hat\omega}_3]^2
+  = \begin{pmatrix}0.7071&-0.7071&0\\0.7071&0.7071&0\\0&0&1\end{pmatrix}
+\]
+
+\textbf{Translation:}
+\[
+  p_x = (1-\cos 45^\circ)\times 0.08 = 0.2929 \times 0.08 = 0.0234\text{ m}
+\]
+\[
+  p_y = \sin(45^\circ) \times 0.08 = 0.7071 \times 0.08 = 0.0566\text{ m}
+\]
+
+\textbf{Full matrix:}
+\[
+  e^{[\mathcal{S}_3]\,45^\circ}
+  = \begin{pmatrix}
+      0.707 & -0.707 & 0 & 0.023 \\
+      0.707 &  0.707 & 0 & 0.057 \\
+      0     &  0     & 1 & 0     \\
+      0     &  0     & 0 & 1
+    \end{pmatrix}
+\]
+
+\textbf{Physical check:} Sensor tip moves
+$d\sin(45^\circ) = 0.08 \times 0.707 \approx 5.7$\,cm to the left.
+This was measurable with a ruler during the lab.
+\end{mathbox}
+
+\subsubsection{Camera Tilt at $\theta_5 = 40^\circ$ Upward (Theoretical)}
+
+\begin{mathbox}{Calculation: $e^{[\mathcal{S}_5]\,40^\circ}$}
+\[
+  \sin(40^\circ) = 0.6428, \quad (1-\cos 40^\circ) = 0.2340
+\]
+
+\textbf{Rotation matrix:}
+\[
+  \mat{R}_5(40^\circ)
+  = \mat{I}
+  + 0.6428\begin{pmatrix}0&0&1\\0&0&0\\-1&0&0\end{pmatrix}
+  + 0.2340\begin{pmatrix}-1&0&0\\0&0&0\\0&0&-1\end{pmatrix}
+  = \begin{pmatrix}0.766&0&0.643\\0&1&0\\-0.643&0&0.766\end{pmatrix}
+\]
+
+\textbf{Interpretation:} Camera has tilted upward by $40^\circ$ in the $xz$-plane.
+The forward component of the camera direction decreases while an upward
+component emerges.
+\end{mathbox}
+
+\subsection{Home Configuration Matrices $M$}
+
+\begin{mathbox}{Home configuration for the ultrasonic sensor (all joints = 0)}
+At the home position, the ultrasonic sensor faces forward. Estimated geometry:
+\[
+  M_{\text{ultrasonic}}
+  = \begin{pmatrix}
+      1 & 0 & 0 & 0.125 \\
+      0 & 1 & 0 & 0.000 \\
+      0 & 0 & 1 & 0.080 \\
+      0 & 0 & 0 & 1
+    \end{pmatrix}
+\]
+where $p_x = 0.08 + 0.045 = 0.125$\,m (servo offset + sensor body),
+$p_z = 0.08$\,m (servo height above chassis).
+\end{mathbox}
+
+\subsection{Physical Verification Procedure}
+
+\begin{donebox}{How to Physically Verify POE Results}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Place robot on a flat surface. Mark the chassis center and forward
+        direction on a sheet of paper below.
+  \item Tape a protractor to the chassis plate, aligned with the servo
+        rotation axis.
+  \item Command each angle via \texttt{servo\_appointed\_detection(angle)};
+        trigger from the serial monitor or a test loop.
+  \item Read the physical angle from the protractor. Compare to the
+        commanded angle. Tolerance: $\pm 3^\circ$ for software PWM.
+  \item For translation: measure the sensor tip position with a ruler
+        from the joint axis, and compare to the POE-predicted position.
+  \item Record \texttt{Serial.print()} output as the digital log.
+\end{enumerate}
+\end{donebox}
+
+\begin{table}[h!]
+\centering
+\caption{Commanded vs predicted positions for $J_3$ (ultrasonic servo)}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{C{1.8cm} C{2cm} C{2cm} L{4cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Angle} &
+\color{white}\textbf{PW ($\mu$s)} &
+\color{white}\textbf{$p_y$ shift} &
+\color{white}\textbf{POE Prediction} \\
+\midrule
+$0^\circ$   & 500  & $0$\,m   & Faces $90^\circ$ right \\
+$45^\circ$  & 995  & $+0.057$\,m & $45^\circ$ right, tip $5.7$\,cm left \\
+$90^\circ$  & 1490 & $+0.080$\,m & Faces forward, tip at origin \\
+$135^\circ$ & 1985 & $+0.057$\,m & $45^\circ$ left \\
+$180^\circ$ & 2480 & $0$\,m   & Faces $90^\circ$ left \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+\section{Task 4 --- Per-Actuator Position Programming \& Verification}
+
+
+\subsection{Actuator 1 --- Left DC Motor (DOF 1)}
+
+\begin{donebox}{}
+Left motor is fully accessible from Arduino UNO via pins 7, 8, and PWM pin 6.
+\end{donebox}
+
+\begin{conceptbox}{Understanding H-Bridge Motor Control}
+A DC motor is driven through an \textbf{H-bridge} circuit (L298N on the
+Yahboom expansion board). The H-bridge allows current to flow through the motor
+in either direction by switching four transistors. The UNO controls it with:
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{Direction pin A} (pin 8): HIGH = forward polarity
+  \item \textbf{Direction pin B} (pin 7): HIGH = reverse polarity
+  \item \textbf{PWM pin} (pin 6): \texttt{analogWrite(0--255)} sets speed
+  \item Both direction pins LOW = brake (motor terminals shorted together)
+\end{itemize}
+
+Speed in RPM is proportional to PWM duty cycle. At \texttt{analogWrite(150)},
+the motor receives approximately $150/255 = 59\%$ of battery voltage.
+\end{conceptbox}
+
+\vspace{6pt}
+\begin{table}[h!]
+\centering
+\caption{Left DC motor states}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{2.5cm} C{2.5cm} C{2.5cm} C{2.5cm} L{3cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{State} &
+\color{white}\textbf{Pin 8 (go)} &
+\color{white}\textbf{Pin 7 (back)} &
+\color{white}\textbf{PWM (Pin 6)} &
+\color{white}\textbf{Effect} \\
+\midrule
+Forward & HIGH & LOW & 0--255 & Track drives forward \\
+Backward & LOW & HIGH & 0--255 & Track drives backward \\
+Brake & LOW & LOW & 0 & Motor locked (short) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{lstlisting}[style=arduino,caption={Task 4 --- Left motor position/state test}]
+// Task 4: Left motor -- initial, multiple positions, final
+void task4_left_motor()
+{
+  Serial.println("=== Task 4: Left Motor ===");
+
+  // INITIAL: Stopped
+  Serial.println("[INITIAL] Stopped");
+  digitalWrite(Left_motor_go,   LOW);
+  digitalWrite(Left_motor_back, LOW);
+  analogWrite(Left_motor_pwm, 0);
+  delay(1000);
+
+  // POSITION 1: Slow forward (PWM = 80, ~31% duty cycle)
+  Serial.println("[POS 1] Slow forward - PWM 80");
+  CarSpeedControl = 80;
+  digitalWrite(Left_motor_go,   HIGH);
+  digitalWrite(Left_motor_back, LOW);
+  analogWrite(Left_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // POSITION 2: Medium forward (PWM = 150, ~59% duty cycle)
+  Serial.println("[POS 2] Medium forward - PWM 150");
+  CarSpeedControl = 150;
+  analogWrite(Left_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // POSITION 3: Fast forward (PWM = 220, ~86% duty cycle)
+  Serial.println("[POS 3] Fast forward - PWM 220");
+  CarSpeedControl = 220;
+  analogWrite(Left_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // POSITION 4: Medium backward
+  Serial.println("[POS 4] Medium backward - PWM 150");
+  CarSpeedControl = 150;
+  digitalWrite(Left_motor_go,   LOW);
+  digitalWrite(Left_motor_back, HIGH);
+  analogWrite(Left_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // FINAL: Stopped (return to initial)
+  Serial.println("[FINAL] Stopped");
+  digitalWrite(Left_motor_go,   LOW);
+  digitalWrite(Left_motor_back, LOW);
+  analogWrite(Left_motor_pwm, 0);
+  delay(500);
+  Serial.println("=== Left Motor Test COMPLETE ===");
+}
+\end{lstlisting}
+
+\subsection{Actuator 2 --- Right DC Motor (DOF 2)}
+
+\begin{donebox}{}
+Mirror of left motor. Pins: go=2, back=4, PWM=5.
+\end{donebox}
+
+\begin{lstlisting}[style=arduino,caption={Task 4 --- Right motor position/state test}]
+// Task 4: Right motor -- initial, multiple positions, final
+void task4_right_motor()
+{
+  Serial.println("=== Task 4: Right Motor ===");
+
+  // INITIAL: Stopped
+  Serial.println("[INITIAL] Stopped");
+  digitalWrite(Right_motor_go,   LOW);
+  digitalWrite(Right_motor_back, LOW);
+  analogWrite(Right_motor_pwm, 0);
+  delay(1000);
+
+  // POSITION 1: Slow forward
+  Serial.println("[POS 1] Slow forward - PWM 80");
+  CarSpeedControl = 80;
+  digitalWrite(Right_motor_go,   HIGH);
+  digitalWrite(Right_motor_back, LOW);
+  analogWrite(Right_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // POSITION 2: Medium forward
+  Serial.println("[POS 2] Medium forward - PWM 150");
+  CarSpeedControl = 150;
+  analogWrite(Right_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // POSITION 3: Fast forward
+  Serial.println("[POS 3] Fast forward - PWM 220");
+  CarSpeedControl = 220;
+  analogWrite(Right_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // POSITION 4: Medium backward
+  Serial.println("[POS 4] Medium backward - PWM 150");
+  CarSpeedControl = 150;
+  digitalWrite(Right_motor_go,   LOW);
+  digitalWrite(Right_motor_back, HIGH);
+  analogWrite(Right_motor_pwm, CarSpeedControl);
+  delay(1200);
+
+  // FINAL: Stopped
+  Serial.println("[FINAL] Stopped");
+  digitalWrite(Right_motor_go,   LOW);
+  digitalWrite(Right_motor_back, LOW);
+  analogWrite(Right_motor_pwm, 0);
+  delay(500);
+  Serial.println("=== Right Motor Test COMPLETE ===");
+}
+\end{lstlisting}
+
+\subsection{Actuator 3 --- Ultrasonic Servo, Joint $J_3$ (DOF 3)}
+
+\begin{donebox}{}
+All five test angles plus return-to-home were physically executed and verified
+with a protractor. POE predictions match observed positions within $\pm 3^\circ$.
+\end{donebox}
+
+\begin{table}[h!]
+\centering
+\caption{Ultrasonic servo --- all programmed positions}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{2.5cm} C{1.5cm} C{1.8cm} C{2cm} L{3.5cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Position} &
+\color{white}\textbf{Angle} &
+\color{white}\textbf{PW ($\mu$s)} &
+\color{white}\textbf{LED Color} &
+\color{white}\textbf{Physical State} \\
+\midrule
+Initial (Home) & $90^\circ$ & 1490 & Green & Sensor faces forward \\
+Position 1 & $45^\circ$ & 995 & Blue & $45^\circ$ right of fwd \\
+Position 2 (Min) & $0^\circ$ & 500 & Red & Full right limit \\
+Position 3 & $135^\circ$ & 1985 & Blue & $45^\circ$ left of fwd \\
+Position 4 (Max) & $180^\circ$ & 2480 & Red & Full left limit \\
+Final (Return) & $90^\circ$ & 1490 & Green & Returns to forward \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{lstlisting}[style=arduino,caption={Task 4 --- Ultrasonic servo: initial, 4 positions, final with logging}]
+void task4_ultrasonic_servo()
+{
+  Serial.println("=== Task 4: Ultrasonic Servo (J3) ===");
+  int angles[] = { 90,  45,   0, 135, 180,  90 };
+  int pw[]     = {1490, 995, 500,1985,2480, 1490};
+  const char* names[] = {"INITIAL (90)", "POS1 (45)",
+                          "POS2-MIN (0)", "POS3 (135)",
+                          "POS4-MAX (180)", "FINAL (90)"};
+  int n = 6;
+
+  whistle();
+  delay(400);
+
+  for (int i = 0; i < n; i++)
+  {
+    servo_appointed_detection(angles[i]);
+
+    // LED color: green=center, red=limit, blue=intermediate
+    if      (angles[i] == 90)                corlor_led(OFF, ON,  OFF);
+    else if (angles[i] == 0 || angles[i]==180) corlor_led(ON,  OFF, OFF);
+    else                                      corlor_led(OFF, OFF, ON);
+
+    Serial.print("["); Serial.print(names[i]); Serial.print("] ");
+    Serial.print("Commanded: "); Serial.print(angles[i]); Serial.print(" deg | ");
+    Serial.print("PW: "); Serial.print(pw[i]); Serial.println(" us");
+
+    delay(2500);   // Hold 2.5 s for protractor reading
+  }
+
+  whistle();
+  corlor_led(OFF, OFF, OFF);
+  Serial.println("=== Ultrasonic Servo Test COMPLETE ===");
+}
+\end{lstlisting}
+
+\subsection{Actuator 4 --- Camera Pan Servo, Joint $J_4$ (DOF 4)}
+
+\begin{dangerbox}{STATUS: THEORETICAL ONLY --- Pi GPIO inaccessible from UNO}
+Camera pan servo is wired to the Raspberry Pi GPIO, not the Arduino UNO.
+Physical testing was not possible due to the Pi image failure.
+Full mathematical analysis is provided below.
+\end{dangerbox}
+
+\begin{table}[h!]
+\centering
+\caption{Camera pan servo --- theoretical position table}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{2.5cm} C{1.5cm} C{1.8cm} L{3.5cm} C{2.8cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Position} &
+\color{white}\textbf{Angle} &
+\color{white}\textbf{PW ($\mu$s)} &
+\color{white}\textbf{Physical State} &
+\color{white}\textbf{Status} \\
+\midrule
+Initial (Home) & $90^\circ$ & 1490 & Camera faces forward & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Position 1 & $45^\circ$ & 995 & $45^\circ$ right & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Position 2 (Min) & $0^\circ$ & 500 & Full right limit & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Position 3 & $135^\circ$ & 1985 & $45^\circ$ left & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Position 4 (Max) & $180^\circ$ & 2480 & Full left limit & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Final (Return) & $90^\circ$ & 1490 & Returns forward & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{POE at $\theta_4 = 90^\circ$:}
+Because $J_4$ has the same axis direction as $J_3$ (both rotate about $z$), the
+rotation matrix is identical:
+\[
+  \mat{R}_4(90^\circ) = \begin{pmatrix}0&-1&0\\1&0&0\\0&0&1\end{pmatrix}
+\]
+The translation differs because $\vect{q}_4 = (0.04, 0, 0.12)$:
+\[
+  \vect{p}_4 = (\mat{I}-\mat{R}_4)[\vect{\hat\omega}_4]\vect{v}_4
+  = \begin{pmatrix}0.04\\-0.04\\0\end{pmatrix}
+\]
+\[
+  e^{[\mathcal{S}_4]\,90^\circ}
+  = \begin{pmatrix}0&-1&0&0.04\\1&0&0&-0.04\\0&0&1&0\\0&0&0&1\end{pmatrix}
+\]
+
+\subsection{Actuator 5 --- Camera Tilt Servo, Joint $J_5$ (DOF 5)}
+
+\begin{dangerbox}{STATUS: THEORETICAL ONLY --- Pi GPIO inaccessible from UNO}
+As with the pan servo, physical testing was not possible. Full analytical
+treatment is provided.
+\end{dangerbox}
+
+\begin{conceptbox}{About the Tilt Servo Range}
+Unlike the pan servo (which is mechanically unconstrained in software from
+$0^\circ$ to $180^\circ$), the tilt servo is \emph{mechanically limited} by the
+camera bracket geometry. From the manual drawings and physical inspection:
+\begin{itemize}[leftmargin=1.5em]
+  \item The bracket prevents tilting more than $\approx 40^\circ$ upward
+        from horizontal (software $\approx 50^\circ$).
+  \item It prevents tilting more than $\approx 30^\circ$ downward
+        from horizontal (software $\approx 120^\circ$).
+  \item Commanding beyond these limits will stall the servo and may damage it.
+\end{itemize}
+Always use the serial monitor to increment in small steps when testing a new
+servo range.
+\end{conceptbox}
+
+\begin{table}[h!]
+\centering
+\caption{Camera tilt servo --- theoretical position table}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{2.5cm} C{1.5cm} C{1.8cm} L{3.5cm} C{2.8cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Position} &
+\color{white}\textbf{Angle} &
+\color{white}\textbf{PW ($\mu$s)} &
+\color{white}\textbf{Physical State} &
+\color{white}\textbf{Status} \\
+\midrule
+Initial (Home) & $90^\circ$ & 1490 & Camera horizontal, forward-facing & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Tilt up $40^\circ$ & $50^\circ$ & 1050 & Camera looks $40^\circ$ upward & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Max up (limit) & $\approx40^\circ$ & $\approx940$ & Mechanical upper limit & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Tilt down $30^\circ$ & $120^\circ$ & 1820 & Camera looks $30^\circ$ downward & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Max down (limit) & $\approx130^\circ$ & $\approx1930$ & Mechanical lower limit & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Final (Return) & $90^\circ$ & 1490 & Returns horizontal & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{POE verification at $\theta_5 = 40^\circ$ upward:}
+From Section~3.6:
+\[
+  e^{[\mathcal{S}_5]\,40^\circ}
+  = \begin{pmatrix}0.766&0&0.643&p_x\\0&1&0&0\\-0.643&0&0.766&p_z\\0&0&0&1\end{pmatrix}
+\]
+
+The translation $\vect{p}$ accounts for the offset of $J_5$ from the space frame origin.
+\newpage
+\subsection{Summary Table --- All Actuators}
+
+\begin{table}[h!]
+\centering
+\caption{Complete per-actuator position summary}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\linewidth}{L{3cm} C{1.5cm} C{1.8cm} C{1.8cm} C{1.8cm} C{1.8cm} C{2cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Actuator} &
+\color{white}\textbf{Type} &
+\color{white}\textbf{Initial} &
+\color{white}\textbf{Min} &
+\color{white}\textbf{Max} &
+\color{white}\textbf{Final} &
+\color{white}\textbf{Status} \\
+\midrule
+Left DC Motor & DC Motor & Stop & PWM=0 & PWM=255 & Stop & \cellcolor{SuccessBG}\color{SuccessGreen}Physical \\
+Right DC Motor & DC Motor & Stop & PWM=0 & PWM=255 & Stop & \cellcolor{SuccessBG}\color{SuccessGreen}Physical \\
+Ultrasonic Servo ($J_3$) & Servo & $90^\circ$ & $0^\circ$ & $180^\circ$ & $90^\circ$ & \cellcolor{SuccessBG}\color{SuccessGreen}Physical \\
+Camera Pan ($J_4$) & Servo & $90^\circ$ & $0^\circ$ & $180^\circ$ & $90^\circ$ & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+Camera Tilt ($J_5$) & Servo & $90^\circ$ & ${\approx}40^\circ$ & ${\approx}130^\circ$ & $90^\circ$ & \cellcolor{DangerBG}\color{DangerRed}Theoretical \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Conclusion}
+
+
+\vspace{8pt}
+The Raspberry Pi OS image failure meant that camera pan and tilt servos (DOF 4
+and DOF 5, joints $J_4$ and $J_5$) could not be physically operated or verified.
+All required mathematical analysis --- screw axis derivation, Rodrigues rotation
+matrices, matrix exponentials, and POE forward kinematics --- was completed in
+full for these joints using the robot geometry from the manual. DOF 1, 2, and 3
+(left track, right track, and ultrasonic servo) were fully demonstrated physically
+and verified against POE predictions.
+
+\newpage
+\appendix
+\section{POE Deep Dive --- Chain Composition and Full Robot Analysis}
+
+\begin{conceptbox}{Why This Section Exists}
+The earlier POE sections treated each joint in isolation. In a real robot, the
+joints are \emph{chained} --- the motion of $J_4$ feeds directly into where
+$J_5$ sits. This section explains how the full chain works, works through a
+complete multi-joint product, and shows what each part of the resulting
+transformation matrix physically means.
+\end{conceptbox}
+
+\subsection{Understanding Matrix Multiplication Order in POE}
+
+A critical point that confuses beginners: in the POE \emph{space form}, all
+screw axes $\mathcal{S}_i$ are defined in the \textbf{fixed space frame at the
+home configuration} --- not in the current (moved) frame. This means:
+
+\begin{resultbox}
+\centering
+You compute \emph{every} screw axis \textbf{once}, before any joint moves.
+You never have to update or re-express them as joints rotate.
+This is the main advantage of POE over the Denavit-Hartenberg method.
+\end{resultbox}
+
+\vspace{6pt}
+
+The multiplication order in:
+\[
+  T = e^{[\mathcal{S}_1]\theta_1}
+    \cdot e^{[\mathcal{S}_2]\theta_2}
+    \cdot e^{[\mathcal{S}_3]\theta_3}
+    \cdot e^{[\mathcal{S}_4]\theta_4}
+    \cdot e^{[\mathcal{S}_5]\theta_5}
+    \cdot M
+\]
+means: apply joint 1 first (leftmost), then joint 2, \ldots, then joint 5, then
+apply the home offset $M$. Reading right to left gives the physical sequence
+from end-effector back to base.
+
+\subsection{Kinematic Chain Structure}
+
+\textbf{Important observation:} $J_1$ and $J_2$ are \emph{parallel independent
+branches} from the chassis. $J_4$ and $J_5$ are \emph{serial}: $J_5$ is mounted
+on the output of $J_4$, so both must be in the chain to find the camera position.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{L{3cm} L{11cm}}
+\toprule
+\textbf{Chain} & \textbf{Joints involved} \\
+\midrule
+Left track      & $J_1$ only (branch from chassis) \\
+Right track     & $J_2$ only (branch from chassis) \\
+Ultrasonic sensor & $J_3$ only (branch from chassis) \\
+Camera          & $J_4 \to J_5$ in series (chassis $\to$ pan bracket $\to$ camera) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Full Camera Chain --- Joints $J_4$ and $J_5$ in Series}
+
+For the camera end-effector at $L_6$:
+\[
+  T_{\text{camera}}(\theta_4,\,\theta_5)
+  = e^{[\mathcal{S}_4]\theta_4}
+    \cdot e^{[\mathcal{S}_5]\theta_5}
+    \cdot M_{\text{camera}}
+\]
+
+\begin{mathbox}{Worked Example: Camera at $\theta_4 = 45^\circ$, $\theta_5 = 0^\circ$}
+
+\textbf{Step 1:} Compute $e^{[\mathcal{S}_4]\,45^\circ}$.
+$\mathcal{S}_4$ uses $z$-axis with $\vect{q}_4=(0.04,\,0,\,0.12)$:
+\[
+  \mat{R}_4(45^\circ) =
+  \begin{pmatrix}0.707&-0.707&0\\0.707&0.707&0\\0&0&1\end{pmatrix},
+  \quad
+  \vect{p}_4 =
+  \begin{pmatrix}(1-\cos45^\circ)(0.04)\\\sin45^\circ(0.04)\\0\end{pmatrix}
+  =\begin{pmatrix}0.012\\0.028\\0\end{pmatrix}
+\]
+\[
+  e^{[\mathcal{S}_4]\,45^\circ}
+  = \begin{pmatrix}0.707&-0.707&0&0.012\\0.707&0.707&0&0.028\\0&0&1&0\\0&0&0&1\end{pmatrix}
+\]
+
+\textbf{Step 2:} $\theta_5=0^\circ$ so $e^{[\mathcal{S}_5]\,0^\circ}=\mathbf{I}_{4\times4}$.
+
+\textbf{Step 3:} Home configuration for camera
+($p_x=0.08$\,m, $p_z=0.15$\,m):
+\[
+  M_{\text{camera}}
+  = \begin{pmatrix}1&0&0&0.08\\0&1&0&0\\0&0&1&0.15\\0&0&0&1\end{pmatrix}
+\]
+
+\textbf{Step 4:} Multiply chain left to right:
+\begin{align*}
+  T_{\text{camera}}
+  &= \begin{pmatrix}0.707&-0.707&0&0.012\\0.707&0.707&0&0.028\\0&0&1&0\\0&0&0&1\end{pmatrix}
+     \begin{pmatrix}1&0&0&0.08\\0&1&0&0\\0&0&1&0.15\\0&0&0&1\end{pmatrix} \\[8pt]
+  &= \begin{pmatrix}
+       0.707 & -0.707 & 0 & (0.707)(0.08)+(-0.707)(0)+0.012 \\
+       0.707 &  0.707 & 0 & (0.707)(0.08)+(0.707)(0)+0.028  \\
+       0     &  0     & 1 & 0.15 \\
+       0     &  0     & 0 & 1
+     \end{pmatrix} \\[8pt]
+  &= \begin{pmatrix}
+       0.707 & -0.707 & 0 & 0.069 \\
+       0.707 &  0.707 & 0 & 0.085 \\
+       0     &  0     & 1 & 0.150 \\
+       0     &  0     & 0 & 1
+     \end{pmatrix}
+\end{align*}
+
+\textbf{Physical meaning:} Camera has panned $45^\circ$ right. Optical centre
+is at $(6.9\,\text{cm},\;8.5\,\text{cm},\;15\,\text{cm})$ relative to the
+chassis centre. The rotation block shows the camera forward axis pointing
+$45^\circ$ between the original forward and left directions.
+\end{mathbox}
+
+\subsection{Reading a Transformation Matrix}
+
+\begin{mathbox}{Anatomy of $T$}
+\[
+  T
+  = \begin{pmatrix}
+      R_{11} & R_{12} & R_{13} & p_x \\
+      R_{21} & R_{22} & R_{23} & p_y \\
+      R_{31} & R_{32} & R_{33} & p_z \\
+      0      & 0      & 0      & 1
+    \end{pmatrix}
+\]
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{3.5cm} L{9cm}}
+\toprule
+\textbf{Part} & \textbf{Meaning} \\
+\midrule
+Top-left $3\times3$ ($\mat{R}$) & Each column is a unit vector showing
+  where the body's $x$, $y$, $z$ axes now point in the space frame \\
+Column 1 of $\mat{R}$ & Direction the body's $x$-axis (forward) points \\
+Column 2 of $\mat{R}$ & Direction the body's $y$-axis (left) points \\
+Column 3 of $\mat{R}$ & Direction the body's $z$-axis (up) points \\
+$(p_x,\,p_y,\,p_z)^\top$ & Position of the frame origin in the space frame \\
+Bottom row $(0,0,0,1)$ & Homogeneous row --- always this, never changes \\
+\midrule
+\multicolumn{2}{l}{\textbf{Quick sanity check:} each column of $\mat{R}$ must have magnitude 1,}\\
+\multicolumn{2}{l}{and any two columns must be perpendicular. Failure = arithmetic error.}\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{mathbox}
+
+\subsection{POE Verification Checklist}
+
+\begin{donebox}{Step-by-Step Checklist for Every POE Calculation}
+\begin{enumerate}[leftmargin=1.5em,itemsep=2pt]
+  \item \textbf{Identify} the end-effector and trace the kinematic chain from base to tip.
+  \item \textbf{Define} the space frame origin and axes clearly before any maths.
+  \item \textbf{Find} $\vect{\hat\omega}_i$ (unit axis vector) and $\vect{q}_i$
+        (any point on the axis) for each joint in the chain.
+  \item \textbf{Compute} $\vect{v}_i = -\vect{\hat\omega}_i \times \vect{q}_i$.
+  \item \textbf{Form} the skew matrix $[\vect{\hat\omega}_i]$.
+        Check: antisymmetric, zeros on diagonal.
+  \item \textbf{Apply Rodrigues} to get $\mat{R}_i(\theta_i)$.
+        Check: $\mat{R}^\top\mat{R}=\mat{I}$, $\det(\mat{R})=+1$.
+  \item \textbf{Compute} the translation $\vect{p}_i$.
+  \item \textbf{Assemble} each $4\times4$ exponential matrix.
+  \item \textbf{Multiply} the chain left to right, then append $M$.
+  \item \textbf{Physically verify}: measure position with ruler or protractor.
+        Mismatch $>5\,\%$ typically indicates a geometry input error.
+\end{enumerate}
+\end{donebox}
+
+\newpage
+\section{Quick-Reference Formula Sheet}
+
+\subsection*{A.1 \quad Grubler's Formula}
+\[
+  \mathrm{DOF} = m(n - 1 - j) + \sum_{i=1}^{j} f_i,
+  \qquad
+  m = \begin{cases}3 & \text{planar}\\6 & \text{spatial}\end{cases}
+\]
+
+\subsection*{A.2 \quad Servo PWM Formula (G1 Tank code)}
+\[
+  \text{PulseWidth}\;[\mu\text{s}] = (\theta \times 11) + 500,
+  \quad \theta \in [0^\circ,\,180^\circ]
+  \qquad\Leftrightarrow\qquad
+  \theta = \frac{\text{PW} - 500}{11}
+\]
+
+\subsection*{A.3 \quad Skew-Symmetric Matrix}
+For $\vect{\hat\omega} = (\omega_1,\,\omega_2,\,\omega_3)$:
+\[
+  [\vect{\hat\omega}]
+  = \begin{pmatrix}
+      0        & -\omega_3 &  \omega_2 \\
+      \omega_3 &  0        & -\omega_1 \\
+     -\omega_2 &  \omega_1 &  0
+    \end{pmatrix},
+  \qquad
+  [\vect{\hat\omega}]\vect{b} = \vect{\hat\omega}\times\vect{b}
+\]
+
+\subsection*{A.4 \quad Rodrigues Rotation Formula}
+\[
+  \mat{R}(\vect{\hat\omega},\,\theta)
+  = \mat{I} + \sin\theta\,[\vect{\hat\omega}] + (1-\cos\theta)\,[\vect{\hat\omega}]^2
+\]
+
+\subsection*{A.5 \quad Screw Axis for a Revolute Joint}
+\[
+  \mathcal{S} = \begin{pmatrix}\vect{\hat\omega}\\\vect{v}\end{pmatrix},
+  \qquad
+  \vect{v} = -\vect{\hat\omega} \times \vect{q}
+\]
+where $\vect{q}$ is any point on the joint axis expressed in the space frame.
+
+\subsection*{A.6 \quad Full $4\times4$ Matrix Exponential (Revolute Joint)}
+\[
+  e^{[\mathcal{S}]\theta}
+  = \begin{pmatrix}
+      \mat{R} &
+      \bigl(\mat{I}-\mat{R}\bigr)[\vect{\hat\omega}]\vect{v}
+      + \vect{\hat\omega}\,\vect{\hat\omega}^\top\vect{v}\,\theta \\
+      \vect{0}^\top & 1
+    \end{pmatrix}
+\]
+
+\subsection*{A.7 \quad POE Space Form}
+\[
+  T(\vect{\theta})
+  = \prod_{i=1}^{n} e^{[\mathcal{S}_i]\theta_i} \cdot M
+\]
+
+\subsection*{A.8 \quad Cross-Product Reference}
+For $\vect{a}=(a_1,a_2,a_3)$, $\vect{b}=(b_1,b_2,b_3)$:
+\[
+  \vect{a}\times\vect{b}
+  = \begin{pmatrix}a_2b_3-a_3b_2\\ a_3b_1-a_1b_3\\ a_1b_2-a_2b_1\end{pmatrix}
+\]
+
+\subsection*{A.9 \quad Special Angle Values}
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{ccccc}
+\toprule
+$\theta$ & $\sin\theta$ & $\cos\theta$ & $1-\cos\theta$ & Notes \\
+\midrule
+$0^\circ$   & 0.000 & 1.000 & 0.000 & Identity rotation \\
+$30^\circ$  & 0.500 & 0.866 & 0.134 & \\
+$45^\circ$  & 0.707 & 0.707 & 0.293 & \\
+$60^\circ$  & 0.866 & 0.500 & 0.500 & \\
+$90^\circ$  & 1.000 & 0.000 & 1.000 & 90 deg rotation \\
+$120^\circ$ & 0.866 &$-0.500$& 1.500 & \\
+$135^\circ$ & 0.707 &$-0.707$& 1.707 & \\
+$180^\circ$ & 0.000 &$-1.000$& 2.000 & Half revolution \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{A.10 \quad G1 Tank Screw Axes Summary}
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{cccccccc}
+\toprule
+\textbf{Joint} & $\omega_1$ & $\omega_2$ & $\omega_3$ &
+                 $v_1$ & $v_2$ & $v_3$ & \textbf{Axis direction} \\
+\midrule
+$J_3$ Ultrasonic & 0 & 0 & 1 & 0      & $-0.08$ & 0      & Vertical $z$ \\
+$J_4$ Camera Pan & 0 & 0 & 1 & 0      & $-0.04$ & 0      & Vertical $z$ \\
+$J_5$ Camera Tilt& 0 & 1 & 0 & $-0.15$& 0       & $0.08$ & Lateral $y$  \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+\section{Glossary of Terms}
+
+\begin{longtable}{L{3.5cm} L{10cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Term} & \color{white}\textbf{Definition} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\textbf{DOF} &
+  Degree of Freedom. The number of independent parameters needed to fully
+  describe the configuration of a mechanical system. \\[4pt]
+
+\textbf{Grubler's Formula} &
+  $\mathrm{DOF}=m(n-1-j)+\sum f_i$. Computes mechanism DOF from number of
+  links, joints, and space constant. \\[4pt]
+
+\textbf{Ground Link} &
+  The fixed reference body in a mechanism. Receives no joint relative to itself.
+  In the G1 Tank this is the chassis and top plate merged into one rigid body. \\[4pt]
+
+\textbf{Revolute Joint} &
+  A joint allowing exactly one rotation about a fixed axis. $f_i=1$.
+  All G1 Tank joints are revolute. \\[4pt]
+
+\textbf{Prismatic Joint} &
+  A joint allowing one translation along a fixed axis. $f_i=1$.
+  Not present in the G1 Tank. \\[4pt]
+
+\textbf{End-Effector} &
+  The output link of a kinematic chain. G1 Tank end-effectors: the ultrasonic
+  sensor and the camera module. \\[4pt]
+
+\textbf{POE} &
+  Product of Exponentials. A forward kinematics method expressing end-effector
+  pose as a product of $4\times4$ matrix exponentials. \\[4pt]
+
+\textbf{Space Frame} &
+  The fixed reference frame attached to the ground link (chassis). All screw
+  axes in the space-form POE are expressed in this frame. \\[4pt]
+
+\textbf{Homogeneous Transform} &
+  A $4\times4$ matrix $T\in\mathrm{SE}(3)$ encoding both rotation and
+  translation in one compact structure. \\[4pt]
+
+\textbf{$\mathrm{SO}(3)$} &
+  Special Orthogonal group in 3D: set of all valid rotation matrices satisfying
+  $\mat{R}^\top\mat{R}=\mat{I}$ and $\det(\mat{R})=+1$. \\[4pt]
+
+\textbf{$\mathrm{SE}(3)$} &
+  Special Euclidean group in 3D: set of all valid $4\times4$ rigid-body
+  transformation matrices (rotation combined with translation). \\[4pt]
+
+\textbf{Screw Axis $\mathcal{S}$} &
+  A 6-vector $(\vect{\hat\omega};\vect{v})\in\mathbb{R}^6$ encoding the
+  rotation axis direction and its geometric offset from the space frame
+  origin. \\[4pt]
+
+\textbf{Skew-Symmetric Matrix} &
+  A $3\times3$ matrix $[\vect{a}]$ such that $[\vect{a}]^\top=-[\vect{a}]$.
+  Allows cross products to be written as matrix multiplication:
+  $[\vect{a}]\vect{b}=\vect{a}\times\vect{b}$. \\[4pt]
+
+\textbf{Matrix Exponential} &
+  $e^{[\mathcal{S}]\theta}$: a $4\times4$ transformation encoding the rigid-body
+  motion produced by rotating $\theta$ radians about screw axis $\mathcal{S}$. \\[4pt]
+
+\textbf{Rodrigues Formula} &
+  $\mat{R}=\mat{I}+\sin\theta[\vect{\hat\omega}]+(1-\cos\theta)[\vect{\hat\omega}]^2$.
+  Computes a $3\times3$ rotation matrix directly from axis and angle. \\[4pt]
+
+\textbf{Home Configuration $M$} &
+  The $4\times4$ pose of the end-effector in the space frame when all joint
+  angles are zero. Used as the rightmost factor in the POE chain. \\[4pt]
+
+\textbf{PWM} &
+  Pulse Width Modulation. A digital technique where the duration of a HIGH pulse
+  encodes a value, such as servo angle or motor speed. \\[4pt]
+
+\textbf{Servo Motor} &
+  A motor with built-in position feedback that moves to a commanded angle and
+  holds it there. Controlled via PWM pulse width. \\[4pt]
+
+\textbf{H-Bridge} &
+  An electronic circuit allowing a DC motor to be driven in both forward and
+  reverse by switching which transistors are conducting. \\[4pt]
+
+\textbf{Differential Drive} &
+  A locomotion system in which independent left/right wheel (or track) speeds
+  produce all navigation behaviours: forward, backward, turning, and spinning. \\[4pt]
+
+\textbf{Bit-Banging} &
+  Generating a precisely timed signal (such as servo PWM) by manually
+  toggling a GPIO pin in software, without dedicated hardware timer support. \\[4pt]
+
+\textbf{GPIO} &
+  General Purpose Input/Output. Configurable digital pins on a microcontroller
+  or single-board computer used to communicate with external hardware. \\[4pt]
+
+\textbf{Kinematic Chain} &
+  A sequence of links and joints from the base to an end-effector. The G1 Tank
+  camera chain: chassis $\to J_4 \to L_5 \to J_5 \to L_6$. \\[4pt]
+
+\textbf{Forward Kinematics} &
+  Computing end-effector position and orientation \emph{given} joint angles.
+  POE is a forward kinematics framework. \\[4pt]
+
+\textbf{Inverse Kinematics} &
+  Computing the joint angles \emph{required} to achieve a desired end-effector
+  pose. Not covered in this lab. \\[4pt]
+
+\textbf{Configuration Space} &
+  The space of all possible joint angle combinations. For the G1 Tank servo
+  joints: $(\theta_3,\theta_4,\theta_5)\in[0^\circ,180^\circ]^3$. \\[4pt]
+
+\textbf{Workspace} &
+  The set of all positions the end-effector can physically reach. For the
+  ultrasonic sensor: a $180^\circ$ arc in the horizontal plane above the chassis. \\
+
+\end{longtable}
+
+\newpage
+\section{Arduino Pin Reference and Code}
+
+\subsection*{C.1 \quad Pin Definitions Summary}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{3.8cm} C{1.5cm} L{3.8cm} L{4cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Variable} &
+\color{white}\textbf{Pin} &
+\color{white}\textbf{Function} &
+\color{white}\textbf{Notes} \\
+\midrule
+\texttt{Left\_motor\_go}    & 8  & Left motor forward  & Digital OUTPUT \\
+\texttt{Left\_motor\_back}  & 7  & Left motor reverse  & Digital OUTPUT \\
+\texttt{Left\_motor\_pwm}   & 6  & Left motor speed    & PWM OUTPUT \\
+\texttt{Right\_motor\_go}   & 2  & Right motor forward & Digital OUTPUT \\
+\texttt{Right\_motor\_back} & 4  & Right motor reverse & Digital OUTPUT \\
+\texttt{Right\_motor\_pwm}  & 5  & Right motor speed   & PWM OUTPUT \\
+\texttt{ServoPin}           & 3  & Ultrasonic servo    & Digital (bit-bang PWM) \\
+\texttt{EchoPin}            & 12 & HC-SR04 echo        & Digital INPUT \\
+\texttt{TrigPin}            & 13 & HC-SR04 trigger     & Digital OUTPUT \\
+\texttt{LED\_R}             & 11 & RGB red channel     & PWM OUTPUT \\
+\texttt{LED\_G}             & 10 & RGB green channel   & PWM OUTPUT \\
+\texttt{LED\_B}             & 9  & RGB blue channel    & PWM OUTPUT \\
+\texttt{buzzer}             & A0 & Piezo buzzer        & Digital OUTPUT \\
+\texttt{VoltagePin}         & A0 & Battery voltage     & Analog INPUT \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{C.2 \quad Motor Direction Truth Table}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{L{2.8cm} C{2cm} C{2.2cm} C{2cm} C{2.2cm}}
+\toprule
+\rowcolor{MidBlue}
+\color{white}\textbf{Function} &
+\color{white}\textbf{L go (8)} &
+\color{white}\textbf{L back (7)} &
+\color{white}\textbf{R go (2)} &
+\color{white}\textbf{R back (4)} \\
+\midrule
+\texttt{run()} forward     & HIGH & LOW  & HIGH & LOW  \\
+\texttt{back()} backward   & LOW  & HIGH & LOW  & HIGH \\
+\texttt{brake()} stop      & LOW  & LOW  & LOW  & LOW  \\
+\texttt{left()} pivot L    & LOW  & LOW  & HIGH & LOW  \\
+\texttt{right()} pivot R   & HIGH & LOW  & LOW  & LOW  \\
+\texttt{spin\_left()}      & LOW  & HIGH & HIGH & LOW  \\
+\texttt{spin\_right()}     & HIGH & LOW  & LOW  & HIGH \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{C.3 \quad Complete Angle-to-PWM Reference}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ccc|ccc}
+\toprule
+\textbf{Angle} & \textbf{PW ($\mu$s)} & \textbf{Position} &
+\textbf{Angle} & \textbf{PW ($\mu$s)} & \textbf{Position} \\
+\midrule
+$0^\circ$   & 500  & Full right   & $100^\circ$ & 1600 & Left of centre \\
+$10^\circ$  & 610  &              & $110^\circ$ & 1710 & \\
+$20^\circ$  & 720  &              & $120^\circ$ & 1820 & \\
+$30^\circ$  & 830  &              & $125^\circ$ & 1875 & \\
+$40^\circ$  & 940  &              & $130^\circ$ & 1930 & \\
+$45^\circ$  & 995  & Right of ctr & $135^\circ$ & 1985 & Left of centre \\
+$50^\circ$  & 1050 &              & $140^\circ$ & 2040 & \\
+$60^\circ$  & 1160 &              & $150^\circ$ & 2150 & \\
+$70^\circ$  & 1270 &              & $160^\circ$ & 2260 & \\
+$80^\circ$  & 1380 &              & $170^\circ$ & 2370 & \\
+$90^\circ$  & 1490 & Centre (fwd) & $180^\circ$ & 2480 & Full left \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{C.4 \quad Serial Trigger Integration}
+
+\begin{lstlisting}[style=arduino,caption={Serial trigger block --- add inside serial\_data\_parse()}]
+// Send "$TEST1#" via Yahboom app free-text field to trigger left motor test
+// Send "$TEST2#" for right motor, "$TEST3#" for ultrasonic servo, etc.
+
+if (InputString.indexOf("TEST1") > 0) {
+  task4_left_motor();
+  InputString = ""; NewLineReceived = false; return;
+}
+if (InputString.indexOf("TEST2") > 0) {
+  task4_right_motor();
+  InputString = ""; NewLineReceived = false; return;
+}
+if (InputString.indexOf("TEST3") > 0) {
+  task4_ultrasonic_servo();
+  InputString = ""; NewLineReceived = false; return;
+}
+if (InputString.indexOf("TASK2A") > 0) {
+  task2_ultrasonic_angles();
+  InputString = ""; NewLineReceived = false; return;
+}
+if (InputString.indexOf("TASK2B") > 0) {
+  task2_track_motors();
+  InputString = ""; NewLineReceived = false; return;
+}
+\end{lstlisting}
+
+\newpage
+
+\end{document}
