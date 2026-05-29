@@ -1,3 +1,4 @@
+// This is a simple Express server that listens on port 8080 and responds with "Hello world uso" when the root URL is accessed. It also includes a middleware function to log incoming requests.
 const express = require('express');
 
 const app = express();
