@@ -13,6 +13,7 @@ struct EventQueue {
     int size;
 };
 
+// Creates a new event queue
 EventQueue* EventQueue_create(void) {
     EventQueue* eq = (EventQueue*)malloc(sizeof(EventQueue));
     if (eq) {
@@ -22,6 +23,7 @@ EventQueue* EventQueue_create(void) {
     return eq;
 }
 
+// Inserts an event into the queue in sorted order
 void EventQueue_insert(EventQueue* eq, SimEvent event) {
     if (!eq) return;
     
@@ -46,6 +48,7 @@ void EventQueue_insert(EventQueue* eq, SimEvent event) {
     eq->size++;
 }
 
+// Pops the next event from the queue (the one with the smallest timestamp)
 bool EventQueue_pop(EventQueue* eq, SimEvent* out_event) {
     if (EventQueue_is_empty(eq)) {
         return false;
@@ -61,10 +64,12 @@ bool EventQueue_pop(EventQueue* eq, SimEvent* out_event) {
     return true;
 }
 
+// Checks if the event queue is empty
 bool EventQueue_is_empty(const EventQueue* eq) {
     return (eq == NULL || eq->head == NULL);
 }
 
+// Destroys the event queue and frees all associated memory
 void EventQueue_destroy(EventQueue* eq) {
     if (!eq) return;
     
