@@ -9,7 +9,8 @@ int main() {
     printf("==========================================================================================================\n");
     printf("%-8s | %-35s | %-15s | %-15s | %-15s\n", "Lambda", "Service Model", "Mean Delay(min)", "Std Dev(min)", "Utilization(rho)");
     printf("==========================================================================================================\n");
-    
+ 
+    // Service model names for display purposes
     const char* service_names[] = {
         "1: Deterministic (1.5)",
         "2: Exponential (M/M/1)",
@@ -17,11 +18,13 @@ int main() {
         "4: Correlated Exponential"
     };
 
+    // Loop through all lambda scenarios and service models
     for (int i = 0; i < NUM_LAMBDA_SCENARIOS; ++i) {
         double lambda = LAMBDAS[i];
         char arrival_trace_file[256];
         sprintf(arrival_trace_file, "%s%.2f.txt", ARRIVAL_TRACE_PREFIX, lambda);
-        
+       
+        // Run simulations for all 4 service models for the current lambda
         for (int model = 1; model <= 4; ++model) {
             char service_trace_file[256];
             sprintf(service_trace_file, "%s%d.txt", SERVICE_TRACE_PREFIX, model);
@@ -31,6 +34,7 @@ int main() {
                 // The simulator will automatically print the 10-event manual trace inside execute_simulation
             }
             
+            // Execute the simulation and get the statistics
             Statistics* simulation_stats = execute_simulation(arrival_trace_file, service_trace_file, is_debug_run);
             
             if (simulation_stats && Statistics_get_count(simulation_stats) == NUM_CARS) {
