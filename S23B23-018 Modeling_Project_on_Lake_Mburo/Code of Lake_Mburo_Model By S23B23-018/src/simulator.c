@@ -8,12 +8,14 @@ typedef struct QueueNode {
     struct QueueNode* next;
 } QueueNode;
 
+// A simple linked list implementation for the waiting queue. We only need to track arrival times for delay calculations, so we don't store any additional data in the nodes.
 typedef struct {
     QueueNode* head;
     QueueNode* tail;
     int size;
 } FIFOQueue;
 
+// Helper functions for the FIFO queue
 static void queue_push(FIFOQueue* q, double arr_time) {
     QueueNode* node = (QueueNode*)malloc(sizeof(QueueNode));
     node->arrival_time = arr_time;
@@ -27,6 +29,7 @@ static void queue_push(FIFOQueue* q, double arr_time) {
     q->size++;
 }
 
+// Returns the arrival time of the car at the front of the queue and removes it from the queue. If the queue is empty, returns 0.0 (though in our simulation logic, we should never pop from an empty queue).
 static double queue_pop(FIFOQueue* q) {
     if (!q->head) return 0.0;
     QueueNode* node = q->head;
@@ -42,6 +45,7 @@ static bool queue_is_empty(FIFOQueue* q) {
     return q->size == 0;
 }
 
+// Main simulation function that runs a single scenario given the paths to the arrival and service trace files. It returns a Statistics object containing the results of the simulation.
 Statistics* execute_simulation(const char* arrival_trace_path, const char* service_trace_path, bool debug_mode) {
     TraceReader* arrival_reader = TraceIO_open(arrival_trace_path);
     TraceReader* service_reader = TraceIO_open(service_trace_path);
@@ -53,6 +57,7 @@ Statistics* execute_simulation(const char* arrival_trace_path, const char* servi
         return NULL;
     }
     
+    // Initialize statistics, event queue, and waiting queue
     Statistics* statistics = Statistics_create();
     EventQueue* future_event_list = EventQueue_create();
     FIFOQueue waiting_queue = {NULL, NULL, 0};
@@ -80,6 +85,7 @@ Statistics* execute_simulation(const char* arrival_trace_path, const char* servi
     int cars_processed = 0;
     int events_printed = 0;
     
+    // Process events until we've handled all cars or the event queue is empty (which shouldn't happen if the traces are correct).
     while (EventQueue_pop(future_event_list, &current_event)) {
         simulation_clock = current_event.timestamp;
         
