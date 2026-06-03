@@ -7,6 +7,7 @@ struct TraceReader {
     FILE* file;
 };
 
+//Tracer IO functions for reading trace files. The TraceReader struct encapsulates the FILE pointer, and the functions provide a simple interface for opening, reading, and closing trace files without exposing the internal details to the rest of the codebase.
 TraceReader* TraceIO_open(const char* filepath) {
     FILE* f = fopen(filepath, "r");
     if (!f) {
