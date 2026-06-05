@@ -7,7 +7,7 @@ ser = serial.Serial(
     baudrate=9600,
     timeout=1
 )
-
+# Note: RTS/CTS and DSR/DTR are disabled by default in pySerial, so we don't need to set them explicitly here.
 def send_cmd(cmd, delay=1):
     ser.write((cmd + "\r\n").encode())
     time.sleep(delay)

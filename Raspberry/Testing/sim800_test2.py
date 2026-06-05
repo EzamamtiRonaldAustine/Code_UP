@@ -37,6 +37,7 @@ time.sleep(10)
 
 # Test 1: Basic communication
 print("\n[TEST 1] Basic AT command test")
+# Try sending AT command multiple times in case module is still booting
 for i in range(3):
     reply = send_cmd("AT")
     if "OK" in reply:
@@ -127,6 +128,7 @@ time.sleep(1)
 prompt = wait_for_response(timeout=5)
 print(f"<<< {prompt}")
 
+# If we get the > prompt, we can send the message
 if ">" in prompt:
     print("✓ Prompt received! Sending message...")
     message = "Hello from Raspberry Pi and SIM800C!"

@@ -10,6 +10,7 @@ ser = serial.Serial(
     dsrdtr=False
 )
 
+# send_cmd function to send AT commands and read responses
 def send_cmd(cmd, delay=1, wait_for=None):
     """Send AT command and read response"""
     print(f"\n>>> Sending: {cmd}")
@@ -94,6 +95,7 @@ def send_sms(phone_number, message):
     response = ""
     start_time = time.time()
     
+    # Wait for either +CMGS: or ERROR response
     while (time.time() - start_time) < 30:  # Wait up to 30 seconds
         if ser.in_waiting > 0:
             chunk = ser.read(ser.in_waiting).decode(errors="ignore")
@@ -188,6 +190,7 @@ try:
         print("FAILED to send SMS. Check the error messages above.")
         print("="*60)
 
+# Handle exceptions and ensure serial port is closed on exit
 except KeyboardInterrupt:
     print("\n\nInterrupted by user")
 except Exception as e:
