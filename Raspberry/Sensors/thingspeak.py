@@ -39,7 +39,7 @@ time.sleep(2)
 pwm = GPIO.PWM(BUZZER, 2000)
 pwm_started = False
 
-
+# Returns distance in cm, or NaN on timeout/invalid reading. Uses timeouts to avoid blocking indefinitely.
 def get_distance():
     """Return distance in cm (rounded). Uses timeouts to avoid blocking indefinitely."""
     GPIO.output(TRIG, True)
@@ -65,7 +65,7 @@ def get_distance():
         return float('nan')
     return round(distance_cm, 2)
 
-
+# Save failed entries locally in a CSV file. Each row: timestamp, distance. We can try to resend these later.
 def save_local(timestamp, distance):
     header_needed = not os.path.exists(BACKUP_FILE)
     with open(BACKUP_FILE, "a", newline="") as f:
@@ -74,7 +74,7 @@ def save_local(timestamp, distance):
             writer.writerow(["timestamp", "distance_cm"])
         writer.writerow([timestamp, distance])
 
-
+# Returns True if successful, False on failure (network error or non-200 response)
 def send_to_thingspeak(distance):
     payload = {"api_key": API_KEY, "field1": distance}
     try:
@@ -83,7 +83,7 @@ def send_to_thingspeak(distance):
     except requests.RequestException:
         return False
 
-
+# Try to resend any failed entries from the backup file. If all succeed, delete the file.
 def flush_backup():
     if not os.path.exists(BACKUP_FILE):
         return
@@ -95,14 +95,14 @@ def flush_backup():
             if len(row) < 2:
                 continue
             rows_to_keep.append(row)
-
+# If we had no valid rows, just delete the backup file. Otherwise, try to resend each entry. If it still fails, keep it in the backup file for next time.
     if not rows_to_keep:
         try:
             os.remove(BACKUP_FILE)
         except OSError:
             pass
         return
-
+# Try to resend each entry. If it still fails, keep it in the backup file for next time.
     still_failed = []
     for row in rows_to_keep:
         ts, dist = row[0], row[1]
@@ -111,7 +111,7 @@ def flush_backup():
             still_failed.append(row)
         else:
             time.sleep(1)
-
+# If we had any entries that still failed, rewrite the backup file with just those. Otherwise, delete the backup file.
     if still_failed:
         with open(BACKUP_FILE, "w", newline="") as f:
             writer = csv.writer(f)
@@ -123,7 +123,7 @@ def flush_backup():
         except OSError:
             pass
 
-
+# ---------------- Main loop ----------------
 try:
     while True:
         distance = get_distance()
