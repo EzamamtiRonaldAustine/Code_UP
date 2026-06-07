@@ -54,6 +54,7 @@ def resolve_base_dir():
         print(f"[INFO] Using Desktop fallback: {desktop_path}")
         return desktop_path
 
+    # If we had no valid candidates, just return the current working directory with a warning.
     print(f"[WARNING] Could not find assets folder. Candidates checked: {candidates}")
     return candidates[0] if candidates and candidates[0] else cwd
 
@@ -112,6 +113,7 @@ def clear_scene():
     links = world.node_tree.links
     nodes.clear()
 
+    # Procedural starry background with noise and color ramp for depth, plus a subtle blue tint to enhance the cosmic atmosphere. This will make the stars pop and give a dreamy quality to the space environment.
     output = nodes.new(type='ShaderNodeOutputWorld')
     bg = nodes.new(type='ShaderNodeBackground')
     tex_coord = nodes.new(type='ShaderNodeTexCoord')
@@ -119,6 +121,7 @@ def clear_scene():
     noise = nodes.new(type='ShaderNodeTexNoise')
     ramp = nodes.new(type='ShaderNodeValToRGB')
 
+    # Tweak noise and color ramp for a more dynamic star field with a subtle blue tint to enhance the cosmic atmosphere.
     mapping.inputs['Scale'].default_value = (0.8, 0.8, 0.8)
     noise.inputs['Scale'].default_value = 2.2
     noise.inputs['Detail'].default_value = 12.0
@@ -129,6 +132,7 @@ def clear_scene():
     ramp.color_ramp.elements[1].color = (0.05, 0.12, 0.35, 1.0)
     bg.inputs['Strength'].default_value = 0.7
 
+    # Connect nodes for the procedural starry background
     links.new(tex_coord.outputs['Generated'], mapping.inputs['Vector'])
     links.new(mapping.outputs['Vector'], noise.inputs['Vector'])
     links.new(noise.outputs['Fac'], ramp.inputs['Fac'])
@@ -136,7 +140,7 @@ def clear_scene():
     links.new(bg.outputs['Background'], output.inputs['Surface'])
     print("Scene cleared and prepared.")
 
-
+# The star field and nebula will be created as part of the environment setup, but we can also create a dense star field using particle instancing for added depth and visual interest. This will give us a richer cosmic backdrop that enhances the mood and makes the space feel more alive and immersive.
 def create_starfield():
     """Creates a dense star field using particle instancing."""
     bpy.ops.mesh.primitive_cube_add(size=1200, location=(0, 0, 0))
@@ -145,12 +149,14 @@ def create_starfield():
     star_emitter.display_type = 'BOUNDS'
     star_emitter.hide_render = True
 
+    # Create a small emissive icosphere to use as the star particle instance. This will give us a more visually appealing star shape that catches the light and adds a subtle glow, enhancing the dreamy quality of the cosmic environment.
     bpy.ops.mesh.primitive_ico_sphere_add(radius=0.25, subdivisions=1, location=(0, 0, 0))
     star_obj = bpy.context.active_object
     star_obj.name = "Star_Instance"
     star_obj.hide_viewport = True
     star_obj.hide_render = True
 
+    # Create a simple emissive material for the star instance to make it glow in the render. This will enhance the visual impact of the star field and contribute to the overall cosmic atmosphere.
     star_mat = bpy.data.materials.new(name="Star_Material")
     star_mat.use_nodes = True
     nodes = star_mat.node_tree.nodes
@@ -163,6 +169,7 @@ def create_starfield():
     links.new(emi.outputs['Emission'], out.inputs['Surface'])
     star_obj.data.materials.append(star_mat)
 
+    # Set up the particle system on the star emitter to create a dense star field. This will add depth and visual interest to the cosmic backdrop, making the space feel more alive and immersive.
     bpy.context.view_layer.objects.active = star_emitter
     star_emitter.select_set(True)
     bpy.ops.object.particle_system_add()
@@ -180,7 +187,7 @@ def create_starfield():
     s.particle_size = 1.0
     s.size_random = 0.7
 
-
+# The asteroid belt will be created as a collection of small icospheres with a rocky material, arranged in a ring around the mid-space section of the flight path. This will add a dynamic and visually interesting obstacle for the character to navigate through, enhancing the sense of motion and danger in that segment of the journey.
 def create_asteroid_belt():
     """Creates stylized asteroid belt around the mid-space section."""
     asteroid_mat = bpy.data.materials.new(name="Asteroid_Material")
