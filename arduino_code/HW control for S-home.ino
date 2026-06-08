@@ -1,5 +1,27 @@
 // Arduino Code for ESP8266 Communication via Hardware Serial (RX/TX)
 // WARNING: Cannot use Serial Monitor while ESP8266 is connected!
+//
+// High-level behavior:
+// - ESP8266 sends ASCII commands over Hardware Serial (pins RX/TX 0/1).
+// - Arduino controls: door relay (lock/unlock), RFID access, ultrasonic intruder sensor,
+//   DHT11-based fan automation, IR remote controls, RGB status LED, and a doorbell/buzzer.
+// - Arduino periodically sends telemetry back to ESP8266 using simple text messages.
+//
+// Serial protocol (commands from ESP8266):
+//   LOCK_DOOR, UNLOCK_DOOR, FAN_ON, FAN_OFF, FAN_AUTO,
+//   BUZZER_ON, BUZZER_OFF, RGB_RED, RGB_GREEN, RGB_BLUE, RGB_WHITE, RGB_OFF,
+//   PING, STATUS
+//
+// Serial protocol (messages from Arduino):
+//   ARDUINO_READY (once on boot)
+//   PONG (response to PING)
+//   ACK:<CMD> (response to each command)
+//   STATUS:DOOR:<LOCKED|UNLOCKED>;FAN:<AUTO|ON|OFF>;FANSPEED:<0..255>
+//   DATA:TEMP:<c>;HUM:<rh>;DIST:<cm>;FAN:<speed>
+//   DOOR:LOCKED / DOOR:UNLOCKED
+//   INTRUDER:DETECTED / INTRUDER:CLEAR
+//   DOORBELL:PRESSED
+
 
 #include <SPI.h>
 #include <MFRC522.h>
@@ -57,9 +79,10 @@ unsigned long intruderToneEnd = 0;
 // ---------- Debug LED (Optional) ----------
 #define DEBUG_LED 13  // Built-in LED for status indication
 
-bool intruderPreviouslyDetected = false; // Add this as a global variable
+bool intruderPreviouslyDetected = false; // Tracks last ultrasonic intruder state to avoid spamming tones/logs
 
 void setup() {
+
   Serial.begin(9600);  // This communicates with ESP8266, NOT Serial Monitor!
   SPI.begin();
   rfid.PCD_Init();
